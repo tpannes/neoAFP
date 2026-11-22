@@ -1,0 +1,328 @@
+{
+ "kind": "document",
+ "pageCount": 5,
+ "sheets": [
+  {
+   "number": 1,
+   "front": {
+    "placements": [
+     {
+      "pageNumber": 1,
+      "x": 0,
+      "y": 0,
+      "rotation": 0
+     },
+     {
+      "pageNumber": 2,
+      "x": 8419,
+      "y": 0,
+      "rotation": 0
+     }
+    ]
+   },
+   "back": {
+    "placements": [
+     {
+      "pageNumber": 3,
+      "x": 0,
+      "y": 0,
+      "rotation": 0
+     },
+     {
+      "pageNumber": 4,
+      "x": 8419,
+      "y": 0,
+      "rotation": 0
+     }
+    ]
+   },
+   "mediumMap": "M1DUPLEX",
+   "duplex": "tumble",
+   "inputBin": 2,
+   "outputBin": 1,
+   "mediaType": "PLAIN",
+   "mediumOverlays": [
+    "O1NEOOVL"
+   ],
+   "mediumSize": {
+    "width": 16838,
+    "height": 11906
+   }
+  },
+  {
+   "number": 2,
+   "front": {
+    "placements": [
+     {
+      "pageNumber": 5,
+      "x": 0,
+      "y": 0,
+      "rotation": 0
+     }
+    ]
+   },
+   "back": null,
+   "mediumMap": "M2SIMPLX",
+   "duplex": "simplex",
+   "inputBin": 1,
+   "outputBin": null,
+   "mediaType": null,
+   "mediumOverlays": [],
+   "mediumSize": {
+    "width": 16838,
+    "height": 11906
+   }
+  }
+ ],
+ "printInfo": {
+  "1": {
+   "duplex": "tumble",
+   "inputBin": 2,
+   "outputBin": 1,
+   "mediaType": "PLAIN",
+   "mediumMap": "M1DUPLEX"
+  },
+  "2": {
+   "duplex": "tumble",
+   "inputBin": 2,
+   "outputBin": 1,
+   "mediaType": "PLAIN",
+   "mediumMap": "M1DUPLEX"
+  },
+  "3": {
+   "duplex": "tumble",
+   "inputBin": 2,
+   "outputBin": 1,
+   "mediaType": "PLAIN",
+   "mediumMap": "M1DUPLEX"
+  },
+  "4": {
+   "duplex": "tumble",
+   "inputBin": 2,
+   "outputBin": 1,
+   "mediaType": "PLAIN",
+   "mediumMap": "M1DUPLEX"
+  },
+  "5": {
+   "duplex": "simplex",
+   "inputBin": 1,
+   "outputBin": null,
+   "mediaType": null,
+   "mediumMap": "M2SIMPLX"
+  }
+ },
+ "diagnostics": [],
+ "decodedFields": [
+  {
+   "offset": 0,
+   "id": "D3A8C6",
+   "parameters": [
+    {
+     "name": "RGrpName",
+     "value": "RESGRP"
+    }
+   ]
+  },
+  {
+   "offset": 17,
+   "id": "D3A8CE",
+   "parameters": [
+    {
+     "name": "RSName",
+     "value": "C0NEOAF1"
+    }
+   ],
+   "triplets": [
+    {
+     "id": 33,
+     "decoded": {
+      "objectType": 64
+     }
+    }
+   ]
+  },
+  {
+   "offset": 882,
+   "id": "D3A8C9",
+   "parameters": [
+    {
+     "name": "AEGName",
+     "value": "AEG1"
+    }
+   ]
+  },
+  {
+   "offset": 899,
+   "id": "D3AB8A",
+   "parameters": [
+    {
+     "name": "RG 1 RGLength",
+     "value": 34
+    }
+   ],
+   "triplets": [
+    {
+     "id": 36,
+     "decoded": {
+      "resourceType": 5,
+      "localId": 1
+     }
+    },
+    {
+     "id": 2,
+     "decoded": {
+      "fqnType": 134,
+      "fqnFormat": 0,
+      "nameHex": "C3F0D5C5D6C1C6F1"
+     }
+    },
+    {
+     "id": 2,
+     "decoded": {
+      "fqnType": 133,
+      "fqnFormat": 0,
+      "nameHex": "E3F1D5C5D6C1C6F1"
+     }
+    },
+    {
+     "id": 38,
+     "decoded": {
+      "charRotation": 0
+     }
+    }
+   ]
+  },
+  {
+   "offset": 942,
+   "id": "D3A6AF",
+   "parameters": [
+    {
+     "name": "XpgBase",
+     "value": "X'00'"
+    },
+    {
+     "name": "YpgBase",
+     "value": "X'00'"
+    },
+    {
+     "name": "XpgUnits",
+     "value": 14400
+    },
+    {
+     "name": "YpgUnits",
+     "value": 14400
+    },
+    {
+     "name": "XpgSize",
+     "value": 16838
+    },
+    {
+     "name": "YpgSize",
+     "value": 11906
+    }
+   ]
+  },
+  {
+   "offset": 966,
+   "id": "D3B19B",
+   "parameters": [
+    {
+     "name": "XPBASE",
+     "value": "X'00'"
+    },
+    {
+     "name": "YPBASE",
+     "value": "X'00'"
+    },
+    {
+     "name": "XPUNITVL",
+     "value": 14400
+    },
+    {
+     "name": "YPUNITVL",
+     "value": 14400
+    },
+    {
+     "name": "XPEXTENT",
+     "value": 16838
+    },
+    {
+     "name": "YPEXTENT",
+     "value": 11906
+    },
+    {
+     "name": "TEXTFLAGS",
+     "value": "X'0000'"
+    },
+    {
+     "name": "TXTCONDS (bytes)",
+     "value": 0
+    }
+   ]
+  },
+  {
+   "offset": 1170,
+   "id": "D3A688",
+   "parameters": [
+    {
+     "name": "XmBase",
+     "value": "X'00'"
+    },
+    {
+     "name": "YmBase",
+     "value": "X'00'"
+    },
+    {
+     "name": "XmUnits",
+     "value": 14400
+    },
+    {
+     "name": "YmUnits",
+     "value": 14400
+    },
+    {
+     "name": "XmSize",
+     "value": 16838
+    },
+    {
+     "name": "YmSize",
+     "value": 11906
+    },
+    {
+     "name": "MDDFlgs",
+     "value": "X'00'"
+    }
+   ]
+  },
+  {
+   "offset": 1527,
+   "id": "D3A8A8",
+   "parameters": [
+    {
+     "name": "DocName",
+     "value": "FORMDOC1"
+    }
+   ]
+  },
+  {
+   "offset": 1544,
+   "id": "D3A8AF",
+   "parameters": [
+    {
+     "name": "PageName",
+     "value": "PAGE0001"
+    }
+   ]
+  },
+  {
+   "offset": 2442,
+   "id": "D3ABCC",
+   "parameters": [
+    {
+     "name": "MMPName",
+     "value": "M2SIMPLX"
+    }
+   ]
+  }
+ ]
+}

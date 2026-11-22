@@ -1,0 +1,269 @@
+{
+ "kind": "resourceGroup",
+ "resources": [
+  {
+   "name": "S1NEOSEG",
+   "type": "pageSegment",
+   "widthMm": 50.8,
+   "heightMm": 25.4,
+   "sizeClass": "small",
+   "resolution": 240,
+   "encoding": "IOCA, uncompressed",
+   "colorProfile": null,
+   "hasPreview": true,
+   "fileSize": 607,
+   "source": {
+    "kind": "file"
+   },
+   "duplicates": [
+    "us3-duplicate.psg"
+   ]
+  },
+  {
+   "name": "O1NEOOVL",
+   "type": "overlay",
+   "widthMm": 210,
+   "heightMm": 297,
+   "sizeClass": "a4",
+   "resolution": null,
+   "encoding": null,
+   "colorProfile": null,
+   "hasPreview": true,
+   "fileSize": 92,
+   "source": {
+    "kind": "file"
+   },
+   "duplicates": []
+  },
+  {
+   "name": "C0NEOAF1",
+   "type": "fontCharacterSet",
+   "widthMm": null,
+   "heightMm": null,
+   "sizeClass": "notApplicable",
+   "resolution": 240,
+   "encoding": "Raster",
+   "colorProfile": null,
+   "hasPreview": false,
+   "fileSize": 571,
+   "source": {
+    "kind": "file"
+   }
+  },
+  {
+   "name": "T1NEOAF1",
+   "type": "codePage",
+   "widthMm": null,
+   "heightMm": null,
+   "sizeClass": "notApplicable",
+   "resolution": null,
+   "encoding": null,
+   "colorProfile": null,
+   "hasPreview": false,
+   "fileSize": 156,
+   "source": {
+    "kind": "file"
+   }
+  },
+  {
+   "name": "X0NEOAF1",
+   "type": "codedFont",
+   "widthMm": null,
+   "heightMm": null,
+   "sizeClass": "notApplicable",
+   "resolution": null,
+   "encoding": null,
+   "colorProfile": null,
+   "hasPreview": true,
+   "fileSize": 79,
+   "source": {
+    "kind": "file"
+   }
+  },
+  {
+   "name": "F1NEOFRM",
+   "type": "formDefinition",
+   "widthMm": null,
+   "heightMm": null,
+   "sizeClass": "notApplicable",
+   "resolution": null,
+   "encoding": null,
+   "colorProfile": null,
+   "hasPreview": true,
+   "fileSize": 81,
+   "source": {
+    "kind": "file"
+   }
+  },
+  {
+   "name": "I1NEOIMG",
+   "type": "image",
+   "widthMm": 101.6,
+   "heightMm": 50.8,
+   "sizeClass": "medium",
+   "resolution": 240,
+   "encoding": "IOCA, uncompressed",
+   "colorProfile": null,
+   "hasPreview": true,
+   "fileSize": 573,
+   "source": {
+    "kind": "file"
+   }
+  },
+  {
+   "name": "P1NEOPDF",
+   "type": "objectContainer",
+   "widthMm": 25.4,
+   "heightMm": 12.7,
+   "sizeClass": "small",
+   "resolution": null,
+   "encoding": "PDF",
+   "colorProfile": null,
+   "hasPreview": true,
+   "fileSize": 455,
+   "source": {
+    "kind": "file"
+   }
+  },
+  {
+   "name": "R1NEOICC",
+   "type": "iccProfile",
+   "widthMm": null,
+   "heightMm": null,
+   "sizeClass": "notApplicable",
+   "resolution": null,
+   "encoding": "RGB",
+   "colorProfile": "neoAFP resource RGB",
+   "hasPreview": false,
+   "fileSize": 212,
+   "source": {
+    "kind": "file"
+   }
+  },
+  {
+   "name": "C1NEOCMR",
+   "type": "colorManagementResource",
+   "widthMm": null,
+   "heightMm": null,
+   "sizeClass": "notApplicable",
+   "resolution": null,
+   "encoding": "CMR CC",
+   "colorProfile": "neoAFP CMR CMYK",
+   "hasPreview": false,
+   "fileSize": 440,
+   "source": {
+    "kind": "file"
+   }
+  },
+  {
+   "name": "us3-duplicate",
+   "internalName": "S1NEOSEG",
+   "type": "pageSegment",
+   "widthMm": null,
+   "heightMm": null,
+   "sizeClass": "notApplicable",
+   "resolution": null,
+   "encoding": null,
+   "colorProfile": null,
+   "hasPreview": true,
+   "fileSize": 101,
+   "source": {
+    "kind": "file"
+   },
+   "duplicates": [
+    "us3-resources.afp"
+   ]
+  }
+ ],
+ "extraction": [
+  {
+   "name": "S1NEOSEG",
+   "type": "pageSegment",
+   "length": 607,
+   "sha256": "da0a284a269797d32999ff41cb1ad21b381b5525b3bac8c145f3880954770f5c",
+   "fileName": "S1NEOSEG.PSG",
+   "mimeType": "application/vnd.ibm.modcap"
+  },
+  {
+   "name": "O1NEOOVL",
+   "type": "overlay",
+   "length": 92,
+   "sha256": "cb9f080b349b2fe9a6fd9e57d5bdf0298b467ca5913202bea69c780f15a4e9be",
+   "fileName": "O1NEOOVL.OVL",
+   "mimeType": "application/vnd.ibm.modcap"
+  },
+  {
+   "name": "C0NEOAF1",
+   "type": "fontCharacterSet",
+   "length": 571,
+   "sha256": "c9cf95baebfc71201958e184b8b889c8d9e1fd29cc942e20cdf6fcf8202dfab3",
+   "fileName": "C0NEOAF1.CHS",
+   "mimeType": "application/vnd.ibm.modcap"
+  },
+  {
+   "name": "T1NEOAF1",
+   "type": "codePage",
+   "length": 156,
+   "sha256": "88a0de8011114003cf3177815a9aa45f4fe0ef114ad900ba6839be07588d1753",
+   "fileName": "T1NEOAF1.CDP",
+   "mimeType": "application/vnd.ibm.modcap"
+  },
+  {
+   "name": "X0NEOAF1",
+   "type": "codedFont",
+   "length": 79,
+   "sha256": "cc5fe1ed8f8a80ca170095f516ea6a8d6c2ba79d077eb5be8bdc26ca77d2ae5a",
+   "fileName": "X0NEOAF1.FON",
+   "mimeType": "application/vnd.ibm.modcap"
+  },
+  {
+   "name": "F1NEOFRM",
+   "type": "formDefinition",
+   "length": 81,
+   "sha256": "ae2e61b3fd0275eb57ff7563c333a436351340a3ebb1f69a962dc77f6ec7cb2a",
+   "fileName": "F1NEOFRM.FDF",
+   "mimeType": "application/vnd.ibm.modcap"
+  },
+  {
+   "name": "I1NEOIMG",
+   "type": "image",
+   "length": 573,
+   "sha256": "950e36c3aa96812f1e263a95f93b3e624fe8d400a3a2ee4d4aefc8b716f45d1c",
+   "fileName": "I1NEOIMG.afp",
+   "mimeType": "application/vnd.ibm.modcap"
+  },
+  {
+   "name": "P1NEOPDF",
+   "type": "objectContainer",
+   "length": 455,
+   "sha256": "ac5d94191a8a7f2e01a3eb60a710622b0a2f9b64da46187642ab82d60590ef4e",
+   "fileName": "P1NEOPDF.pdf",
+   "mimeType": "application/pdf"
+  },
+  {
+   "name": "R1NEOICC",
+   "type": "iccProfile",
+   "length": 212,
+   "sha256": "89f84fafd93cc93806294e6e07d6a39e8c802d3c1b1ef78a596a5a5a405edb49",
+   "fileName": "R1NEOICC.icc",
+   "mimeType": "application/vnd.iccprofile"
+  },
+  {
+   "name": "C1NEOCMR",
+   "type": "colorManagementResource",
+   "length": 440,
+   "sha256": "4f4422d9d7deea3a5747121ef52a8da26c3305d336c3805fcbae7ebaeb72a6d4",
+   "fileName": "C1NEOCMR.cmr",
+   "mimeType": "application/octet-stream"
+  },
+  {
+   "name": "us3-duplicate",
+   "type": "pageSegment",
+   "source": "us3-duplicate.psg",
+   "length": 101,
+   "sha256": "f628306f7519157215055c546b9c8b1fe1088722b7dc4c24a19dabd71dc22592",
+   "fileName": "us3-duplicate.psg",
+   "mimeType": "application/vnd.ibm.modcap"
+  }
+ ]
+}

@@ -1,0 +1,337 @@
+{
+ "kind": "document",
+ "pageCount": 1,
+ "renderModel": {
+  "1": {
+   "widthUnits": 11906,
+   "heightUnits": 16838,
+   "items": [
+    {
+     "type": "glyphRun",
+     "text": "ABC CAB",
+     "x": 1440,
+     "y": 1440,
+     "rotation": 0,
+     "color": "#000000",
+     "font": {
+      "kind": "raster",
+      "resolution": 240,
+      "name": "C0NEOAF1"
+     },
+     "dx": [
+      0,
+      144,
+      288,
+      432,
+      576,
+      720,
+      864
+     ]
+    },
+    {
+     "type": "glyphRun",
+     "text": "BAC",
+     "x": 1440,
+     "y": 1800,
+     "rotation": 0,
+     "color": "#000000",
+     "font": {
+      "kind": "raster",
+      "resolution": 240,
+      "name": "C0NEOAF1"
+     },
+     "dx": [
+      0,
+      144,
+      288
+     ]
+    },
+    {
+     "type": "glyphRun",
+     "text": "CCC",
+     "x": 2592,
+     "y": 2160,
+     "rotation": 0,
+     "color": "#ff0000",
+     "font": {
+      "kind": "raster",
+      "resolution": 240,
+      "name": "C0NEOAF1"
+     },
+     "dx": [
+      0,
+      144,
+      288
+     ]
+    },
+    {
+     "type": "glyphRun",
+     "text": "AB",
+     "x": 1440,
+     "y": 2880,
+     "rotation": 0,
+     "color": "#008000",
+     "font": {
+      "kind": "raster",
+      "resolution": 240,
+      "name": "C0NEOAF1"
+     },
+     "dx": [
+      0,
+      144
+     ]
+    },
+    {
+     "type": "glyphRun",
+     "text": "A",
+     "x": 1584,
+     "y": 2880,
+     "rotation": 0,
+     "color": "#008000",
+     "font": {
+      "kind": "raster",
+      "resolution": 240,
+      "name": "C0NEOAF1"
+     },
+     "dx": [
+      0
+     ]
+    },
+    {
+     "type": "glyphRun",
+     "text": "ABC",
+     "x": 4320,
+     "y": 4320,
+     "rotation": 90,
+     "color": "#000000",
+     "font": {
+      "kind": "raster",
+      "resolution": 240,
+      "name": "C0NEOAF1"
+     },
+     "dx": [
+      0,
+      144,
+      288
+     ]
+    },
+    {
+     "type": "glyphRun",
+     "text": "ABC",
+     "x": 7200,
+     "y": 8640,
+     "rotation": 180,
+     "color": "#000000",
+     "font": {
+      "kind": "raster",
+      "resolution": 240,
+      "name": "C0NEOAF1"
+     },
+     "dx": [
+      0,
+      144,
+      288
+     ]
+    },
+    {
+     "type": "glyphRun",
+     "text": "ABC",
+     "x": 7200,
+     "y": 10080,
+     "rotation": 270,
+     "color": "#000000",
+     "font": {
+      "kind": "raster",
+      "resolution": 240,
+      "name": "C0NEOAF1"
+     },
+     "dx": [
+      0,
+      144,
+      288
+     ]
+    }
+   ]
+  }
+ },
+ "diagnostics": [],
+ "decodedFields": [
+  {
+   "offset": 0,
+   "id": "D3A8C6",
+   "parameters": [
+    {
+     "name": "RGrpName",
+     "value": "RESGRP"
+    }
+   ]
+  },
+  {
+   "offset": 17,
+   "id": "D3A8CE",
+   "parameters": [
+    {
+     "name": "RSName",
+     "value": "C0NEOAF1"
+    }
+   ],
+   "triplets": [
+    {
+     "id": 33,
+     "decoded": {
+      "objectType": 64
+     }
+    }
+   ]
+  },
+  {
+   "offset": 853,
+   "id": "D3A8A8",
+   "parameters": [
+    {
+     "name": "DocName",
+     "value": "TEXTDOC1"
+    }
+   ]
+  },
+  {
+   "offset": 870,
+   "id": "D3A8AD",
+   "parameters": [
+    {
+     "name": "PGrpName",
+     "value": "GROUP001"
+    }
+   ]
+  },
+  {
+   "offset": 887,
+   "id": "D3A8AF",
+   "parameters": [
+    {
+     "name": "PageName",
+     "value": "PAGE0001"
+    }
+   ]
+  },
+  {
+   "offset": 904,
+   "id": "D3A8C9",
+   "parameters": [
+    {
+     "name": "AEGName",
+     "value": "AEG1"
+    }
+   ]
+  },
+  {
+   "offset": 921,
+   "id": "D3AB8A",
+   "parameters": [
+    {
+     "name": "RG 1 RGLength",
+     "value": 34
+    }
+   ],
+   "triplets": [
+    {
+     "id": 36,
+     "decoded": {
+      "resourceType": 5,
+      "localId": 1
+     }
+    },
+    {
+     "id": 2,
+     "decoded": {
+      "fqnType": 134,
+      "fqnFormat": 0,
+      "nameHex": "C3F0D5C5D6C1C6F1"
+     }
+    },
+    {
+     "id": 2,
+     "decoded": {
+      "fqnType": 133,
+      "fqnFormat": 0,
+      "nameHex": "E3F1D5C5D6C1C6F1"
+     }
+    },
+    {
+     "id": 38,
+     "decoded": {
+      "charRotation": 0
+     }
+    }
+   ]
+  },
+  {
+   "offset": 964,
+   "id": "D3A6AF",
+   "parameters": [
+    {
+     "name": "XpgBase",
+     "value": "X'00'"
+    },
+    {
+     "name": "YpgBase",
+     "value": "X'00'"
+    },
+    {
+     "name": "XpgUnits",
+     "value": 14400
+    },
+    {
+     "name": "YpgUnits",
+     "value": 14400
+    },
+    {
+     "name": "XpgSize",
+     "value": 11906
+    },
+    {
+     "name": "YpgSize",
+     "value": 16838
+    }
+   ]
+  },
+  {
+   "offset": 988,
+   "id": "D3B19B",
+   "parameters": [
+    {
+     "name": "XPBASE",
+     "value": "X'00'"
+    },
+    {
+     "name": "YPBASE",
+     "value": "X'00'"
+    },
+    {
+     "name": "XPUNITVL",
+     "value": 14400
+    },
+    {
+     "name": "YPUNITVL",
+     "value": 14400
+    },
+    {
+     "name": "XPEXTENT",
+     "value": 11906
+    },
+    {
+     "name": "YPEXTENT",
+     "value": 16838
+    },
+    {
+     "name": "TEXTFLAGS",
+     "value": "X'0000'"
+    },
+    {
+     "name": "TXTCONDS (bytes)",
+     "value": 0
+    }
+   ]
+  }
+ ]
+}

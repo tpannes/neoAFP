@@ -1,0 +1,1326 @@
+{
+ "kind": "document",
+ "pageCount": 1,
+ "fields": [
+  {
+   "offset": 0,
+   "length": 17,
+   "id": "D3A8A5"
+  },
+  {
+   "offset": 17,
+   "length": 62,
+   "id": "D3B288"
+  },
+  {
+   "offset": 79,
+   "length": 17,
+   "id": "D3A8A7"
+  },
+  {
+   "offset": 96,
+   "length": 69,
+   "id": "D3B2A7"
+  },
+  {
+   "offset": 165,
+   "length": 17,
+   "id": "D3A9A7"
+  },
+  {
+   "offset": 182,
+   "length": 17,
+   "id": "D3A8C6"
+  },
+  {
+   "offset": 199,
+   "length": 29,
+   "id": "D3A8CE"
+  },
+  {
+   "offset": 228,
+   "length": 17,
+   "id": "D3A88A"
+  },
+  {
+   "offset": 245,
+   "length": 11,
+   "id": "D3A78A"
+  },
+  {
+   "offset": 256,
+   "length": 34,
+   "id": "D38C8A"
+  },
+  {
+   "offset": 290,
+   "length": 17,
+   "id": "D3A98A"
+  },
+  {
+   "offset": 307,
+   "length": 17,
+   "id": "D3A9CE"
+  },
+  {
+   "offset": 324,
+   "length": 29,
+   "id": "D3A8CE"
+  },
+  {
+   "offset": 353,
+   "length": 17,
+   "id": "D3A8CD"
+  },
+  {
+   "offset": 370,
+   "length": 17,
+   "id": "D3A8C4"
+  },
+  {
+   "offset": 387,
+   "length": 25,
+   "id": "D3A688"
+  },
+  {
+   "offset": 412,
+   "length": 17,
+   "id": "D3A9C4"
+  },
+  {
+   "offset": 429,
+   "length": 21,
+   "id": "D3A8CC"
+  },
+  {
+   "offset": 450,
+   "length": 26,
+   "id": "D3AB88"
+  },
+  {
+   "offset": 476,
+   "length": 26,
+   "id": "D3ABCD"
+  },
+  {
+   "offset": 502,
+   "length": 39,
+   "id": "D3A088"
+  },
+  {
+   "offset": 541,
+   "length": 30,
+   "id": "D3A7AF"
+  },
+  {
+   "offset": 571,
+   "length": 17,
+   "id": "D3A788"
+  },
+  {
+   "offset": 588,
+   "length": 21,
+   "id": "D3A288"
+  },
+  {
+   "offset": 609,
+   "length": 25,
+   "id": "D3B1DF"
+  },
+  {
+   "offset": 634,
+   "length": 34,
+   "id": "D3B1AF"
+  },
+  {
+   "offset": 668,
+   "length": 17,
+   "id": "D3A9CC"
+  },
+  {
+   "offset": 685,
+   "length": 17,
+   "id": "D3A9CD"
+  },
+  {
+   "offset": 702,
+   "length": 17,
+   "id": "D3A9CE"
+  },
+  {
+   "offset": 719,
+   "length": 17,
+   "id": "D3A9C6"
+  },
+  {
+   "offset": 736,
+   "length": 32,
+   "id": "D3A8A8"
+  },
+  {
+   "offset": 768,
+   "length": 25,
+   "id": "D3A8AD"
+  },
+  {
+   "offset": 793,
+   "length": 40,
+   "id": "D3A090"
+  },
+  {
+   "offset": 833,
+   "length": 17,
+   "id": "D3A8AF"
+  },
+  {
+   "offset": 850,
+   "length": 17,
+   "id": "D3A8C9"
+  },
+  {
+   "offset": 867,
+   "length": 25,
+   "id": "D3B15F"
+  },
+  {
+   "offset": 892,
+   "length": 34,
+   "id": "D3ABD8"
+  },
+  {
+   "offset": 926,
+   "length": 42,
+   "id": "D3AB8A"
+  },
+  {
+   "offset": 968,
+   "length": 56,
+   "id": "D3ABC3"
+  },
+  {
+   "offset": 1024,
+   "length": 28,
+   "id": "D3A7A8"
+  },
+  {
+   "offset": 1052,
+   "length": 24,
+   "id": "D3A6AF"
+  },
+  {
+   "offset": 1076,
+   "length": 17,
+   "id": "D3A9C9"
+  },
+  {
+   "offset": 1093,
+   "length": 51,
+   "id": "D3B490"
+  },
+  {
+   "offset": 1144,
+   "length": 70,
+   "id": "D3AFC3"
+  },
+  {
+   "offset": 1214,
+   "length": 17,
+   "id": "D3A892"
+  },
+  {
+   "offset": 1231,
+   "length": 17,
+   "id": "D3A8C7"
+  },
+  {
+   "offset": 1248,
+   "length": 14,
+   "id": "D3AB92"
+  },
+  {
+   "offset": 1262,
+   "length": 17,
+   "id": "D3A9C7"
+  },
+  {
+   "offset": 1279,
+   "length": 13,
+   "id": "D3EE92"
+  },
+  {
+   "offset": 1292,
+   "length": 17,
+   "id": "D3A992"
+  },
+  {
+   "offset": 1309,
+   "length": 26,
+   "id": "D3AFAF"
+  },
+  {
+   "offset": 1335,
+   "length": 17,
+   "id": "D3A9AF"
+  },
+  {
+   "offset": 1352,
+   "length": 17,
+   "id": "D3A9AD"
+  },
+  {
+   "offset": 1369,
+   "length": 17,
+   "id": "D3A9A8"
+  },
+  {
+   "offset": 1386,
+   "length": 17,
+   "id": "D3A9A5"
+  }
+ ],
+ "decodedFields": [
+  {
+   "offset": 0,
+   "id": "D3A8A5",
+   "parameters": [
+    {
+     "name": "PFName",
+     "value": "PRTFILE1"
+    }
+   ]
+  },
+  {
+   "offset": 17,
+   "id": "D3B288",
+   "parameters": [
+    {
+     "name": "PFCFlgs",
+     "value": "X'80'"
+    }
+   ],
+   "triplets": [
+    {
+     "id": 116,
+     "decoded": {
+      "TSvCtrl": "X'01'"
+     }
+    },
+    {
+     "id": 117,
+     "decoded": {
+      "StpCoEx": "X'01'",
+      "RepCoEx": "X'02'",
+      "ColSub": "X'01'"
+     }
+    },
+    {
+     "id": 120,
+     "decoded": {
+      "StpFntEx": "X'02'"
+     }
+    },
+    {
+     "id": 134,
+     "decoded": {
+      "StpTxtEx": "X'01'",
+      "RepTxtEx": "X'02'"
+     }
+    },
+    {
+     "id": 135,
+     "decoded": {
+      "StpMedEx": "X'02'"
+     }
+    },
+    {
+     "id": 136,
+     "decoded": {
+      "StpFinEx": "X'01'",
+      "RepFinEx": "X'01'"
+     }
+    },
+    {
+     "id": 150,
+     "decoded": {
+      "StpCMREx": "X'02'",
+      "RepCMREx": "X'02'"
+     }
+    }
+   ]
+  },
+  {
+   "offset": 79,
+   "id": "D3A8A7",
+   "parameters": [
+    {
+     "name": "IndxName",
+     "value": "INDEX001"
+    }
+   ]
+  },
+  {
+   "offset": 96,
+   "id": "D3B2A7",
+   "parameters": [],
+   "triplets": [
+    {
+     "id": 2,
+     "decoded": {
+      "fqnType": 202,
+      "fqnFormat": 0,
+      "nameHex": "C9C5D3F0F0F0F0F1"
+     }
+    },
+    {
+     "id": 2,
+     "decoded": {
+      "fqnType": 135,
+      "fqnFormat": 0,
+      "nameHex": "D7C1C7C5F0F0F0F1"
+     }
+    },
+    {
+     "id": 45,
+     "decoded": {
+      "DirByOff": 400
+     }
+    },
+    {
+     "id": 87,
+     "decoded": {
+      "ByteExt": 1200
+     }
+    },
+    {
+     "id": 88,
+     "decoded": {
+      "SFOff": 12
+     }
+    },
+    {
+     "id": 89,
+     "decoded": {
+      "SFExt": 30
+     }
+    },
+    {
+     "id": 86,
+     "decoded": {
+      "PageNum": 1
+     }
+    },
+    {
+     "id": 129,
+     "decoded": {
+      "PGPRG": 1
+     }
+    },
+    {
+     "id": 131,
+     "decoded": {
+      "PRSFlg": "X'80'"
+     }
+    }
+   ]
+  },
+  {
+   "offset": 165,
+   "id": "D3A9A7",
+   "parameters": [
+    {
+     "name": "IndxName",
+     "value": "INDEX001"
+    }
+   ]
+  },
+  {
+   "offset": 228,
+   "id": "D3A88A",
+   "parameters": [
+    {
+     "name": "CFName",
+     "value": "X0NEOAF1"
+    }
+   ]
+  },
+  {
+   "offset": 245,
+   "id": "D3A78A",
+   "parameters": [
+    {
+     "name": "CFIRGLen",
+     "value": 25
+    }
+   ]
+  },
+  {
+   "offset": 256,
+   "id": "D38C8A",
+   "parameters": [
+    {
+     "name": "RG 1 FCSName",
+     "value": "C0NEOAF1"
+    },
+    {
+     "name": "RG 1 CPName",
+     "value": "T1NEOAF1"
+    },
+    {
+     "name": "RG 1 SVSize",
+     "value": 240
+    },
+    {
+     "name": "RG 1 SHScale",
+     "value": 0
+    },
+    {
+     "name": "RG 1 Section",
+     "value": 0
+    }
+   ]
+  },
+  {
+   "offset": 290,
+   "id": "D3A98A",
+   "parameters": [
+    {
+     "name": "CFName",
+     "value": "X0NEOAF1"
+    }
+   ]
+  },
+  {
+   "offset": 353,
+   "id": "D3A8CD",
+   "parameters": [
+    {
+     "name": "FMName",
+     "value": "F1NEOFRM"
+    }
+   ]
+  },
+  {
+   "offset": 370,
+   "id": "D3A8C4",
+   "parameters": [
+    {
+     "name": "DEGName",
+     "value": "DEG00001"
+    }
+   ]
+  },
+  {
+   "offset": 387,
+   "id": "D3A688",
+   "parameters": [
+    {
+     "name": "XmBase",
+     "value": "X'00'"
+    },
+    {
+     "name": "YmBase",
+     "value": "X'00'"
+    },
+    {
+     "name": "XmUnits",
+     "value": 14400
+    },
+    {
+     "name": "YmUnits",
+     "value": 14400
+    },
+    {
+     "name": "XmSize",
+     "value": 11906
+    },
+    {
+     "name": "YmSize",
+     "value": 16838
+    },
+    {
+     "name": "MDDFlgs",
+     "value": "X'00'"
+    }
+   ],
+   "triplets": [
+    {
+     "id": 104,
+     "decoded": {
+      "MedOrient": "X'01'"
+     }
+    }
+   ]
+  },
+  {
+   "offset": 412,
+   "id": "D3A9C4",
+   "parameters": [
+    {
+     "name": "DEGName",
+     "value": "DEG00001"
+    }
+   ]
+  },
+  {
+   "offset": 429,
+   "id": "D3A8CC",
+   "parameters": [
+    {
+     "name": "MMName",
+     "value": "M1NEOMAP"
+    }
+   ],
+   "triplets": [
+    {
+     "id": 69,
+     "decoded": {
+      "EjCtrl": "X'01'"
+     }
+    }
+   ]
+  },
+  {
+   "offset": 450,
+   "id": "D3AB88",
+   "parameters": [
+    {
+     "name": "RG 1 RGLength",
+     "value": 17
+    }
+   ]
+  },
+  {
+   "offset": 476,
+   "id": "D3ABCD",
+   "parameters": [
+    {
+     "name": "RG 1 RGLength",
+     "value": 17
+    }
+   ],
+   "triplets": [
+    {
+     "id": 2,
+     "decoded": {
+      "fqnType": 18,
+      "fqnFormat": 0,
+      "nameHex": "C2C9D5F2"
+     }
+    },
+    {
+     "id": 34,
+     "decoded": {
+      "ResType": "X'42'",
+      "ResLID": "X'00000002'"
+     }
+    }
+   ]
+  },
+  {
+   "offset": 502,
+   "id": "D3A088",
+   "parameters": [
+    {
+     "name": "MFCFlgs",
+     "value": "X'80'"
+    },
+    {
+     "name": "MedColl",
+     "value": "X'01'"
+    },
+    {
+     "name": "MFCScpe",
+     "value": "X'04'"
+    }
+   ],
+   "triplets": [
+    {
+     "id": 133,
+     "decoded": {
+      "FOpType": "X'04'",
+      "FOpOpt": "X'00'",
+      "RefEdge": "X'00'",
+      "FOpCnt": 2,
+      "AxOffst": 100,
+      "OpPos": [
+       1000,
+       5000
+      ]
+     }
+    },
+    {
+     "id": 142,
+     "decoded": {
+      "Seqnum": 1,
+      "UP3iDat": "X'123456789ABCDEF011'"
+     }
+    }
+   ]
+  },
+  {
+   "offset": 541,
+   "id": "D3A7AF",
+   "parameters": [
+    {
+     "name": "PMCid",
+     "value": "X'05'"
+    }
+   ],
+   "triplets": [
+    {
+     "id": 108,
+     "decoded": {
+      "ObjType": "X'DF'",
+      "ObjName": "O1NEOOVL",
+      "XobjOset": 1440,
+      "YobjOset": -720,
+      "ObOrent": "X'0000'"
+     }
+    }
+   ]
+  },
+  {
+   "offset": 571,
+   "id": "D3A788",
+   "parameters": [
+    {
+     "name": "MMCid",
+     "value": "X'01'"
+    },
+    {
+     "name": "Constant",
+     "value": "X'FF'"
+    },
+    {
+     "name": "Keyword X'E0'",
+     "value": "X'01'"
+    },
+    {
+     "name": "Keyword X'E1'",
+     "value": "X'02'"
+    },
+    {
+     "name": "Keyword X'F2'",
+     "value": "X'01'"
+    }
+   ]
+  },
+  {
+   "offset": 588,
+   "id": "D3A288",
+   "parameters": [
+    {
+     "name": "RG 1 Startnum",
+     "value": 1
+    },
+    {
+     "name": "RG 1 Stopnum",
+     "value": 2
+    },
+    {
+     "name": "RG 1 MMCid",
+     "value": "X'01'"
+    },
+    {
+     "name": "RG 2 Startnum",
+     "value": 3
+    },
+    {
+     "name": "RG 2 Stopnum",
+     "value": 3
+    },
+    {
+     "name": "RG 2 MMCid",
+     "value": "X'01'"
+    }
+   ]
+  },
+  {
+   "offset": 609,
+   "id": "D3B1DF",
+   "parameters": [
+    {
+     "name": "RGLength",
+     "value": 12
+    },
+    {
+     "name": "RG 1 OVLid",
+     "value": 1
+    },
+    {
+     "name": "RG 1 Flags",
+     "value": "X'00'"
+    },
+    {
+     "name": "RG 1 OVLname",
+     "value": "O1NEOOVL"
+    }
+   ]
+  },
+  {
+   "offset": 634,
+   "id": "D3B1AF",
+   "parameters": [
+    {
+     "name": "Constant",
+     "value": "X'01'"
+    },
+    {
+     "name": "RG 1 RGLength",
+     "value": 12
+    },
+    {
+     "name": "RG 1 XmOset",
+     "value": 0
+    },
+    {
+     "name": "RG 1 YmOset",
+     "value": 0
+    },
+    {
+     "name": "RG 1 PGorient",
+     "value": "X'0000'"
+    },
+    {
+     "name": "RG 1 SHside",
+     "value": "X'00'"
+    },
+    {
+     "name": "RG 1 PgFlgs",
+     "value": "X'00'"
+    },
+    {
+     "name": "RG 1 PMCid",
+     "value": 255
+    },
+    {
+     "name": "RG 2 RGLength",
+     "value": 12
+    },
+    {
+     "name": "RG 2 XmOset",
+     "value": 1440
+    },
+    {
+     "name": "RG 2 YmOset",
+     "value": 720
+    },
+    {
+     "name": "RG 2 PGorient",
+     "value": "X'2D00'"
+    },
+    {
+     "name": "RG 2 SHside",
+     "value": "X'01'"
+    },
+    {
+     "name": "RG 2 PgFlgs",
+     "value": "X'00'"
+    },
+    {
+     "name": "RG 2 PMCid",
+     "value": 255
+    }
+   ]
+  },
+  {
+   "offset": 668,
+   "id": "D3A9CC",
+   "parameters": [
+    {
+     "name": "MMName",
+     "value": "M1NEOMAP"
+    }
+   ]
+  },
+  {
+   "offset": 685,
+   "id": "D3A9CD",
+   "parameters": [
+    {
+     "name": "FMName",
+     "value": "F1NEOFRM"
+    }
+   ]
+  },
+  {
+   "offset": 702,
+   "id": "D3A9CE",
+   "parameters": [
+    {
+     "name": "RSName",
+     "value": "F1NEOFRM"
+    }
+   ]
+  },
+  {
+   "offset": 719,
+   "id": "D3A9C6",
+   "parameters": [
+    {
+     "name": "RGrpName",
+     "value": "RESGRP"
+    }
+   ]
+  },
+  {
+   "offset": 736,
+   "id": "D3A8A8",
+   "parameters": [
+    {
+     "name": "DocName",
+     "value": "FIELDDOC"
+    }
+   ],
+   "triplets": [
+    {
+     "id": 114,
+     "decoded": {
+      "YearAD": 2026,
+      "Month": 11,
+      "Day": 7,
+      "Hour": 10,
+      "Minute": 30,
+      "Second": 15,
+      "TimeZone": "X'01'",
+      "UTCDiffH": 1,
+      "UTCDiffM": 0
+     }
+    }
+   ]
+  },
+  {
+   "offset": 768,
+   "id": "D3A8AD",
+   "parameters": [
+    {
+     "name": "PGrpName",
+     "value": "GROUP001"
+    }
+   ],
+   "triplets": [
+    {
+     "id": 94,
+     "decoded": {
+      "SubObj": "X'AF'",
+      "SObjNum": 1
+     }
+    }
+   ]
+  },
+  {
+   "offset": 793,
+   "id": "D3A090",
+   "parameters": [],
+   "triplets": [
+    {
+     "id": 2,
+     "decoded": {
+      "fqnType": 11,
+      "fqnFormat": 0,
+      "nameHex": "E3C1C74040404040"
+     }
+    },
+    {
+     "id": 54,
+     "decoded": {
+      "AttVal": "VALUE"
+     }
+    },
+    {
+     "id": 128,
+     "decoded": {
+      "SeqNum": 1,
+      "LevNum": 0
+     }
+    }
+   ]
+  },
+  {
+   "offset": 867,
+   "id": "D3B15F",
+   "parameters": [
+    {
+     "name": "RGLength",
+     "value": 12
+    },
+    {
+     "name": "RG 1 PsegName",
+     "value": "S1NEOSEG"
+    }
+   ]
+  },
+  {
+   "offset": 892,
+   "id": "D3ABD8",
+   "parameters": [
+    {
+     "name": "RG 1 RGLength",
+     "value": 25
+    }
+   ],
+   "triplets": [
+    {
+     "id": 2,
+     "decoded": {
+      "fqnType": 132,
+      "fqnFormat": 0,
+      "nameHex": "D6F1D5C5D6D6E5D3"
+     }
+    },
+    {
+     "id": 36,
+     "decoded": {
+      "resourceType": 2,
+      "localId": 1
+     }
+    },
+    {
+     "id": 70,
+     "decoded": {
+      "PgOvType": "X'01'",
+      "Level": "X'05'"
+     }
+    },
+    {
+     "id": 71,
+     "decoded": {
+      "Frequency": "X'FF'"
+     }
+    }
+   ]
+  },
+  {
+   "offset": 926,
+   "id": "D3AB8A",
+   "parameters": [
+    {
+     "name": "RG 1 RGLength",
+     "value": 33
+    }
+   ],
+   "triplets": [
+    {
+     "id": 2,
+     "decoded": {
+      "fqnType": 142,
+      "fqnFormat": 0,
+      "nameHex": "C3F0D5C5D6C1C6F1"
+     }
+    },
+    {
+     "id": 36,
+     "decoded": {
+      "resourceType": 5,
+      "localId": 2
+     }
+    },
+    {
+     "id": 37,
+     "decoded": {
+      "ResSNum": "X'00'"
+     }
+    },
+    {
+     "id": 32,
+     "decoded": {
+      "GCSGID": "X'02B9'",
+      "CPGID": "X'01F4'"
+     }
+    },
+    {
+     "id": 132,
+     "decoded": {
+      "MetTech": "X'01'",
+      "RPuBase": "X'00'",
+      "RPUnits": 2400
+     }
+    }
+   ]
+  },
+  {
+   "offset": 968,
+   "id": "D3ABC3",
+   "parameters": [
+    {
+     "name": "RG 1 RGLength",
+     "value": 47
+    }
+   ],
+   "triplets": [
+    {
+     "id": 2,
+     "decoded": {
+      "fqnType": 222,
+      "fqnFormat": 0,
+      "nameHex": "C1D9C9C1D3"
+     }
+    },
+    {
+     "id": 140,
+     "decoded": {
+      "LocFlgs": "X'00'",
+      "LangCode": "de",
+      "ScrptCde": "Latn",
+      "RegCde": "DE"
+     }
+    }
+   ]
+  },
+  {
+   "offset": 1024,
+   "id": "D3A7A8",
+   "parameters": [],
+   "triplets": [
+    {
+     "id": 149,
+     "decoded": {
+      "IOCARI": "X'00'",
+      "OCRI": "X'01'",
+      "PTOCARI": "X'02'",
+      "GOCARI": "X'03'"
+     }
+    },
+    {
+     "id": 151,
+     "decoded": {
+      "DevApp": "X'0001'"
+     }
+    }
+   ]
+  },
+  {
+   "offset": 1076,
+   "id": "D3A9C9",
+   "parameters": [
+    {
+     "name": "AEGName",
+     "value": "AEG1"
+    }
+   ]
+  },
+  {
+   "offset": 1093,
+   "id": "D3B490",
+   "parameters": [
+    {
+     "name": "LnkType",
+     "value": "X'01'"
+    },
+    {
+     "name": "RG 1 RGLength",
+     "value": 25
+    },
+    {
+     "name": "RG 1 RGFunct",
+     "value": "X'01'"
+    },
+    {
+     "name": "RG 2 RGLength",
+     "value": 15
+    },
+    {
+     "name": "RG 2 RGFunct",
+     "value": "X'02'"
+    }
+   ],
+   "triplets": [
+    {
+     "id": 77,
+     "decoded": {
+      "XarOset": 100,
+      "YarOset": 200,
+      "XarSize": 1440,
+      "YarSize": 720
+     }
+    },
+    {
+     "id": 130,
+     "decoded": {
+      "ParmSyn": "X'02'",
+      "ParmVal": "X'C1C2C3'"
+     }
+    },
+    {
+     "id": 2,
+     "decoded": {
+      "fqnType": 135,
+      "fqnFormat": 0,
+      "nameHex": "D7C1C7C5F0F0F0F1"
+     }
+    }
+   ]
+  },
+  {
+   "offset": 1144,
+   "id": "D3AFC3",
+   "parameters": [
+    {
+     "name": "ObjName",
+     "value": "OC000001"
+    },
+    {
+     "name": "ObjType",
+     "value": "X'92'"
+    },
+    {
+     "name": "XoaOset",
+     "value": 0
+    },
+    {
+     "name": "YoaOset",
+     "value": 0
+    },
+    {
+     "name": "XoaOrent",
+     "value": "X'0000'"
+    },
+    {
+     "name": "YoaOrent",
+     "value": "X'2D00'"
+    },
+    {
+     "name": "XocaOset",
+     "value": 0
+    },
+    {
+     "name": "YocaOset",
+     "value": 0
+    },
+    {
+     "name": "RefCSys",
+     "value": "X'01'"
+    }
+   ],
+   "triplets": [
+    {
+     "id": 112,
+     "decoded": {
+      "BgMxFlag": "X'80'"
+     }
+    },
+    {
+     "id": 113,
+     "decoded": {
+      "Keyword X'70'": "X'01'"
+     }
+    },
+    {
+     "id": 154,
+     "decoded": {
+      "XBase": "X'00'",
+      "YBase": "X'00'",
+      "XResol": 3000,
+      "YResol": 3000
+     }
+    },
+    {
+     "id": 156,
+     "decoded": {
+      "PDFSize": "X'01'",
+      "XocBase": "X'00'",
+      "YocBase": "X'00'",
+      "XocUnits": 14400,
+      "YocUnits": 14400,
+      "XpsSize": 1440,
+      "YpsSize": 720
+     }
+    }
+   ]
+  },
+  {
+   "offset": 1231,
+   "id": "D3A8C7",
+   "parameters": [
+    {
+     "name": "OEGName",
+     "value": "OEG00001"
+    }
+   ]
+  },
+  {
+   "offset": 1248,
+   "id": "D3AB92",
+   "parameters": [
+    {
+     "name": "RG 1 RGLength",
+     "value": 5
+    }
+   ]
+  },
+  {
+   "offset": 1262,
+   "id": "D3A9C7",
+   "parameters": [
+    {
+     "name": "OEGName",
+     "value": "OEG00001"
+    }
+   ]
+  },
+  {
+   "offset": 1279,
+   "id": "D3EE92",
+   "parameters": [
+    {
+     "name": "ObjCdat (bytes)",
+     "value": 4
+    }
+   ]
+  },
+  {
+   "offset": 1292,
+   "id": "D3A992",
+   "parameters": [
+    {
+     "name": "ObjCName",
+     "value": "OC000001"
+    }
+   ]
+  },
+  {
+   "offset": 1309,
+   "id": "D3AFAF",
+   "parameters": [
+    {
+     "name": "PgName",
+     "value": "PAGE0002"
+    },
+    {
+     "name": "IPgFlgs",
+     "value": "X'00'"
+    }
+   ]
+  },
+  {
+   "offset": 1335,
+   "id": "D3A9AF",
+   "parameters": [
+    {
+     "name": "PageName",
+     "value": "PAGE0001"
+    }
+   ]
+  },
+  {
+   "offset": 1369,
+   "id": "D3A9A8",
+   "parameters": [
+    {
+     "name": "DocName",
+     "value": "FIELDDOC"
+    }
+   ]
+  },
+  {
+   "offset": 1386,
+   "id": "D3A9A5",
+   "parameters": [
+    {
+     "name": "PFName",
+     "value": "PRTFILE1"
+    }
+   ]
+  }
+ ]
+}

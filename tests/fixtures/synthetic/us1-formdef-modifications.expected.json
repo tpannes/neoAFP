@@ -1,0 +1,23 @@
+{
+ "kind": "document",
+ "pageCount": 2,
+ "diagnostics": [
+  "unsupportedObject"
+ ],
+ "decodedFields": [
+  {
+   "offset": 1521,
+   "id": "D3ABEA",
+   "parameters": [
+    {
+     "name": "RG 1 SUPname",
+     "value": "SUPPRES1"
+    },
+    {
+     "name": "RG 1 SUPid",
+     "value": 5
+    }
+   ]
+  }
+ ]
+}

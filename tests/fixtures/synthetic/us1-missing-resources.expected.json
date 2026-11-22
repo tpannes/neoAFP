@@ -1,0 +1,238 @@
+{
+ "kind": "document",
+ "pageCount": 1,
+ "renderModel": {
+  "1": {
+   "widthUnits": 11906,
+   "heightUnits": 16838,
+   "items": [
+    {
+     "type": "glyphRun",
+     "text": "ABC",
+     "x": 1440,
+     "y": 1440,
+     "rotation": 0,
+     "color": "#000000",
+     "font": {
+      "kind": "substitute",
+      "name": "C0MISSNG"
+     },
+     "dx": [
+      0,
+      100,
+      200
+     ]
+    },
+    {
+     "type": "placeholder",
+     "reason": "missingResource",
+     "rect": {
+      "x": 1440,
+      "y": 2880,
+      "width": 1440,
+      "height": 720
+     }
+    },
+    {
+     "type": "placeholder",
+     "reason": "missingResource",
+     "rect": {
+      "x": 5760,
+      "y": 4320,
+      "width": 1440,
+      "height": 720
+     }
+    }
+   ]
+  }
+ },
+ "diagnostics": [
+  "missingResource",
+  "fontSubstituted",
+  "missingResource",
+  "fontSubstituted",
+  "missingResource",
+  "missingResource"
+ ],
+ "decodedFields": [
+  {
+   "offset": 0,
+   "id": "D3A8A8",
+   "parameters": [
+    {
+     "name": "DocName",
+     "value": "MISSING1"
+    }
+   ]
+  },
+  {
+   "offset": 17,
+   "id": "D3A8AF",
+   "parameters": [
+    {
+     "name": "PageName",
+     "value": "PAGE0001"
+    }
+   ]
+  },
+  {
+   "offset": 34,
+   "id": "D3A8C9",
+   "parameters": [
+    {
+     "name": "AEGName",
+     "value": "AEG1"
+    }
+   ]
+  },
+  {
+   "offset": 51,
+   "id": "D3AB8A",
+   "parameters": [
+    {
+     "name": "RG 1 RGLength",
+     "value": 34
+    }
+   ],
+   "triplets": [
+    {
+     "id": 36,
+     "decoded": {
+      "resourceType": 5,
+      "localId": 1
+     }
+    },
+    {
+     "id": 2,
+     "decoded": {
+      "fqnType": 134,
+      "fqnFormat": 0,
+      "nameHex": "C3F0D4C9E2E2D5C7"
+     }
+    },
+    {
+     "id": 2,
+     "decoded": {
+      "fqnType": 133,
+      "fqnFormat": 0,
+      "nameHex": "E3F1D4C9E2E2D5C7"
+     }
+    },
+    {
+     "id": 38,
+     "decoded": {
+      "charRotation": 0
+     }
+    }
+   ]
+  },
+  {
+   "offset": 94,
+   "id": "D3A6AF",
+   "parameters": [
+    {
+     "name": "XpgBase",
+     "value": "X'00'"
+    },
+    {
+     "name": "YpgBase",
+     "value": "X'00'"
+    },
+    {
+     "name": "XpgUnits",
+     "value": 14400
+    },
+    {
+     "name": "YpgUnits",
+     "value": 14400
+    },
+    {
+     "name": "XpgSize",
+     "value": 11906
+    },
+    {
+     "name": "YpgSize",
+     "value": 16838
+    }
+   ]
+  },
+  {
+   "offset": 118,
+   "id": "D3B19B",
+   "parameters": [
+    {
+     "name": "XPBASE",
+     "value": "X'00'"
+    },
+    {
+     "name": "YPBASE",
+     "value": "X'00'"
+    },
+    {
+     "name": "XPUNITVL",
+     "value": 14400
+    },
+    {
+     "name": "YPUNITVL",
+     "value": 14400
+    },
+    {
+     "name": "XPEXTENT",
+     "value": 11906
+    },
+    {
+     "name": "YPEXTENT",
+     "value": 16838
+    },
+    {
+     "name": "TEXTFLAGS",
+     "value": "X'0000'"
+    },
+    {
+     "name": "TXTCONDS (bytes)",
+     "value": 0
+    }
+   ]
+  },
+  {
+   "offset": 225,
+   "id": "D3AF5F",
+   "parameters": [
+    {
+     "name": "PsegName",
+     "value": "S1MISSNG"
+    },
+    {
+     "name": "XpsOset",
+     "value": 1440
+    },
+    {
+     "name": "YpsOset",
+     "value": 2880
+    }
+   ]
+  },
+  {
+   "offset": 248,
+   "id": "D3AFD8",
+   "parameters": [
+    {
+     "name": "OvlyName",
+     "value": "O1MISSNG"
+    },
+    {
+     "name": "XolOset",
+     "value": 5760
+    },
+    {
+     "name": "YolOset",
+     "value": 4320
+    },
+    {
+     "name": "OvlyOrent",
+     "value": "X'0000'"
+    }
+   ]
+  }
+ ]
+}

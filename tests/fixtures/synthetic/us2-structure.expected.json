@@ -1,0 +1,252 @@
+{
+ "kind": "document",
+ "pageCount": 2,
+ "fields": [
+  {
+   "offset": 0,
+   "length": 25,
+   "id": "D3A8A8"
+  },
+  {
+   "offset": 25,
+   "length": 25,
+   "id": "D3EEEE"
+  },
+  {
+   "offset": 50,
+   "length": 16,
+   "id": "D3EEEE"
+  },
+  {
+   "offset": 66,
+   "length": 17,
+   "id": "D3A8AD"
+  },
+  {
+   "offset": 83,
+   "length": 37,
+   "id": "D3A090"
+  },
+  {
+   "offset": 120,
+   "length": 39,
+   "id": "D3A090"
+  },
+  {
+   "offset": 159,
+   "length": 17,
+   "id": "D3A8AF"
+  },
+  {
+   "offset": 176,
+   "length": 17,
+   "id": "D3A8C9"
+  },
+  {
+   "offset": 193,
+   "length": 24,
+   "id": "D3A6AF"
+  },
+  {
+   "offset": 217,
+   "length": 23,
+   "id": "D3B19B"
+  },
+  {
+   "offset": 240,
+   "length": 17,
+   "id": "D3A9C9"
+  },
+  {
+   "offset": 257,
+   "length": 46,
+   "id": "D3A090"
+  },
+  {
+   "offset": 303,
+   "length": 12,
+   "id": "D3EEFE"
+  },
+  {
+   "offset": 315,
+   "length": 17,
+   "id": "D3A9AF"
+  },
+  {
+   "offset": 332,
+   "length": 17,
+   "id": "D3A8AD"
+  },
+  {
+   "offset": 349,
+   "length": 37,
+   "id": "D3A090"
+  },
+  {
+   "offset": 386,
+   "length": 17,
+   "id": "D3A8AF"
+  },
+  {
+   "offset": 403,
+   "length": 17,
+   "id": "D3A8C9"
+  },
+  {
+   "offset": 420,
+   "length": 24,
+   "id": "D3A6AF"
+  },
+  {
+   "offset": 444,
+   "length": 23,
+   "id": "D3B19B"
+  },
+  {
+   "offset": 467,
+   "length": 17,
+   "id": "D3A9C9"
+  },
+  {
+   "offset": 484,
+   "length": 24,
+   "id": "D3A090"
+  },
+  {
+   "offset": 508,
+   "length": 17,
+   "id": "D3A9AF"
+  },
+  {
+   "offset": 525,
+   "length": 17,
+   "id": "D3A9AD"
+  },
+  {
+   "offset": 542,
+   "length": 17,
+   "id": "D3A9AD"
+  },
+  {
+   "offset": 559,
+   "length": 17,
+   "id": "D3A9A8"
+  }
+ ],
+ "tles": [
+  {
+   "name": "Straße",
+   "value": "Größe Ä!",
+   "ownerType": "pageGroup",
+   "ownerName": "GROUP001",
+   "ownerRef": 3,
+   "offset": 83,
+   "fileCodePage": "ebcdic-273"
+  },
+  {
+   "name": "ACCOUNT",
+   "value": "A-100 [7]",
+   "ownerType": "pageGroup",
+   "ownerName": "GROUP001",
+   "ownerRef": 3,
+   "offset": 120,
+   "fileCodePage": "ebcdic-500"
+  },
+  {
+   "name": "PAGETAG",
+   "value": "P1 [X]",
+   "ownerType": "page",
+   "ownerName": "PAGE0001",
+   "ownerRef": 6,
+   "offset": 257,
+   "fileCodePage": "ebcdic-500",
+   "sequence": 1,
+   "level": 2
+  },
+  {
+   "name": "REGION",
+   "value": "NORD",
+   "ownerType": "pageGroup",
+   "ownerName": "GROUP002",
+   "ownerRef": 14,
+   "offset": 349,
+   "fileCodePage": "ebcdic-500"
+  },
+  {
+   "name": "LANG",
+   "value": "EN!",
+   "ownerType": "page",
+   "ownerName": "PAGE0002",
+   "ownerRef": 16,
+   "offset": 484,
+   "fileCodePage": "ebcdic-037"
+  }
+ ],
+ "nops": [
+  {
+   "offset": 25,
+   "ownerRef": 0,
+   "fileCodePage": null,
+   "text": "NEOAFP FIXTURE 1",
+   "codePage": "ebcdic-273"
+  },
+  {
+   "offset": 50,
+   "ownerRef": 0,
+   "fileCodePage": null,
+   "text": "··A···B",
+   "codePage": "ebcdic-273"
+  }
+ ],
+ "diagnostics": [
+  "unknownField",
+  "unknownTriplet"
+ ],
+ "decodedFields": [
+  {
+   "offset": 25,
+   "id": "D3EEEE",
+   "parameters": [
+    {
+     "name": "UndfData (bytes)",
+     "value": 16
+    }
+   ]
+  },
+  {
+   "offset": 83,
+   "id": "D3A090",
+   "parameters": []
+  },
+  {
+   "offset": 315,
+   "id": "D3A9AF",
+   "parameters": [
+    {
+     "name": "PageName",
+     "value": "PAGE0001"
+    }
+   ]
+  },
+  {
+   "offset": 525,
+   "id": "D3A9AD",
+   "parameters": [
+    {
+     "name": "PGrpName",
+     "value": "GROUP002"
+    }
+   ]
+  },
+  {
+   "offset": 559,
+   "id": "D3A9A8",
+   "parameters": [
+    {
+     "name": "DocName",
+     "value": "STRUCDOC"
+    }
+   ]
+  }
+ ]
+}

@@ -1,0 +1,1007 @@
+{
+ "kind": "document",
+ "pageCount": 3,
+ "renderModel": {
+  "1": {
+   "items": [
+    {
+     "type": "path",
+     "fill": "#000000",
+     "commands": {
+      "0": [
+       "M",
+       1300,
+       1300
+      ],
+      "298": [
+       "L",
+       4519.8,
+       1785.8
+      ]
+     }
+    },
+    {
+     "type": "glyphRun",
+     "text": "NEOAFP-39U",
+     "x": 2357.7,
+     "y": 1954.3
+    },
+    {
+     "type": "path",
+     "fill": "#000000",
+     "commands": {
+      "0": [
+       "M",
+       6500,
+       1300
+      ],
+      "133": [
+       "L",
+       7960.2,
+       1732
+      ]
+     }
+    },
+    {
+     "type": "glyphRun",
+     "text": "80523",
+     "x": 6958.6,
+     "y": 1900.5
+    },
+    {
+     "type": "path",
+     "fill": "#000000",
+     "commands": {
+      "0": [
+       "M",
+       1300,
+       4300
+      ],
+      "148": [
+       "L",
+       3059.7,
+       5693.9
+      ]
+     }
+    },
+    {
+     "type": "glyphRun",
+     "text": "0",
+     "x": 1205.5,
+     "y": 5768.8
+    },
+    {
+     "type": "glyphRun",
+     "text": "12345",
+     "x": 1562.1,
+     "y": 5768.8
+    },
+    {
+     "type": "glyphRun",
+     "text": "67890",
+     "x": 2310.9,
+     "y": 5768.8
+    },
+    {
+     "type": "glyphRun",
+     "text": "5",
+     "x": 3097.1,
+     "y": 5768.8
+    },
+    {
+     "type": "path",
+     "fill": "#000000",
+     "commands": {
+      "0": [
+       "M",
+       6500,
+       4300
+      ],
+      "83": [
+       "L",
+       7436,
+       5693.9
+      ]
+     }
+    },
+    {
+     "type": "glyphRun",
+     "text": "0",
+     "x": 6405.5,
+     "y": 5768.8
+    },
+    {
+     "type": "glyphRun",
+     "text": "425261",
+     "x": 6646,
+     "y": 5768.8
+    },
+    {
+     "type": "glyphRun",
+     "text": "4",
+     "x": 7473.4,
+     "y": 5768.8
+    },
+    {
+     "type": "path",
+     "fill": "#000000",
+     "commands": {
+      "0": [
+       "M",
+       1300,
+       7300
+      ],
+      "33": [
+       "L",
+       1637,
+       8408.8
+      ]
+     }
+    },
+    {
+     "type": "glyphRun",
+     "text": "1",
+     "x": 1389.9,
+     "y": 7281.3
+    },
+    {
+     "type": "glyphRun",
+     "text": "2",
+     "x": 1558.3,
+     "y": 7281.3
+    },
+    {
+     "type": "path",
+     "fill": "#000000",
+     "commands": {
+      "0": [
+       "M",
+       6500,
+       7300
+      ],
+      "78": [
+       "L",
+       7361.1,
+       8408.8
+      ]
+     }
+    },
+    {
+     "type": "glyphRun",
+     "text": "5",
+     "x": 6589.9,
+     "y": 7281.3
+    },
+    {
+     "type": "glyphRun",
+     "text": "4",
+     "x": 6758.3,
+     "y": 7281.3
+    },
+    {
+     "type": "glyphRun",
+     "text": "3",
+     "x": 6926.8,
+     "y": 7281.3
+    },
+    {
+     "type": "glyphRun",
+     "text": "2",
+     "x": 7095.3,
+     "y": 7281.3
+    },
+    {
+     "type": "glyphRun",
+     "text": "1",
+     "x": 7263.8,
+     "y": 7281.3
+    },
+    {
+     "type": "path",
+     "fill": "#000000",
+     "commands": {
+      "0": [
+       "M",
+       1300,
+       10300
+      ],
+      "108": [
+       "L",
+       2535.5,
+       11434.7
+      ]
+     }
+    },
+    {
+     "type": "glyphRun",
+     "text": "2468",
+     "x": 1416.1,
+     "y": 11509.6
+    },
+    {
+     "type": "glyphRun",
+     "text": "1230",
+     "x": 2033.8,
+     "y": 11509.6
+    },
+    {
+     "type": "path",
+     "fill": "#000000",
+     "commands": {
+      "0": [
+       "M",
+       6500,
+       10300
+      ],
+      "148": [
+       "L",
+       8259.7,
+       11693.9
+      ]
+     }
+    },
+    {
+     "type": "glyphRun",
+     "text": "4",
+     "x": 6380.2,
+     "y": 11768.8
+    },
+    {
+     "type": "glyphRun",
+     "text": "006381",
+     "x": 6646,
+     "y": 11768.8
+    },
+    {
+     "type": "glyphRun",
+     "text": "333931",
+     "x": 7525.9,
+     "y": 11768.8
+    },
+    {
+     "type": "path",
+     "fill": "#000000",
+     "commands": {
+      "0": [
+       "M",
+       1300,
+       13300
+      ],
+      "33": [
+       "L",
+       1655.7,
+       14509.6
+      ]
+     }
+    },
+    {
+     "type": "glyphRun",
+     "text": "0",
+     "x": 1389.9,
+     "y": 13281.3
+    },
+    {
+     "type": "glyphRun",
+     "text": "5",
+     "x": 1558.3,
+     "y": 13281.3
+    },
+    {
+     "type": "path",
+     "fill": "#000000",
+     "commands": {
+      "0": [
+       "M",
+       6500,
+       13300
+      ],
+      "78": [
+       "L",
+       7361.1,
+       14509.6
+      ]
+     }
+    },
+    {
+     "type": "glyphRun",
+     "text": "5",
+     "x": 6589.9,
+     "y": 13281.3
+    },
+    {
+     "type": "glyphRun",
+     "text": "2",
+     "x": 6758.3,
+     "y": 13281.3
+    },
+    {
+     "type": "glyphRun",
+     "text": "4",
+     "x": 6926.8,
+     "y": 13281.3
+    },
+    {
+     "type": "glyphRun",
+     "text": "9",
+     "x": 7095.3,
+     "y": 13281.3
+    },
+    {
+     "type": "glyphRun",
+     "text": "5",
+     "x": 7263.8,
+     "y": 13281.3
+    }
+   ]
+  },
+  "2": {
+   "items": [
+    {
+     "type": "path",
+     "fill": "#000000",
+     "commands": {
+      "0": [
+       "M",
+       1300,
+       1300
+      ],
+      "253": [
+       "L",
+       3761.7,
+       1676.3
+      ]
+     }
+    },
+    {
+     "type": "glyphRun",
+     "text": "543210683",
+     "x": 2048.8,
+     "y": 1844.8
+    },
+    {
+     "type": "path",
+     "fill": "#000000",
+     "commands": {
+      "0": [
+       "M",
+       6500,
+       1300
+      ],
+      "163": [
+       "L",
+       8259.7,
+       1660
+      ]
+     }
+    },
+    {
+     "type": "glyphRun",
+     "text": "543210683",
+     "x": 6883.8,
+     "y": 1828.5
+    },
+    {
+     "type": "path",
+     "fill": "#000000",
+     "commands": {
+      "0": [
+       "M",
+       1300,
+       4300
+      ],
+      "213": [
+       "L",
+       3743,
+       4660
+      ]
+     }
+    },
+    {
+     "type": "glyphRun",
+     "text": "15400141288763",
+     "x": 1641.6,
+     "y": 4828.5
+    },
+    {
+     "type": "path",
+     "fill": "#000000",
+     "commands": {
+      "0": [
+       "M",
+       6500,
+       4300
+      ],
+      "198": [
+       "L",
+       8549.8,
+       4660
+      ]
+     }
+    },
+    {
+     "type": "glyphRun",
+     "text": "34698735",
+     "x": 7099,
+     "y": 4828.5
+    },
+    {
+     "type": "path",
+     "fill": "#000000",
+     "commands": {
+      "0": [
+       "M",
+       1300,
+       7300
+      ],
+      "243": [
+       "L",
+       4594.7,
+       7799.8
+      ]
+     }
+    },
+    {
+     "type": "glyphRun",
+     "text": "ABC123abc@456",
+     "x": 2236,
+     "y": 7968.3
+    },
+    {
+     "type": "path",
+     "fill": "#000000",
+     "commands": {
+      "0": [
+       "M",
+       6500,
+       7300
+      ],
+      "243": [
+       "L",
+       9794.7,
+       7799.8
+      ]
+     }
+    },
+    {
+     "type": "glyphRun",
+     "text": "(01)90614141007687(15)001230",
+     "x": 6593.6,
+     "y": 7968.3
+    },
+    {
+     "type": "path",
+     "fill": "#000000",
+     "commands": {
+      "0": [
+       "M",
+       1300,
+       10300
+      ],
+      "153": [
+       "L",
+       2984.8,
+       10660
+      ]
+     }
+    },
+    {
+     "type": "glyphRun",
+     "text": "TEST93",
+     "x": 1814.8,
+     "y": 10828.5
+    },
+    {
+     "type": "path",
+     "fill": "#000000",
+     "commands": {
+      "0": [
+       "M",
+       6500,
+       10300
+      ],
+      "158": [
+       "L",
+       8529.1,
+       10480
+      ]
+     }
+    },
+    {
+     "type": "path",
+     "fill": "#000000",
+     "commands": {
+      "0": [
+       "M",
+       1300,
+       13300
+      ],
+      "188": [
+       "L",
+       3721.8,
+       13585.1
+      ]
+     }
+    },
+    {
+     "type": "path",
+     "fill": "#000000",
+     "commands": {
+      "0": [
+       "M",
+       6500,
+       13300
+      ],
+      "333": [
+       "L",
+       11061.9,
+       13507.4
+      ]
+     }
+    }
+   ]
+  },
+  "3": {
+   "items": [
+    {
+     "type": "path",
+     "fill": "#000000",
+     "commands": {
+      "0": [
+       "M",
+       1300,
+       1300
+      ],
+      "258": [
+       "L",
+       4425.1,
+       1477.3
+      ]
+     }
+    },
+    {
+     "type": "glyphRun",
+     "text": "59 56439111 ABA 9",
+     "x": 2061,
+     "y": 1196
+    },
+    {
+     "type": "path",
+     "fill": "#000000",
+     "commands": {
+      "0": [
+       "M",
+       6500,
+       1300
+      ],
+      "323": [
+       "L",
+       10689.1,
+       1439.2
+      ]
+     }
+    },
+    {
+     "type": "glyphRun",
+     "text": "01 234 567094 987654321 01234567891",
+     "x": 6928.9,
+     "y": 1708.8
+    },
+    {
+     "type": "path",
+     "fill": "#000000",
+     "commands": {
+      "0": [
+       "M",
+       1300,
+       4300
+      ],
+      "448": [
+       "L",
+       1300,
+       4844.3
+      ]
+     }
+    },
+    {
+     "type": "path",
+     "fill": "#000000",
+     "commands": {
+      "0": [
+       "M",
+       10700,
+       4300
+      ],
+      "808": [
+       "L",
+       10268,
+       4593.8
+      ]
+     }
+    },
+    {
+     "type": "path",
+     "fill": "#000000",
+     "commands": {
+      "0": [
+       "M",
+       1300,
+       7300
+      ],
+      "1013": [
+       "L",
+       3699,
+       7864.5
+      ]
+     }
+    },
+    {
+     "type": "path",
+     "fill": "#000000",
+     "commands": {
+      "0": [
+       "M",
+       6950.3,
+       7302.8
+      ],
+      "2851": [
+       "L",
+       7358.4,
+       7999.2
+      ]
+     }
+    },
+    {
+     "type": "path",
+     "fill": "#000000",
+     "commands": {
+      "0": [
+       "M",
+       1360.5,
+       10300
+      ],
+      "423": [
+       "L",
+       1501.6,
+       10683
+      ]
+     }
+    },
+    {
+     "type": "path",
+     "fill": "#000000",
+     "commands": {
+      "0": [
+       "M",
+       10700,
+       12100
+      ],
+      "143": [
+       "L",
+       10538.7,
+       11878.2
+      ]
+     }
+    },
+    {
+     "type": "path",
+     "fill": "#000000",
+     "commands": {
+      "0": [
+       "M",
+       1300,
+       15100
+      ],
+      "798": [
+       "L",
+       1732,
+       14702.6
+      ]
+     }
+    },
+    {
+     "type": "placeholder",
+     "reason": "notYetSupported",
+     "rect": {
+      "x": 6200,
+      "y": 13000,
+      "width": 4800,
+      "height": 2400
+     }
+    }
+   ]
+  }
+ },
+ "diagnostics": [
+  "unsupportedObject"
+ ],
+ "decodedFields": [
+  {
+   "offset": 0,
+   "id": "D3A8A8",
+   "parameters": [
+    {
+     "name": "DocName",
+     "value": "BARCODES"
+    }
+   ]
+  },
+  {
+   "offset": 17,
+   "id": "D3A8AF",
+   "parameters": [
+    {
+     "name": "PageName",
+     "value": "PAGE0001"
+    }
+   ]
+  },
+  {
+   "offset": 34,
+   "id": "D3A8C9",
+   "parameters": [
+    {
+     "name": "AEGName",
+     "value": "AEG1"
+    }
+   ]
+  },
+  {
+   "offset": 51,
+   "id": "D3A6AF",
+   "parameters": [
+    {
+     "name": "XpgBase",
+     "value": "X'00'"
+    },
+    {
+     "name": "YpgBase",
+     "value": "X'00'"
+    },
+    {
+     "name": "XpgUnits",
+     "value": 14400
+    },
+    {
+     "name": "YpgUnits",
+     "value": 14400
+    },
+    {
+     "name": "XpgSize",
+     "value": 11906
+    },
+    {
+     "name": "YpgSize",
+     "value": 16838
+    }
+   ]
+  },
+  {
+   "offset": 75,
+   "id": "D3B19B",
+   "parameters": [
+    {
+     "name": "XPBASE",
+     "value": "X'00'"
+    },
+    {
+     "name": "YPBASE",
+     "value": "X'00'"
+    },
+    {
+     "name": "XPUNITVL",
+     "value": 14400
+    },
+    {
+     "name": "YPUNITVL",
+     "value": 14400
+    },
+    {
+     "name": "XPEXTENT",
+     "value": 11906
+    },
+    {
+     "name": "YPEXTENT",
+     "value": 16838
+    },
+    {
+     "name": "TEXTFLAGS",
+     "value": "X'0000'"
+    },
+    {
+     "name": "TXTCONDS (bytes)",
+     "value": 0
+    }
+   ]
+  },
+  {
+   "offset": 115,
+   "id": "D3A8EB",
+   "parameters": [
+    {
+     "name": "BCdoName",
+     "value": "BC000001"
+    }
+   ]
+  },
+  {
+   "offset": 149,
+   "id": "D3A66B",
+   "parameters": [],
+   "triplets": [
+    {
+     "id": 67,
+     "decoded": {
+      "descriptorPositionId": 1
+     }
+    },
+    {
+     "id": 75,
+     "decoded": {
+      "xUnitBase": 0,
+      "yUnitBase": 0,
+      "xUnitsPerBase": 14400,
+      "yUnitsPerBase": 14400
+     }
+    },
+    {
+     "id": 76,
+     "decoded": {
+      "sizeType": 2,
+      "xSize": 4800,
+      "ySize": 2400
+     }
+    }
+   ]
+  },
+  {
+   "offset": 178,
+   "id": "D3AC6B",
+   "parameters": [
+    {
+     "name": "OAPosID",
+     "value": 1
+    },
+    {
+     "name": "RGLength",
+     "value": 23
+    },
+    {
+     "name": "XoaOset",
+     "value": 1000
+    },
+    {
+     "name": "YoaOset",
+     "value": 1000
+    },
+    {
+     "name": "XoaOrent",
+     "value": "X'0000'"
+    },
+    {
+     "name": "YoaOrent",
+     "value": "X'2D00'"
+    },
+    {
+     "name": "XocaOset",
+     "value": 0
+    },
+    {
+     "name": "YocaOset",
+     "value": 0
+    },
+    {
+     "name": "XocaOrent",
+     "value": "X'0000'"
+    },
+    {
+     "name": "YocaOrent",
+     "value": "X'2D00'"
+    },
+    {
+     "name": "RefCSys",
+     "value": "X'01'"
+    }
+   ]
+  },
+  {
+   "offset": 211,
+   "id": "D3ABEB",
+   "parameters": [
+    {
+     "name": "RG 1 RGLength",
+     "value": 5
+    }
+   ],
+   "triplets": [
+    {
+     "id": 4,
+     "decoded": {
+      "mappingOption": 0
+     }
+    }
+   ]
+  },
+  {
+   "offset": 225,
+   "id": "D3A6EB",
+   "parameters": [
+    {
+     "name": "Unit base",
+     "value": "X'00'"
+    },
+    {
+     "name": "XUPUB",
+     "value": 14400
+    },
+    {
+     "name": "YUPUB",
+     "value": 14400
+    },
+    {
+     "name": "X extent",
+     "value": 65535
+    },
+    {
+     "name": "Y extent",
+     "value": 65535
+    },
+    {
+     "name": "Symbol width",
+     "value": 0
+    },
+    {
+     "name": "Type",
+     "value": "X'01'"
+    },
+    {
+     "name": "Modifier",
+     "value": "X'02'"
+    },
+    {
+     "name": "Local ID",
+     "value": "X'FF'"
+    },
+    {
+     "name": "Color",
+     "value": "X'FF07'"
+    },
+    {
+     "name": "Module width",
+     "value": 255
+    },
+    {
+     "name": "Element height",
+     "value": 65535
+    },
+    {
+     "name": "Multiplier",
+     "value": 1
+    },
+    {
+     "name": "WE:NE",
+     "value": 65535
+    }
+   ]
+  },
+  {
+   "offset": 274,
+   "id": "D3EEEB",
+   "parameters": [
+    {
+     "name": "BCOCA data (bytes)",
+     "value": 14
+    }
+   ]
+  },
+  {
+   "offset": 297,
+   "id": "D3A9EB",
+   "parameters": [
+    {
+     "name": "BCdoName",
+     "value": "BC000001"
+    }
+   ]
+  }
+ ]
+}

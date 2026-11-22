@@ -1,0 +1,156 @@
+{
+ "kind": "document",
+ "pageCount": 2,
+ "search": [
+  {
+   "query": {
+    "text": "Müller"
+   },
+   "results": [
+    {
+     "category": "text",
+     "distance": 0,
+     "match": "Müller",
+     "location": {
+      "pageNumber": 1
+     }
+    }
+   ]
+  },
+  {
+   "query": {
+    "text": "mueller"
+   },
+   "results": [
+    {
+     "category": "text",
+     "distance": 1,
+     "match": "Müller",
+     "location": {
+      "pageNumber": 1
+     }
+    }
+   ]
+  },
+  {
+   "query": {
+    "text": "Rechnug"
+   },
+   "results": [
+    {
+     "category": "text",
+     "distance": 1,
+     "match": "Rechnung",
+     "location": {
+      "pageNumber": 1
+     }
+    }
+   ]
+  },
+  {
+   "query": {
+    "text": "Rehcnug"
+   },
+   "results": [
+    {
+     "category": "text",
+     "distance": 2,
+     "match": "Rechnung",
+     "location": {
+      "pageNumber": 1
+     }
+    }
+   ]
+  },
+  {
+   "query": {
+    "text": "Rxhcnug"
+   },
+   "results": []
+  },
+  {
+   "query": {
+    "text": "STRASSE"
+   },
+   "results": [
+    {
+     "category": "text",
+     "distance": 0,
+     "match": "Straße",
+     "location": {
+      "pageNumber": 1
+     }
+    }
+   ]
+  },
+  {
+   "query": {
+    "text": "zurich"
+   },
+   "results": [
+    {
+     "category": "text",
+     "distance": 0,
+     "match": "Zürich",
+     "location": {
+      "pageNumber": 2
+     }
+    }
+   ]
+  },
+  {
+   "query": {
+    "text": "Müller Straße"
+   },
+   "results": [
+    {
+     "category": "text",
+     "distance": 0,
+     "match": "Müller",
+     "location": {
+      "pageNumber": 1
+     }
+    }
+   ]
+  },
+  {
+   "query": {
+    "text": "Müller Zürich"
+   },
+   "results": []
+  },
+  {
+   "query": {
+    "text": "Kunde"
+   },
+   "results": [
+    {
+     "category": "text",
+     "distance": 0,
+     "match": "Kunde",
+     "location": {
+      "pageNumber": 2
+     }
+    }
+   ]
+  },
+  {
+   "query": {
+    "text": "東京"
+   },
+   "results": []
+  },
+  {
+   "query": {
+    "text": "Testgenerater"
+   },
+   "results": []
+  },
+  {
+   "query": {
+    "text": "S1LOGOXY"
+   },
+   "results": []
+  }
+ ]
+}

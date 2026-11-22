@@ -1,0 +1,24 @@
+.claude/
+
+.DS_Store
+
+# Node.js / editor
+node_modules/
+*.log
+.env*
+*.tmp
+*.swp
+Thumbs.db
+.vscode/
+.idea/
+
+# Generated performance test files (tools/generate-large-afp.js)
+perf/
+
+# Local development files (not in version control)
+package.json
+tools/
+
+# Specification and Spec Kit files (local only)
+specs/
+.specify/

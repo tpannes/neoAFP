@@ -1,0 +1,403 @@
+{
+ "kind": "document",
+ "pageCount": 1,
+ "renderModel": {
+  "1": {
+   "widthUnits": 11906,
+   "heightUnits": 16838,
+   "items": [
+    {
+     "type": "path",
+     "fill": null,
+     "stroke": "#ff0000",
+     "commands": {
+      "0": [
+       "M",
+       2040,
+       2040
+      ],
+      "2": [
+       "L",
+       4440,
+       2640
+      ]
+     }
+    },
+    {
+     "type": "path",
+     "fill": null,
+     "stroke": "#00ff00",
+     "commands": {
+      "0": [
+       "M",
+       5040,
+       1740
+      ],
+      "3": [
+       "L",
+       5040,
+       2640
+      ]
+     }
+    },
+    {
+     "type": "path",
+     "fill": null,
+     "stroke": "#0000ff",
+     "commands": {
+      "0": [
+       "M",
+       2040,
+       3240
+      ],
+      "2": [
+       "Q",
+       3240,
+       3720,
+       3840,
+       3240
+      ]
+     }
+    },
+    {
+     "type": "path",
+     "fill": null,
+     "stroke": "#000000",
+     "commands": {
+      "0": [
+       "M",
+       7740,
+       2340
+      ],
+      "60": [
+       "L",
+       7740,
+       2340
+      ]
+     }
+    },
+    {
+     "type": "path",
+     "fill": null,
+     "stroke": "#000000",
+     "commands": {
+      "0": [
+       "M",
+       4440,
+       4440
+      ],
+      "1": [
+       "C",
+       5040,
+       3240,
+       6240,
+       5040,
+       6840,
+       3840
+      ]
+     }
+    },
+    {
+     "type": "path",
+     "fill": "#ff00ff",
+     "stroke": null,
+     "commands": {
+      "0": [
+       "M",
+       7140,
+       4440
+      ],
+      "4": [
+       "L",
+       7140,
+       4440
+      ]
+     }
+    },
+    {
+     "type": "glyphRun",
+     "text": "GOCA",
+     "x": 2040,
+     "y": 4740,
+     "rotation": 0,
+     "color": "#000000"
+    }
+   ]
+  }
+ },
+ "diagnostics": [],
+ "decodedFields": [
+  {
+   "offset": 0,
+   "id": "D3A8A8",
+   "parameters": [
+    {
+     "name": "DocName",
+     "value": "GOCADOC1"
+    }
+   ]
+  },
+  {
+   "offset": 17,
+   "id": "D3A8AF",
+   "parameters": [
+    {
+     "name": "PageName",
+     "value": "PAGE0001"
+    }
+   ]
+  },
+  {
+   "offset": 34,
+   "id": "D3A8C9",
+   "parameters": [
+    {
+     "name": "AEGName",
+     "value": "AEG1"
+    }
+   ]
+  },
+  {
+   "offset": 51,
+   "id": "D3A6AF",
+   "parameters": [
+    {
+     "name": "XpgBase",
+     "value": "X'00'"
+    },
+    {
+     "name": "YpgBase",
+     "value": "X'00'"
+    },
+    {
+     "name": "XpgUnits",
+     "value": 14400
+    },
+    {
+     "name": "YpgUnits",
+     "value": 14400
+    },
+    {
+     "name": "XpgSize",
+     "value": 11906
+    },
+    {
+     "name": "YpgSize",
+     "value": 16838
+    }
+   ]
+  },
+  {
+   "offset": 75,
+   "id": "D3B19B",
+   "parameters": [
+    {
+     "name": "XPBASE",
+     "value": "X'00'"
+    },
+    {
+     "name": "YPBASE",
+     "value": "X'00'"
+    },
+    {
+     "name": "XPUNITVL",
+     "value": 14400
+    },
+    {
+     "name": "YPUNITVL",
+     "value": 14400
+    },
+    {
+     "name": "XPEXTENT",
+     "value": 11906
+    },
+    {
+     "name": "YPEXTENT",
+     "value": 16838
+    },
+    {
+     "name": "TEXTFLAGS",
+     "value": "X'0000'"
+    },
+    {
+     "name": "TXTCONDS (bytes)",
+     "value": 0
+    }
+   ]
+  },
+  {
+   "offset": 115,
+   "id": "D3A8BB",
+   "parameters": [
+    {
+     "name": "GdoName",
+     "value": "GR000001"
+    }
+   ]
+  },
+  {
+   "offset": 149,
+   "id": "D3A66B",
+   "parameters": [],
+   "triplets": [
+    {
+     "id": 67,
+     "decoded": {
+      "descriptorPositionId": 1
+     }
+    },
+    {
+     "id": 75,
+     "decoded": {
+      "xUnitBase": 0,
+      "yUnitBase": 0,
+      "xUnitsPerBase": 14400,
+      "yUnitsPerBase": 14400
+     }
+    },
+    {
+     "id": 76,
+     "decoded": {
+      "sizeType": 2,
+      "xSize": 7200,
+      "ySize": 3600
+     }
+    }
+   ]
+  },
+  {
+   "offset": 178,
+   "id": "D3AC6B",
+   "parameters": [
+    {
+     "name": "OAPosID",
+     "value": 1
+    },
+    {
+     "name": "RGLength",
+     "value": 23
+    },
+    {
+     "name": "XoaOset",
+     "value": 1440
+    },
+    {
+     "name": "YoaOset",
+     "value": 1440
+    },
+    {
+     "name": "XoaOrent",
+     "value": "X'0000'"
+    },
+    {
+     "name": "YoaOrent",
+     "value": "X'2D00'"
+    },
+    {
+     "name": "XocaOset",
+     "value": 0
+    },
+    {
+     "name": "YocaOset",
+     "value": 0
+    },
+    {
+     "name": "XocaOrent",
+     "value": "X'0000'"
+    },
+    {
+     "name": "YocaOrent",
+     "value": "X'2D00'"
+    },
+    {
+     "name": "RefCSys",
+     "value": "X'01'"
+    }
+   ]
+  },
+  {
+   "offset": 211,
+   "id": "D3ABBB",
+   "parameters": [
+    {
+     "name": "RG 1 RGLength",
+     "value": 5
+    }
+   ],
+   "triplets": [
+    {
+     "id": 4,
+     "decoded": {
+      "mappingOption": 32
+     }
+    }
+   ]
+  },
+  {
+   "offset": 242,
+   "id": "D3A6BB",
+   "parameters": [
+    {
+     "name": "FLAGS",
+     "value": "X'40'"
+    },
+    {
+     "name": "CFORMAT",
+     "value": "X'00'"
+    },
+    {
+     "name": "UBASE",
+     "value": "X'00'"
+    },
+    {
+     "name": "XRESOL",
+     "value": 2400
+    },
+    {
+     "name": "YRESOL",
+     "value": 2400
+    },
+    {
+     "name": "IMXYRES",
+     "value": 0
+    },
+    {
+     "name": "XLWIND",
+     "value": 0
+    },
+    {
+     "name": "XRWIND",
+     "value": 1200
+    },
+    {
+     "name": "YBWIND",
+     "value": 0
+    },
+    {
+     "name": "YTWIND",
+     "value": 600
+    }
+   ]
+  },
+  {
+   "offset": 271,
+   "id": "D3EEBB",
+   "parameters": [
+    {
+     "name": "GOCA data (bytes)",
+     "value": 150
+    }
+   ]
+  },
+  {
+   "offset": 430,
+   "id": "D3A9BB",
+   "parameters": [
+    {
+     "name": "GdoName",
+     "value": "GR000001"
+    }
+   ]
+  }
+ ]
+}

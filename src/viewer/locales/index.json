@@ -1,0 +1,4 @@
+{
+  "languages": ["en", "de", "fr", "es", "it", "nl", "zh-Hans", "ja"],
+  "fallback": "en"
+}

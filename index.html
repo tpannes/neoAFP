@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Only same-origin resources; file contents never leave the device (research R15). -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; img-src 'self' blob: data:; worker-src 'self' blob:; connect-src 'self'; style-src 'self'; font-src 'self' blob: data:">
+  <title>neoAFP Viewer</title>
+  <!-- SVG favicon for current browsers; the .ico (16 and 32 px) for the rest. -->
+  <link rel="icon" href="src/viewer/assets/icons/neoafp-favicon.ico" sizes="32x32">
+  <link rel="icon" href="src/viewer/assets/icons/neoafp-favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="src/viewer/styles/base.css">
+</head>
+<body>
+  <neoafp-app></neoafp-app>
+  <script type="module" src="src/viewer/app.js"></script>
+</body>
+</html>
