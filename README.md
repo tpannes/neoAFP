@@ -4,36 +4,67 @@ A modern, web-based viewer for AFP (Advanced Function Presentation, MO:DCA) docu
 resources: AFP files, page segments, overlays and fonts. Everything runs in the browser; files
 never leave your device — there is no server component, no upload and no request to other sites.
 
+## How neoAFP was built
+
+neoAFP was created 100 % by AI: all code, tests and documentation were written by Claude Opus
+(Anthropic), guided by me. After a fair amount of vibe coding, it is my first project built
+with spec-driven development (SDD), using GitHub Spec Kit.
+
+In spec-driven development the specification comes first and stays the reference for everything
+else: requirements are written down and clarified before any code exists, then turned into a
+technical plan and a list of small, ordered tasks that the AI implements one by one. Compared
+with vibe coding, this has the following advantages:
+
+- **A shared source of truth.** Requirements are numbered and precise, so the AI and I always
+  mean the same thing, and every change can be traced from requirement to code and test.
+- **Consistency across many sessions.** A large project outlives any single conversation; the
+  spec, the plan and the task list carry the decisions from one session to the next.
+- **Fewer repeated mistakes.** Every bug fix and design decision is written into the task list,
+  so a later change or a fresh implementation does not fall into the same trap again.
+- **Tests that follow the spec.** Expectations are derived from the requirements and the
+  published AFP references, not from what the code happens to do.
+- **Scope under control.** What is in, what is out and what is blocked is decided in the spec,
+  not discovered halfway through the code.
+
 ## Features
 
-- **AFP-Viewer** (the main screen): thumbnails on the left, the pages in the middle, a Details
-  panel on the right with the file's metadata (documents, page groups, counts, form definition,
-  missing resources) and the current page's (size, sheet and side, print settings, fonts,
-  overlays, page segments, objects, index values). Pages as printed — text, images, graphics,
-  bar codes, overlays, page segments and embedded objects — in one continuous scroll area,
-  duplex sheets with front and back side by side as the form definition defines (duplex,
-  tumble, N-up), or every page alone with the simplex button; zoom and page navigation; search
-  in the page text (fuzzy: accents and case ignored, up to two typos per word) with matches
-  highlighted; export of a page as PNG, TIFF or text; a switch that hides the test print (the
-  word "TEST" drawn from lines). Missing resources are listed and filled in when the files are
-  added; files of up to several hundred megabytes are read in the background.
-- **TLE browser**: all index values as a table, one row per page group and one column per TLE
-  name; sort, hide columns, search, export as JSON or CSV.
-- **NOP browser**: all NOP records with offset, page, encoding (detected: EBCDIC 273,
-  Windows-1252 or UTF-8) and text; hide the ISIS Papyrus `$ISIS_TAG` records; search, export.
-- **Structure view**: every structured field in a tree (Begin/End pairs as branches, triplets
-  below their field) with icons; Details with decoded parameters and triplets and the raw bytes
-  in hex; find by name or identifier, jump to a byte offset; links from a page to its fields and
-  back; code page choice for NOPs, TLEs and other text where they are shown.
-- **Resource-Explorer**: all resources of the open files and folders as a grid with previews or as
-  a sortable list; filters by name, type, content (text, IM or IOCA images, bar codes, page
-  segments, no text …), dimensions, file size, font, resolution, color profile and encoding,
-  kept between visits; a preview dialog with metadata; character grids of fonts and code page
-  tables; coded fonts as sample text and character map by code point; form definitions as a
-  diagram of each medium map with its print settings; download of the list as CSV, of a preview
-  as PNG or TIFF and of the exact original bytes of any resource.
-- **Languages**: English, German, French, Spanish, Italian, Dutch, Simplified Chinese and
-  Japanese; the browser language is used when available.
+- **Open AFP data your way.** Drop files or a whole folder onto the window, or use the Open
+  buttons. When you open a folder, neoAFP finds the fonts, overlays, page segments and form
+  definitions the documents need by itself, even in 240, 300 and 600 dpi copies, and tells you
+  at once which resources are missing. Add them later and the pages are redrawn. Files of
+  several hundred megabytes open quickly; only the pages you look at are drawn.
+- **See the pages as they will be printed.** Text, fonts, images, graphics, bar codes, overlays
+  and embedded PDFs appear as on paper. Duplex sheets show front and back side by side, N-up
+  sheets show all their pages, or you switch to one page after another. Scroll through the
+  whole document, jump to a page, use the thumbnails, and zoom to the page, to its width or to
+  100 %.
+- **Know what is on a page.** The Details panel shows the file at a glance (documents, page
+  groups, form definition, missing resources) and everything about the current page: size,
+  sheet and side, print settings such as bins and copies, fonts, overlays, page segments,
+  objects and index values.
+- **Find text.** Search the text of all pages; neoAFP ignores case and accents, tolerates up to
+  two typos per word and highlights every match on the page.
+- **Trace any element to its source.** Click text, an image or a line on the page and the
+  structure view opens on the structured field that drew it, even when it comes from an overlay
+  or page segment in another file. The other way round, any field can show you where it lands
+  on the page.
+- **Look inside the data stream.** The structure view shows every structured field and triplet
+  as a tree, with decoded parameters and the raw bytes in hex. Find fields by name or
+  identifier, jump to a byte offset, group long runs of like items, and choose the code page
+  for text where the file does not say.
+- **Work with index values and comments.** TLEs appear as a table with one row per page group
+  and one column per index name; NOPs as a list with their page, encoding and text. Sort,
+  filter, hide columns or ISIS Papyrus tagging records, and export both as JSON or CSV.
+- **Explore resources.** The Resource Explorer shows every font, overlay, page segment, image,
+  form definition and color profile of the open files as previews or as a list. Filter by type,
+  content, size, resolution, font or encoding, look at character sets and code page tables, see
+  each medium map of a form definition as a diagram, and download any resource with its exact
+  original bytes, a preview as PNG or TIFF, or the whole list as CSV.
+- **Take pages with you.** Save the current page as a PNG or TIFF image, or as plain text in
+  reading order.
+- **Use it in your language.** The interface speaks English, German, French, Spanish, Italian,
+  Dutch, Simplified Chinese and Japanese, follows your browser's language, and has a light and
+  a dark theme.
 
 ## Supported formats
 
