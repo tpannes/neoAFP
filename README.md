@@ -4,6 +4,8 @@ A modern, web-based viewer for AFP (Advanced Function Presentation, MO:DCA) docu
 resources: AFP files, page segments, overlays and fonts. Everything runs in the browser; files
 never leave your device — there is no server component, no upload and no request to other sites.
 
+![neoAFP start screen: the welcome page with the drop area and the feature list, page thumbnails on the left and the details panel on the right](docs/screenshots/neoAFP%20Startscreen.jpeg)
+
 ## How neoAFP was built
 
 neoAFP was created 100 % by AI: all code, tests and documentation were written by Claude Opus
