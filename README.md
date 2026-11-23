@@ -72,7 +72,7 @@ with vibe coding, this has the following advantages:
 |---|---|
 | Data stream | MO:DCA-P documents and resource files (with or without record separators); inline and external resource groups; resources found by file name or by the name in their Begin field, by resolution (240/300/600 dpi copies) |
 | Text | PTOCA presentation text; raster, Type 1 and CID-keyed font character sets; TrueType/OpenType fonts as files or embedded in object containers; EBCDIC (Latin, Japanese, Simplified Chinese), ASCII/ANSI and Unicode code pages |
-| Images | IOCA (uncompressed, IBM MMR, G3 MH/MR, G4 MMR, TIFF LZW, TIFF PackBits, JPEG; tiles, transparency masks, color spaces), IM images, JPEG, PNG, GIF and TIFF in object containers |
+| Images | IOCA (uncompressed, IBM MMR, G3 MH/MR, G4 MMR, TIFF algorithm 2, TIFF LZW (also with predictor), TIFF PackBits, JPEG; tiles, transparency masks, color spaces), IM images, JPEG, PNG, GIF and TIFF in object containers |
 | Graphics | GOCA for AFP (lines with line types, ends and joins, boxes, arcs, curves, areas with fill patterns, custom patterns, linear and radial gradients and boundary lines, markers, character strings in AFP fonts with angle and direction, images) |
 | Bar codes | BCOCA: Code 39, Code 93, Code 128 (with GS1 HRI), Codabar, MSI, Industrial/Matrix/Interleaved 2-of-5, UPC/EAN with supplements, POSTNET/PLANET, RM4SCC/KIX, Intelligent Mail, Japan Post, Australia Post, Royal Mail Mailmark, GS1 DataBar (all variants), Data Matrix, QR Code (also with image), PDF417 (also Macro PDF417), MaxiCode, Aztec, Han Xin |
 | Embedded objects | PDF pages (pdf.js, bundled), images and fonts in object containers |
@@ -81,9 +81,9 @@ with vibe coding, this has the following advantages:
 
 ## Known gaps
 
-- IOCA compressions RL4, ABIC, concatenated ABIC, JBIG2, TIFF algorithm 2, TIFF LZW with
-  predictor and the OS/2 color compression are not decoded: such images show a placeholder and a
-  diagnostic.
+- IOCA compressions RL4, ABIC, concatenated ABIC, JBIG2 and the OS/2 Image Support color
+  compression are not decoded, nor TIFF LZW with predictor for bilevel images: such images show a
+  placeholder and a diagnostic.
 - Royal Mail RED TAG bar codes are not drawn (placeholder and diagnostic).
 - Line data, mixed-mode data and page definitions are not supported: they are not part of
   MO:DCA (they are defined in IBM's line data reference; page definitions are usually built with

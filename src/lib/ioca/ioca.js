@@ -12,9 +12,10 @@
  * X'8E'/X'8F' begin/end transparency mask, X'FE92' image data, X'FE9C' band image data (band
  * number, 2 reserved bytes, data), X'FEBB' tile table of contents.
  *
- * Compressions: X'03' none, X'82' G4 MMR, X'80' G3 MH, X'81' G3 MR, X'0D' TIFF LZW,
- * X'0C' TIFF PackBits, X'83' JPEG (decoded by the browser). Others (IBM MMR X'01', RL4 X'06',
- * ABIC X'08', JBIG2 X'84', …) are reported as not supported (research R6).
+ * Compressions: X'03' none, X'01' IBM MMR, X'82' G4 MMR, X'80' G3 MH, X'81' G3 MR, X'09' TIFF
+ * algorithm 2, X'0D' TIFF LZW, X'0E' TIFF LZW with Differencing Predictor (8-bit samples),
+ * X'0C' TIFF PackBits, X'83' JPEG (decoded by the browser). Others (RL4 X'06', ABIC X'08' and
+ * X'0A', OS/2 Image Support X'0B', JBIG2 X'84', …) are reported as not supported (research R6).
  */
 
 import { specTable, shortNames } from '../spec-table.js';
@@ -33,8 +34,10 @@ const IPD = 0xd3eefb;
 /** Compression IDs (Image Encoding parameter X'95', COMPRID). */
 export const COMPRESSION_TABLE = specTable('IOCA Reference (AFPC-0003-09)', 'Image Encoding Parameter, COMPRID', [
   [0x01, 'IBM MMR', 'IBM MMR-Modified Modified Read'], [0x03, 'none', 'No compression'], [0x06, 'RL4', 'RL4 (Run Length 4)'],
-  [0x08, 'ABIC', 'ABIC (Bilevel Q-Coder)'], [0x0a, 'concatenated ABIC', 'Concatenated ABIC'],
-  [0x0c, 'TIFF PackBits', 'TIFF PackBits'], [0x0d, 'TIFF LZW', 'TIFF LZW'], [0x20, 'solid fill', 'Solid Fill Rectangle'],
+  [0x08, 'ABIC', 'ABIC (Bilevel Q-Coder)'], [0x09, 'TIFF algorithm 2', 'TIFF algorithm 2'],
+  [0x0a, 'concatenated ABIC', 'Concatenated ABIC'], [0x0b, 'OS/2 Image Support', 'Color compression used by OS/2 Image Support'],
+  [0x0c, 'TIFF PackBits', 'TIFF PackBits'], [0x0d, 'TIFF LZW', 'TIFF LZW'],
+  [0x0e, 'TIFF LZW with predictor', 'TIFF LZW with Differencing Predictor'], [0x20, 'solid fill', 'Solid Fill Rectangle'],
   [0x80, 'G3 MH', 'G3 MH-Modified Huffman'], [0x81, 'G3 MR', 'G3 MH-Modified READ'], [0x82, 'G4 MMR', 'G4 MMR-Modified Modified READ'],
   [0x83, 'JPEG', 'JPEG algorithms'], [0x84, 'JBIG2', 'JBIG2'],
 ]);
@@ -164,6 +167,25 @@ export function parseIoca(segment) {
 }
 
 /**
+ * Undoes the TIFF horizontal differencing predictor (TIFF 6.0, section 14; IOCA X'0E'): in each
+ * row, every 8-bit sample is stored as the difference to the same component of the pixel on its
+ * left, modulo 256.
+ * @param {Uint8Array} data Decompressed rows (changed in place).
+ * @param {number} width Pixels per row.
+ * @param {number} height Rows.
+ * @param {number} samples Samples (bytes) per pixel.
+ * @returns {Uint8Array} The same array.
+ */
+export function undoPredictor(data, width, height, samples) {
+  const rowLength = width * samples;
+  for (let y = 0; y < height; y++) {
+    const row = y * rowLength;
+    for (let i = samples; i < rowLength && row + i < data.length; i++) data[row + i] = (data[row + i] + data[row + i - samples]) & 0xff;
+  }
+  return data;
+}
+
+/**
  * Decompresses bilevel data.
  * @param {Uint8Array} data Compressed data.
  * @param {number} width Width.
@@ -179,8 +201,17 @@ function bilevel(data, width, height, compression) {
     const r = decodeCcitt(data, width, height, scheme);
     return { bits: r.bits, rowBytes, error: r.error };
   }
+  if (compression === 0x09) {
+    // TIFF algorithm 2: G3 MH, each row starting on a byte boundary, without end-of-line codes.
+    const r = decodeCcitt(data, width, height, 'G3-1D', { byteAlignRows: true });
+    return { bits: r.bits, rowBytes, error: r.error };
+  }
   if (compression === 0x0d) return { bits: decodeLzw(data, rowBytes * height), rowBytes, error: null };
   if (compression === 0x0c) return { bits: decodePackBits(data, rowBytes * height), rowBytes, error: null };
+  if (compression === 0x0e) {
+    // The predictor works on samples of 8 bits or more (TIFF 6.0, section 14), not on 1-bit images.
+    return { bits: null, rowBytes, error: 'TIFF LZW with Differencing Predictor is not defined for bilevel images' };
+  }
   return { bits: null, rowBytes, error: `compression ${COMPRESSIONS[compression] ?? `X'${compression.toString(16)}'`} not supported` };
 }
 
@@ -219,9 +250,10 @@ export function decodePart(p) {
     return out;
   }
   const n = p.width * p.height;
-  const decompress = (data, size) => {
+  const decompress = (data, size, samples) => {
     if (p.compression === 0x03) return data;
     if (p.compression === 0x0d) return decodeLzw(data, size);
+    if (p.compression === 0x0e) return undoPredictor(decodeLzw(data, size), p.width, p.height, samples);
     if (p.compression === 0x0c) return decodePackBits(data, size);
     return null;
   };
@@ -229,9 +261,9 @@ export function decodePart(p) {
   let planes;
   let interleaved = false;
   if (p.bands) {
-    planes = [...p.bandData.keys()].sort((a, b) => a - b).map((k) => decompress(concat(p.bandData.get(k)), n));
+    planes = [...p.bandData.keys()].sort((a, b) => a - b).map((k) => decompress(concat(p.bandData.get(k)), n, 1));
   } else {
-    planes = [decompress(p.data, n * Math.ceil(p.ideSize / 8))];
+    planes = [decompress(p.data, n * Math.ceil(p.ideSize / 8), Math.ceil(p.ideSize / 8))];
     interleaved = true;
   }
   if (planes.some((pl) => !pl)) {
@@ -322,7 +354,7 @@ async function renderIoca(r, file, row, env, origin, areaOverride = null) {
   const height = image.height || (idd ? u(idd, 7, 2) : 0);
   const area = (await readObjectArea(file, row, env, areaOverride)) ?? { x: 0, y: 0, width: null, height: null, contentX: 0, contentY: 0, rotation: 0, mappingOption: null };
   const unsupported = [...new Set(image.parts.map((p) => p.compression))]
-    .filter((c) => ![0x03, 0x01, 0x82, 0x80, 0x81, 0x0d, 0x0c, 0x83].includes(c));
+    .filter((c) => ![0x03, 0x01, 0x82, 0x80, 0x81, 0x09, 0x0d, 0x0e, 0x0c, 0x83].includes(c));
   const place = placeInArea({ ...area, x: origin.x + area.x, y: origin.y + area.y }, width * 1440 / xRes, height * 1440 / yRes);
   if (unsupported.length) {
     const reason = `IOCA compression ${unsupported.map((c) => COMPRESSIONS[c] ?? `X'${c.toString(16)}'`).join(', ')} not supported`;
