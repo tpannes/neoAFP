@@ -81,24 +81,20 @@ with vibe coding, this has the following advantages:
 
 ## Known gaps
 
-- IOCA compressions ABIC, concatenated ABIC and the OS/2 Image Support color compression are not
-  decoded, nor TIFF LZW with predictor for bilevel images and JBIG2 in tiled images: such images
-  show a placeholder and a diagnostic.
-- Royal Mail RED TAG bar codes are not drawn (placeholder and diagnostic).
-- Line data, mixed-mode data and page definitions are not supported: they are not part of
-  MO:DCA (they are defined in IBM's line data reference; page definitions are usually built with
-  PPFA). Such files are listed as not supported.
-- PTOCA: the glyph runs for complex scripts are not drawn.
-- Object containers other than PDF, JPEG, JPEG 2000, PNG, GIF, TIFF and TrueType/OpenType fonts
-  (e.g. EPS, PCL) show a placeholder and a diagnostic.
-- Only the first copy of a copy group is shown; N-up page positions are taken as positions on
-  the sheet (no partition origins); an Include Page between pages is reported, not shown.
-- Mixing rules, conditional page overlays and links (Link Logical Element) have no effect on the
-  display.
-- Color management resources and ICC profiles (also as stand-alone files) are listed as
-  resources but not applied to colors.
-- The structure view shows the retired Color Attribute Table fields and line-data page definition
-  fields raw.
+| Gap | Reason |
+|---|---|
+| Line data, mixed-mode data and page definitions | **Out of scope.** They are not part of MO:DCA: they are defined in IBM's line data reference, and page definitions are usually built with PPFA. Such files are listed as not supported. |
+| Object containers other than PDF, JPEG, JPEG 2000, PNG, GIF, TIFF and TrueType/OpenType fonts (e.g. EPS, PCL) | **Out of scope.** Each would need a full PostScript or PCL interpreter in the browser. |
+| Further copies of a copy group, N-up partition origins, Include Page between pages | **Out of scope.** neoAFP shows each sheet once as the document lays it out; it does not simulate a print run with repeated copies or inserted pages. N-up page positions are taken as positions on the sheet, and an Include Page between pages is reported. |
+| Mixing rules, conditional page overlays and links (Link Logical Element) | **Out of scope.** They depend on the printer or on interaction outside a static page view; the viewer draws objects in order over each other and shows the fields in the structure view. |
+| Retired Color Attribute Table fields and line-data page definition fields are shown raw in the structure view | **Out of scope.** The Color Attribute Table is retired in MO:DCA, and page definitions belong to line data (see above). |
+| IOCA ABIC and concatenated ABIC images (X'08', X'0A') | **Spec not available.** The IOCA Reference does not define the algorithm; it points to an IBM research paper from 1988 that is not available. A decoder written without it could draw wrong images unnoticed. |
+| IOCA OS/2 Image Support color compression (X'0B') | **Spec not available.** It is based on an early, unpublished draft of JPEG that differs from the JPEG standard, so browsers cannot decode it either. |
+| Royal Mail RED TAG bar codes | **Spec not available.** BCOCA only lists the data fields and the symbol size; Royal Mail never published the bar encoding, and the symbology is deprecated. |
+| TIFF LZW with predictor for bilevel images | **Not defined.** The predictor works on 8-bit samples; the IOCA and TIFF specifications do not say how it applies to 1-bit images (libtiff refuses them as well). |
+| JBIG2 in tiled IOCA images and JBIG2 files in random-access organization | **No samples.** Single JBIG2 images are drawn; these rarer forms would need extra handling that could not be tested against real files. |
+| PTOCA glyph runs for complex scripts | **Browser limit, no samples.** The glyph runs give glyph IDs of a TrueType/OpenType font, but the browser draws fonts by character, not by glyph ID; this would need an own outline renderer. |
+| Color management resources and ICC profiles (also as stand-alone files) are not applied to colors | **Design decision.** They are listed as resources with their details; colors are shown as defined in the document, so the view does not depend on profile handling. |
 
 ## Requirements
 
