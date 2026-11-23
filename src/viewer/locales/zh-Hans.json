@@ -69,6 +69,7 @@
     "kind.otherResource": "资源",
     "kind.resourceGroup": "资源组",
     "kind.truetypeFont": "TrueType/OpenType 字体",
+    "kind.iccProfile": "ICC 配置文件",
     "kind.unsupported:lineData": "行数据（不支持）",
     "kind.unsupported:mixedMode": "混合模式数据（不支持）",
     "kind.unsupported:pageDefinition": "页面定义（不支持）",

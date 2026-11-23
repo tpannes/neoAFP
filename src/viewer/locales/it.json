@@ -69,6 +69,7 @@
     "kind.otherResource": "Risorsa",
     "kind.resourceGroup": "Gruppo di risorse",
     "kind.truetypeFont": "Font TrueType/OpenType",
+    "kind.iccProfile": "Profilo ICC",
     "kind.unsupported:lineData": "Line data (non supportati)",
     "kind.unsupported:mixedMode": "Dati mixed mode (non supportati)",
     "kind.unsupported:pageDefinition": "Page definition (non supportata)",

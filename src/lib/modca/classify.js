@@ -106,6 +106,8 @@ export async function sniffFile(source) {
   if (magic === '\x00\x01\x00\x00' || magic === 'true' || magic === 'OTTO' || magic === 'ttcf') {
     return result('truetypeFont');
   }
+  // A stand-alone ICC profile: signature 'acsp' at byte 36 of its header (ICC.1, T308).
+  if (head.length >= 132 && String.fromCharCode(...head.subarray(36, 40)) === 'acsp') return result('iccProfile');
   if (head[0] === 0x5a) return { isAfp: true, kind: null, skipReason: null };
   // X'5A' read as EBCDIC 273 is "Ü", which Latin-1 stores as X'DC'; X'D3' becomes X'4C'.
   if (head[0] === 0xdc && head[3] === 0x4c) return result('notRecognized', 'unknownEncoding');

@@ -29,7 +29,8 @@ import { ebcdicName } from './modca/bytes.js';
 import { readFontNames } from './foca/opentype.js';
 import { outlineReader } from './foca/type1.js';
 import { imImagePixels, BEGIN_IM_IMAGE } from './im/im-image.js';
-import { readIocaImage, BEGIN_IMAGE_OBJECT } from './ioca/ioca.js';
+import { readIocaImage, readJbig2Image, BEGIN_IMAGE_OBJECT } from './ioca/ioca.js';
+import { imagePdf, jpeg2000Header } from './objcontainer/image-pdf.js';
 import './goca/goca.js';
 import './bcoca/bcoca.js';
 import { containerPixels, readContainer, BEGIN_OBJECT_CONTAINER } from './objcontainer/object-container.js';
@@ -901,7 +902,8 @@ export class Workspace {
   }
 
   /**
-   * Returns the content of an object container (e.g. an embedded PDF for pdf.js).
+   * Returns the content of an object container (e.g. an embedded PDF for pdf.js); for a JPEG 2000
+   * container or a JBIG2 IOCA image, a one-page PDF that shows the image (T311).
    * @param {string} objectRef Reference from a render item ("<fileId>:<row>").
    * @returns {Promise<{format: string, bytes: Uint8Array}>} Format and bytes.
    */
@@ -909,8 +911,19 @@ export class Workspace {
     const [fileId, rowText] = String(objectRef).split(':');
     const file = this.getFileRecord(fileId);
     const row = Number(rowText);
+    // JBIG2 in an IOCA image and JPEG 2000 in a container are passed to pdf.js as a one-page PDF (T311).
+    if (file.index?.id[row] === BEGIN_IMAGE_OBJECT) {
+      const jbig2 = await readJbig2Image(file, row);
+      if (jbig2.error) throw new RangeError(jbig2.error);
+      return { format: 'pdf', bytes: imagePdf({ ...jbig2, filter: 'JBIG2Decode', imageMask: true }) };
+    }
     if (file.index?.id[row] !== BEGIN_OBJECT_CONTAINER) throw new RangeError(`not an object container: ${objectRef}`);
     const { format, bytes } = await readContainer(file, row);
+    if (format === 'jpeg2000') {
+      const hdr = jpeg2000Header(bytes);
+      if (!hdr) throw new RangeError(`JPEG 2000 image could not be read: ${objectRef}`);
+      return { format: 'pdf', bytes: imagePdf({ data: bytes, width: hdr.width, height: hdr.height, filter: 'JPXDecode' }) };
+    }
     return { format, bytes };
   }
 

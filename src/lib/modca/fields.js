@@ -102,7 +102,15 @@ export async function getField(file, fieldIndex) {
   let ok = false;
   if (entry?.decode) {
     try {
-      const out = entry.decode(data);
+      // Some fields can only be read with an earlier field of the same group (entry.context).
+      let context = null;
+      if (entry.context) {
+        const { index } = file;
+        for (let r = fieldIndex - 1; r >= 0 && index.parent[r] === index.parent[fieldIndex]; r--) {
+          if (index.id[r] === entry.context) { context = await fieldData(file, r); break; }
+        }
+      }
+      const out = entry.decode(data, context);
       parameters = out.parameters;
       triplets = out.tripletRanges.flatMap(([from, to]) => parseTriplets(data.subarray(from, to)))
         .map(({ id, name, decoded, raw, rawOnly }) => ({ id, name, decoded, rawOnly, raw, start: raw.byteOffset - data.byteOffset }));

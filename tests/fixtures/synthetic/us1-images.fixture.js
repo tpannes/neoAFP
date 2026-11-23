@@ -7,7 +7,7 @@
  * 1. bilevel 64 × 48 at 240 dpi, uncompressed (X'03'), Map Image Object "position and trim";
  * 2. the same bitmap, G4 MMR (X'82');
  * 3. the same bitmap, TIFF LZW (X'0D');
- * 4. RL4 (X'06'), which neoAFP does not support (research R6): placeholder + diagnostic;
+ * 4. ABIC (X'08'), which neoAFP does not support (research R6, T281): placeholder + diagnostic;
  * 5. a 32 × 24 JPEG (X'83'), passed on encoded;
  * 6. grayscale 32 × 32, 8 bits per pel, uncompressed;
  * 7. tiled 64 × 32: a bilevel tile with a transparency mask and an 8-bit grayscale tile.
@@ -94,7 +94,7 @@ export function buildBytes() {
     image(1, 1440, 1440, 64, 48, bytes(encoding(0x03), ide(1), data(bits)), 0x10),
     image(2, 4320, 1440, 64, 48, bytes(encoding(0x82), ide(1), data(G4))),
     image(3, 7200, 1440, 64, 48, bytes(encoding(0x0d), ide(1), data(LZW))),
-    image(4, 1440, 4320, 64, 48, bytes(encoding(0x06), ide(1), data(new Uint8Array(16)))),
+    image(4, 1440, 4320, 64, 48, bytes(encoding(0x08), ide(1), data(new Uint8Array(16)))),
     image(5, 4320, 4320, 32, 24, bytes(encoding(0x83), ide(24), sdf(0x9b, 0x00, 0x12, 0, 0, 0, 8, 8, 8), data(JPEG))),
     image(6, 7200, 4320, 32, 32, bytes(encoding(0x03), ide(8), data(gray))),
     image(7, 1440, 7200, 64, 32, tiled),

@@ -1,0 +1,230 @@
+{
+ "kind": "resourceGroup",
+ "decodedFields": [
+  {
+   "offset": 136,
+   "id": "D38C87",
+   "parameters": [
+    {
+     "name": "RG 1 GCGID",
+     "value": "LA020000"
+    },
+    {
+     "name": "RG 1 GCGIDFlgs",
+     "value": "X'00'"
+    },
+    {
+     "name": "RG 1 CodePoint",
+     "value": "X'C1'"
+    },
+    {
+     "name": "RG 2 GCGID",
+     "value": "LB020000"
+    },
+    {
+     "name": "RG 2 GCGIDFlgs",
+     "value": "X'00'"
+    },
+    {
+     "name": "RG 2 CodePoint",
+     "value": "X'C2'"
+    },
+    {
+     "name": "RG 3 GCGID",
+     "value": "LC020000"
+    },
+    {
+     "name": "RG 3 GCGIDFlgs",
+     "value": "X'00'"
+    },
+    {
+     "name": "RG 3 CodePoint",
+     "value": "X'C3'"
+    },
+    {
+     "name": "RG 4 GCGID",
+     "value": "SP010000"
+    },
+    {
+     "name": "RG 4 GCGIDFlgs",
+     "value": "X'00'"
+    },
+    {
+     "name": "RG 4 CodePoint",
+     "value": "X'40'"
+    }
+   ]
+  },
+  {
+   "offset": 338,
+   "id": "D38C87",
+   "parameters": [
+    {
+     "name": "RG 1 GCGID",
+     "value": "JPNEO000"
+    },
+    {
+     "name": "RG 1 GCGIDFlgs",
+     "value": "X'00'"
+    },
+    {
+     "name": "RG 1 CodePoint",
+     "value": "X'4281'"
+    },
+    {
+     "name": "RG 2 GCGID",
+     "value": "JPNEO001"
+    },
+    {
+     "name": "RG 2 GCGIDFlgs",
+     "value": "X'00'"
+    },
+    {
+     "name": "RG 2 CodePoint",
+     "value": "X'4282'"
+    },
+    {
+     "name": "RG 3 GCGID",
+     "value": "JPNEO002"
+    },
+    {
+     "name": "RG 3 GCGIDFlgs",
+     "value": "X'00'"
+    },
+    {
+     "name": "RG 3 CodePoint",
+     "value": "X'4283'"
+    },
+    {
+     "name": "RG 4 GCGID",
+     "value": "JPNEO003"
+    },
+    {
+     "name": "RG 4 GCGIDFlgs",
+     "value": "X'00'"
+    },
+    {
+     "name": "RG 4 CodePoint",
+     "value": "X'4284'"
+    },
+    {
+     "name": "RG 5 GCGID",
+     "value": "JPNEO004"
+    },
+    {
+     "name": "RG 5 GCGIDFlgs",
+     "value": "X'00'"
+    },
+    {
+     "name": "RG 5 CodePoint",
+     "value": "X'4285'"
+    },
+    {
+     "name": "RG 6 GCGID",
+     "value": "JPNEO005"
+    },
+    {
+     "name": "RG 6 GCGIDFlgs",
+     "value": "X'00'"
+    },
+    {
+     "name": "RG 6 CodePoint",
+     "value": "X'4286'"
+    },
+    {
+     "name": "RG 7 GCGID",
+     "value": "JPNEO006"
+    },
+    {
+     "name": "RG 7 GCGIDFlgs",
+     "value": "X'00'"
+    },
+    {
+     "name": "RG 7 CodePoint",
+     "value": "X'4287'"
+    },
+    {
+     "name": "RG 8 GCGID",
+     "value": "JPNEO007"
+    },
+    {
+     "name": "RG 8 GCGIDFlgs",
+     "value": "X'00'"
+    },
+    {
+     "name": "RG 8 CodePoint",
+     "value": "X'4288'"
+    },
+    {
+     "name": "RG 9 GCGID",
+     "value": "JPNEO008"
+    },
+    {
+     "name": "RG 9 GCGIDFlgs",
+     "value": "X'00'"
+    },
+    {
+     "name": "RG 9 CodePoint",
+     "value": "X'4289'"
+    },
+    {
+     "name": "RG 10 GCGID",
+     "value": "JPNEO009"
+    },
+    {
+     "name": "RG 10 GCGIDFlgs",
+     "value": "X'00'"
+    },
+    {
+     "name": "RG 10 CodePoint",
+     "value": "X'428A'"
+    }
+   ]
+  },
+  {
+   "offset": 677,
+   "id": "D3AB89",
+   "parameters": [
+    {
+     "name": "RG 1 GCGID",
+     "value": "LA010000"
+    },
+    {
+     "name": "RG 1 TSOffset",
+     "value": 24
+    },
+    {
+     "name": "RG 1 GlyphName",
+     "value": "a"
+    },
+    {
+     "name": "RG 2 GCGID",
+     "value": "LB010000"
+    },
+    {
+     "name": "RG 2 TSOffset",
+     "value": 26
+    },
+    {
+     "name": "RG 2 GlyphName",
+     "value": "b"
+    }
+   ]
+  },
+  {
+   "offset": 867,
+   "id": "D3ACAF",
+   "parameters": [
+    {
+     "name": "XmOset",
+     "value": 100
+    },
+    {
+     "name": "YmOset",
+     "value": 200
+    }
+   ]
+  }
+ ],
+ "diagnostics": []
+}

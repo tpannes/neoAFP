@@ -102,6 +102,12 @@ export class ResourceCatalog {
    */
   async addFile(file) {
     this.version++;
+    if (file.kind === 'iccProfile') {
+      // A stand-alone ICC profile file is a resource of its own, named like the file (T308).
+      const displayName = file.name.split(/[\\/]/).pop().replace(/\.[^.]*$/, '') || file.name;
+      this.#add({ type: 'iccProfile', name: displayName.toUpperCase(), displayName, fileId: file.id, beginRow: -1, origin: file.source });
+      return;
+    }
     if (file.kind === 'truetypeFont') {
       for (const font of file.fontNames ?? []) {
         this.#add({ type: 'truetypeFont', name: font.fullName.toUpperCase(), displayName: font.fullName, fileId: file.id, beginRow: -1,

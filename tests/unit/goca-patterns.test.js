@@ -148,3 +148,18 @@ test('a segment that ends inside a custom pattern definition ends the definition
   const { items } = run([{ code: 0xde, data: bytes(0, 0, 0, 0x03, 0x04, xy(0, 20, 0, 10)) }, pts(0xc1, [[0, 0], [5, 5]])]);
   assert.deepEqual(items, []);
 });
+
+test('CMYK and CIELAB gradients are interpolated in their own color space (T310)', async () => {
+  const { extendedColor } = await import('../../src/lib/ptoca/ptoca.js');
+  const spec = (space, value) => bytes(10 + value.length, 0x00, space, 0, 0, 0, 0, ...value.map(() => 8), ...Array(4 - value.length).fill(0), ...value);
+  const color = (space, value) => extendedColor(new Uint8Array([0x00, space, 0, 0, 0, 0, ...value.map(() => 8), ...Array(4 - value.length).fill(0), ...value]));
+  const order = (space, start, end) => bytes(0, 0, 0x01, 0x02, xy(0, 0, 100, 0), spec(space, start), ...end, 1, 1);
+  const cmyk = readLinearGradient(order(0x04, [255, 0, 0, 0], [0, 0, 255, 0]));
+  assert.equal(cmyk.stops.length, 17, 'start, 15 steps, end');
+  assert.deepEqual(cmyk.stops[8], { offset: 0.5, color: color(0x04, [128, 0, 128, 0]) }, 'the middle is mixed in CMYK');
+  // CIELAB: a from −100 to +100 (signed bytes X'9C' and X'64'): the middle has a = 0, not −128.
+  const lab = readLinearGradient(order(0x08, [128, 0x9c, 0], [128, 0x64, 0]));
+  assert.deepEqual(lab.stops[8].color, color(0x08, [128, 0, 0]));
+  const rgb = readLinearGradient(gradientData('linear', [0, 0, 100, 0], [1, 1]));
+  assert.equal(rgb.stops.length, 2, 'RGB gradients keep their stops');
+});

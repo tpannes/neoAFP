@@ -7,8 +7,10 @@
  * A gradient is parameterized by t: 0 at the start (point or full arc), 1 at the end. Canvas
  * gradients pad beyond their ends, so the other Outside values are drawn by giving the canvas
  * gradient a range [tmin, tmax] that covers the area and stops that repeat, mirror or end there.
- * Colors are interpolated by the drawing surface in RGB (the reference asks for the gradient's
- * own color space; CMYK and CIELAB gradients are converted to RGB at each stop).
+ * Colors are interpolated in the gradient's own color space, as the reference asks (T310): for
+ * CMYK and CIELAB gradients 15 stops are added between each two stops, interpolated in that space
+ * and then converted to RGB; the drawing surface interpolates in RGB only between those close
+ * stops. RGB gradients need no extra stops.
  */
 
 import { extendedColor } from '../ptoca/ptoca.js';
@@ -40,16 +42,55 @@ function readColors(d, at) {
   if (!start || !end || pos + 2 > d.length) return null; // EC-0E02/0E03
   const outside = [OUTSIDE[d[pos]] ?? 'none', OUTSIDE[d[pos + 1]] ?? 'none'];
   pos += 2;
-  const stops = [{ offset: 0, color: start }];
+  const value = (at) => d.subarray(at, at + size);
+  const raw = [{ offset: 0, value: value(at + 11) }];
   let last = 0;
   for (; pos + 2 + size <= d.length; pos += 2 + size) {
     const offset = u(d, pos, 2);
     if (offset > 10000 || offset / 10000 < last) continue; // EC-DC05: ignore the stop
     last = offset / 10000;
-    stops.push({ offset: last, color: color(pos + 2) ?? end });
+    raw.push({ offset: last, value: value(pos + 2) });
   }
-  stops.push({ offset: 1, color: end });
-  return { stops, outside };
+  raw.push({ offset: 1, value: value(at + 1 + len) });
+  const toColor = (v) => extendedColor(new Uint8Array([...header, ...v])) ?? end;
+  return { stops: interpolated(raw, header, toColor), outside };
+}
+
+/** Extra stops added between two stops of a CMYK or CIELAB gradient. */
+const STEPS = 16;
+
+/**
+ * Turns the stops of a gradient into colors. CMYK (X'04') and CIELAB (X'08') gradients with 8-bit
+ * components get STEPS − 1 extra stops between each two stops, interpolated component by
+ * component (CIELAB a and b as signed values), so that the result follows the gradient's own
+ * color space; other gradients keep their stops.
+ * @param {{offset: number, value: Uint8Array}[]} raw Stops with their color values.
+ * @param {Uint8Array} header Color space and component sizes (bytes 1–10 of the color
+ *   specification).
+ * @param {(value: Uint8Array) => string} toColor Converts a color value to RGB.
+ * @returns {{offset: number, color: string}[]} Stops.
+ */
+function interpolated(raw, header, toColor) {
+  const space = header[1];
+  const sizes = [...header.subarray(6, 10)].filter(Boolean);
+  const own = (space === 0x04 || space === 0x08) && sizes.every((b) => b === 8);
+  if (!own) return raw.map((r) => ({ offset: r.offset, color: toColor(r.value) }));
+  const signed = (i, v) => (space === 0x08 && i > 0 && v > 127 ? v - 256 : v);
+  const out = [];
+  raw.forEach((r, n) => {
+    out.push({ offset: r.offset, color: toColor(r.value) });
+    const next = raw[n + 1];
+    if (!next || next.offset === r.offset) return; // two stops at one offset: a jump
+    for (let j = 1; j < STEPS; j++) {
+      const t = j / STEPS;
+      const v = Uint8Array.from(r.value, (a, i) => {
+        const x = signed(i, a) + (signed(i, next.value[i]) - signed(i, a)) * t;
+        return Math.round(x) & 0xff;
+      });
+      out.push({ offset: r.offset + (next.offset - r.offset) * t, color: toColor(v) });
+    }
+  });
+  return out;
 }
 
 /**

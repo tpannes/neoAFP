@@ -125,6 +125,8 @@ export function runPtoca(parts, ctx) {
     iDeg: 0, bDeg: 90, underscore: false, tbm: 0,
     // Local ID of the open text suppression (BSU … ESU) whose ID is active, else null.
     suppressing: null,
+    // Overstrike field (OVS … OVS, T307): character, bypass flags, and the open overstrike area.
+    ovs: null,
   };
   const segments = [];
   const rules = [];
@@ -136,6 +138,51 @@ export function runPtoca(parts, ctx) {
   const font = () => ctx.font(st.lid);
 
   /**
+   * Starts an overstrike area at the current position, unless one is open.
+   * @returns {void}
+   */
+  const ovsOpen = () => {
+    const o = st.ovs;
+    if (!o || o.start !== null || st.suppressing !== null) return;
+    Object.assign(o, { start: st.i, end: st.i, b: st.b + st.tbm, iDeg: st.iDeg, bDeg: st.bDeg, color: st.color, lid: st.lid, part });
+  };
+
+  /**
+   * Ends the open overstrike area: the overstrike character side by side over its length, as
+   * many as fit (rounded down), at least one (PTOCA Reference, Overstrike semantics).
+   * @returns {void}
+   */
+  const ovsClose = () => {
+    const o = st.ovs;
+    if (!o || o.start === null) return;
+    const start = o.start;
+    const length = o.end - start;
+    o.start = null;
+    if (length <= 0) return;
+    const f = ctx.font(o.lid);
+    const g = f.glyph(o.code);
+    const count = g.advance > 0 ? Math.max(1, Math.floor(length / g.advance + 1e-9)) : 1;
+    const glyphs = Array.from({ length: count }, (_, n) => ({ id: g.id, unicode: g.unicode, code: o.code, di: n * g.advance }));
+    segments.push({ type: 'text', i: start, b: o.b, iDeg: o.iDeg, bDeg: o.bDeg, lid: o.lid, color: o.color, part: o.part, glyphs, overstrike: true });
+  };
+
+  /**
+   * Moves the inline position inside an overstrike field: a backward move or a bypassed kind of
+   * move ends the area, other moves are overstruck too.
+   * @param {number} to New inline position.
+   * @param {'ami'|'rmi'} kind Absolute or relative move.
+   * @returns {void}
+   */
+  const moveInline = (to, kind) => {
+    const o = st.ovs;
+    if (o && o.start !== null) {
+      if (to < st.i || o.bypass[kind]) ovsClose();
+      else o.end = Math.max(o.end, to);
+    }
+    st.i = to;
+  };
+
+  /**
    * Places characters at the current position.
    * @param {Uint8Array} bytes Character bytes.
    * @returns {void}
@@ -144,11 +191,16 @@ export function runPtoca(parts, ctx) {
     if (bytes.length === 0) return;
     const f = font();
     const seg = { type: 'text', i: st.i, b: st.b + st.tbm, iDeg: st.iDeg, bDeg: st.bDeg, lid: st.lid, color: st.color, part, glyphs: [] };
+    if (st.suppressing !== null) ovsClose();
     for (const { code } of f.split(bytes)) {
       const g = f.glyph(code);
       seg.glyphs.push({ id: g.id, unicode: g.unicode, code, di: st.i - seg.i });
+      // Overstrike: spaces end the area when the bypass flags say so, other characters open one.
+      const bypassed = st.ovs && st.ovs.bypass.space && (g.variableSpace || g.unicode === ' ');
+      if (bypassed) ovsClose(); else ovsOpen();
       const advance = g.variableSpace && st.svi !== null ? st.svi : g.advance;
       st.i += advance + st.sia;
+      if (!bypassed && st.ovs && st.ovs.start !== null) st.ovs.end = Math.max(st.ovs.end, st.i);
     }
     // Suppressed text (BSU/ESU, T284): positions move on as if it were there, nothing is drawn.
     if (st.suppressing !== null) return;
@@ -171,12 +223,13 @@ export function runPtoca(parts, ctx) {
       case 0xc0: st.margin = u(d, 0, 2) * k; break; // SIM
       case 0xc2: st.sia = (d[2] === 1 ? -1 : 1) * u(d, 0, 2) * k; break; // SIA
       case 0xc4: st.svi = u(d, 0, 2) * k; break; // SVI
-      case 0xc6: st.i = u(d, 0, 2) * k; break; // AMI
-      case 0xc8: st.i += s(d, 0, 2) * k; break; // RMI
+      case 0xc6: moveInline(u(d, 0, 2) * k, 'ami'); break; // AMI
+      case 0xc8: moveInline(st.i + s(d, 0, 2) * k, 'rmi'); break; // RMI
       case 0xd0: st.baselineInc = u(d, 0, 2) * k; break; // SBI
-      case 0xd2: st.b = u(d, 0, 2) * k; break; // AMB
-      case 0xd4: st.b += s(d, 0, 2) * k; break; // RMB
-      case 0xd8: st.i = st.margin; st.b += st.baselineInc ?? font().baselineIncrement; break; // BLN
+      // Baseline moves and new lines end an overstrike area.
+      case 0xd2: ovsClose(); st.b = u(d, 0, 2) * k; break; // AMB
+      case 0xd4: ovsClose(); st.b += s(d, 0, 2) * k; break; // RMB
+      case 0xd8: ovsClose(); st.i = st.margin; st.b += st.baselineInc ?? font().baselineIncrement; break; // BLN
       case 0xda: text(d); break; // TRN
       case 0xe4: case 0xe6: { // DIR, DBR
         const length = s(d, 0, 2) * k;
@@ -195,11 +248,12 @@ export function runPtoca(parts, ctx) {
         break;
       }
       case 0xf0: st.lid = d[0]; break; // SCFL
-      case 0xf6: st.iDeg = orientation(u(d, 0, 2)); st.bDeg = orientation(u(d, 2, 2)); break; // STO
+      case 0xf6: ovsClose(); st.iDeg = orientation(u(d, 0, 2)); st.bDeg = orientation(u(d, 2, 2)); break; // STO
       case 0x74: st.color = NAMED_COLORS[u(d, 0, 2)] ?? st.color; break; // STC
       case 0x80: st.color = extendedColor(d) ?? st.color; break; // SEC
       case 0x76: st.underscore = d[0] !== 0; break; // USC (bypass flags; 0 = off)
       case 0x78: { // TBM
+        ovsClose();
         const dir = d[0];
         const inc = d.length >= 4 ? u(d, 2, 2) * k : 0;
         st.tbm = dir === 1 ? 0 : dir === 2 ? st.tbm - inc : dir === 3 ? st.tbm + inc : st.tbm;
@@ -209,7 +263,16 @@ export function runPtoca(parts, ctx) {
       case 0xf2: if (st.suppressing === null && ctx.suppressed?.has(d[0])) st.suppressing = d[0]; break;
       // ESU: ends the suppression with the same local ID (another ID is ignored).
       case 0xf4: if (st.suppressing === d[0]) st.suppressing = null; break;
-      case 0xf8: case 0x72: break; // NOP, OVS: no visible effect here
+      case 0x72: { // OVS: bits 4–7 of BYPSIDEN non-zero begin an overstrike field, zero ends it
+        ovsClose();
+        const flags = d[0];
+        if ((flags & 0x0f) === 0) { st.ovs = null; break; }
+        const all = (flags & 0x01) !== 0; // bit 7: no bypass, everything is overstruck
+        st.ovs = { code: u(d, 1, 2), start: null, end: 0,
+          bypass: { rmi: !all && (flags & 0x08) !== 0, ami: !all && (flags & 0x04) !== 0, space: !all && (flags & 0x02) !== 0 } };
+        break;
+      }
+      case 0xf8: break; // NOP
       default: unknown.add(type);
     }
   };
@@ -240,6 +303,7 @@ export function runPtoca(parts, ctx) {
     }
     if (!chained) text(data.subarray(textStart, data.length));
   }
+  ovsClose(); // the end of the text object ends an overstrike field
   for (const type of unknown) ctx.report('unsupportedObject', { reason: `PTOCA control sequence X'${type.toString(16).toUpperCase()}'` });
   return { segments, rules };
 }

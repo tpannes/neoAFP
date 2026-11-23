@@ -69,6 +69,7 @@
     "kind.otherResource": "リソース",
     "kind.resourceGroup": "リソース・グループ",
     "kind.truetypeFont": "TrueType/OpenType フォント",
+    "kind.iccProfile": "ICC プロファイル",
     "kind.unsupported:lineData": "行データ（非対応）",
     "kind.unsupported:mixedMode": "混合モード・データ（非対応）",
     "kind.unsupported:pageDefinition": "ページ定義（非対応）",

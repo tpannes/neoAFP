@@ -185,6 +185,44 @@ const NAME = (name) => [[0, 8, 'char', name]];
  */
 const ORIENTATIONS = (x, y, at) => [[at, 2, 'code', x], [at + 2, 2, 'code', y]];
 
+/**
+ * Decodes a Font Name Map (FOCA, outline fonts; T309): a short header, repeating groups of a
+ * GCGID and a 4-byte offset into the name area after the groups, and the names (a length byte
+ * that counts itself, then a Type 1 glyph name in ASCII or a 2-byte CID). The group length and
+ * the number of groups come from the Font Control (FNNRGLen byte 35, FNNMapCnt bytes 40–41);
+ * the header is 0, 2 or 4 bytes, found where the first offset points just past the groups (as
+ * the font reader does). A map split over several fields shows a name only when its offset lies
+ * in this field.
+ * @param {Uint8Array} d Field data.
+ * @param {Uint8Array|null} fnc Font Control data, if found.
+ * @returns {DecodedField} Parameters.
+ */
+function decodeFontNameMap(d, fnc) {
+  const rg = fnc?.[35] || 12;
+  const count = fnc && fnc.length >= 42 ? ubin(fnc, 40, 2) : 0;
+  const cid = fnc?.[1] === 0x1e;
+  let header = -1;
+  for (const h of [0, 2, 4]) {
+    const first = d.length >= h + 12 ? ubin(d, h + 8, 4) : -1;
+    const groups = (first - h) / rg;
+    if (Number.isInteger(groups) && groups > 0 && first <= d.length && (!count || groups === count)) { header = h; break; }
+  }
+  if (header < 0) throw new RangeError('no name map groups found');
+  const parameters = header ? fixed(d, [[0, header, 'code', 'Header']]) : [];
+  const groups = (ubin(d, header + 8, 4) - header) / rg;
+  for (let i = 0, pos = header; i < groups; i++, pos += rg) {
+    const n = i + 1;
+    parameters.push(...fixed(d, [[0, 8, 'char', 'GCGID'], [8, 4, 'ubin', 'TSOffset']], pos, `RG ${n} `));
+    const off = ubin(d, pos + 8, 4);
+    const len = d[off];
+    if (len >= 2 && off + len <= d.length) {
+      const name = d.subarray(off + 1, off + len);
+      parameters.push({ name: `RG ${n} ${cid ? 'CID' : 'GlyphName'}`, value: cid ? ubin(name, 0, name.length) : String.fromCharCode(...name) });
+    }
+  }
+  return { parameters, tripletRanges: [] };
+}
+
 /** Decoders by field identifier. */
 const DECODERS = {
   0xd3a8a8: withTriplets(NAME('DocName'), 10), // BDT
@@ -328,6 +366,7 @@ Object.assign(DECODERS, {
   // MSU: repeating groups of suppression name (8), reserved (1), local ID (1) (MO:DCA "Map Suppression").
   0xd3abea: fixedGroups(0, [], 10, [[0, 8, 'char', 'SUPname'], [9, 1, 'ubin', 'SUPid']]),
   0xd3afaf: withTriplets([...NAME('PgName'), [16, 1, 'code', 'IPgFlgs']], 17), // IPG
+  0xd3acaf: withTriplets([[0, 3, 'ubin', 'XmOset'], [3, 3, 'ubin', 'YmOset']], null), // PGP format 1 (T309)
   0xd3b1af: (d) => { // PGP format 2: constant, then groups of RGLength bytes (10–12)
     const parameters = fixed(d, [[0, 1, 'code', 'Constant']]);
     for (let pos = 1, n = 1; pos < d.length; n++) {
@@ -363,6 +402,14 @@ Object.assign(DECODERS, {
     [38, 2, 'ubin', 'GCSGID'], [40, 2, 'ubin', 'CPGID'], [42, 2, 'code', 'EncScheme']], null), // CPD
   0xd3a787: withTriplets([[0, 8, 'char', 'DefCharID'], [8, 1, 'code', 'PrtFlags'], [9, 1, 'code', 'CPIRGLen'],
     [10, 1, 'ubin', 'VSCharSN'], [11, 1, 'ubin', 'VSChar'], [12, 1, 'code', 'VSFlags']], null), // CPC
+  // CPI: groups of GCGID, flags and a 1- or 2-byte code point; the group length is in the Code
+  // Page Control (CPIRGLen: X'0A'/X'0E' single-byte, X'0B'/X'0F' double-byte) (T309).
+  0xd38c87: (d, cpc) => {
+    const rg = cpc?.[9] || (d.length % 11 === 0 && d.length % 10 !== 0 ? 11 : 10);
+    const width = rg === 11 || rg === 0x0f ? 2 : 1;
+    return fixedGroups(0, [], rg, [[0, 8, 'char', 'GCGID'], [8, 1, 'code', 'GCGIDFlgs'], [9, width, 'code', 'CodePoint']])(d);
+  },
+  0xd3ab89: decodeFontNameMap, // FNN (T309)
   0xd3a78a: withTriplets([[0, 1, 'ubin', 'CFIRGLen']], 2), // CFC
   0xd38c8a: fixedGroups(0, [], 25, [[0, 8, 'char', 'FCSName'], [8, 8, 'char', 'CPName'], [16, 2, 'ubin', 'SVSize'],
     [18, 2, 'ubin', 'SHScale'], [24, 1, 'ubin', 'Section']]), // CFI
@@ -374,6 +421,10 @@ Object.assign(DECODERS, {
 // fields of the fixture font), us1-images, us1-graphics and us1-barcodes.
 const RAW_ONLY = new Set([]);
 
+/** Fields read with an earlier field of their group: Code Page Index with Code Page Control,
+ * Font Name Map with Font Control. */
+const CONTEXT = { [0xd38c87]: 0xd3a787, [0xd3ab89]: 0xd3a789 };
+
 for (const [id, decode] of Object.entries(DECODERS)) {
-  fieldRegistry.setDecoder(Number(id), decode, { rawOnly: RAW_ONLY.has(Number(id)) });
+  fieldRegistry.setDecoder(Number(id), decode, { rawOnly: RAW_ONLY.has(Number(id)), context: CONTEXT[id] });
 }

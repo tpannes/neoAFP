@@ -12,10 +12,10 @@
  * X'8E'/X'8F' begin/end transparency mask, X'FE92' image data, X'FE9C' band image data (band
  * number, 2 reserved bytes, data), X'FEBB' tile table of contents.
  *
- * Compressions: X'03' none, X'01' IBM MMR, X'82' G4 MMR, X'80' G3 MH, X'81' G3 MR, X'09' TIFF
- * algorithm 2, X'0D' TIFF LZW, X'0E' TIFF LZW with Differencing Predictor (8-bit samples),
- * X'0C' TIFF PackBits, X'83' JPEG (decoded by the browser). Others (RL4 X'06', ABIC X'08' and
- * X'0A', OS/2 Image Support X'0B', JBIG2 X'84', …) are reported as not supported (research R6).
+ * Compressions: X'03' none, X'01' IBM MMR, X'06' RL4, X'82' G4 MMR, X'80' G3 MH, X'81' G3 MR,
+ * X'09' TIFF algorithm 2, X'84' JBIG2 (single-part images, drawn by pdf.js), X'0D' TIFF LZW, X'0E' TIFF LZW with Differencing Predictor (8-bit samples),
+ * X'0C' TIFF PackBits, X'83' JPEG (decoded by the browser). Others (ABIC X'08' and
+ * X'0A', OS/2 Image Support X'0B', …) are reported as not supported (research R6).
  */
 
 import { specTable, shortNames } from '../spec-table.js';
@@ -24,8 +24,10 @@ import { u, toPageUnits } from '../modca/bytes.js';
 import { decodeCcitt } from './decoders/ccitt.js';
 import { decodeLzw } from './decoders/lzw.js';
 import { decodePackBits } from './decoders/packbits.js';
+import { decodeRl4 } from './decoders/rl4.js';
 import { toRgba } from './color.js';
 import { registerObjectRenderer, readObjectArea } from '../render/page-renderer.js';
+import { jbig2Embedded, jbig2PageSize } from '../objcontainer/image-pdf.js';
 
 const BIM = 0xd3a8fb;
 const IDD = 0xd3a6fb;
@@ -206,6 +208,7 @@ function bilevel(data, width, height, compression) {
     const r = decodeCcitt(data, width, height, 'G3-1D', { byteAlignRows: true });
     return { bits: r.bits, rowBytes, error: r.error };
   }
+  if (compression === 0x06) return decodeRl4(data, width, height);
   if (compression === 0x0d) return { bits: decodeLzw(data, rowBytes * height), rowBytes, error: null };
   if (compression === 0x0c) return { bits: decodePackBits(data, rowBytes * height), rowBytes, error: null };
   if (compression === 0x0e) {
@@ -299,6 +302,29 @@ export async function readIocaImage(file, row) {
 }
 
 /**
+ * Reads the JBIG2 data of an IOCA image (compression X'84', T311) as an embedded stream with its
+ * size: an image of one part only (tiled JBIG2 images are not supported), size from the image or,
+ * when IOCA gives none, from the JBIG2 page information.
+ * @param {object} file File record.
+ * @param {number} row Row of Begin Image Object.
+ * @returns {Promise<{data: Uint8Array, width: number, height: number}|{error: string}>} Data, or
+ *   why it cannot be shown.
+ */
+export async function readJbig2Image(file, row) {
+  const fields = await collectFields(file, row, new Set([IDD, IPD]));
+  const image = parseIoca(concat(fields.filter((f) => f.id === IPD).map((f) => f.data)));
+  if (image.parts.length !== 1 || image.parts[0].compression !== 0x84) return { error: 'IOCA compression JBIG2 in tiled images not supported' };
+  const part = image.parts[0];
+  const data = jbig2Embedded(part.data);
+  if (!data) return { error: 'JBIG2 file in random-access organization not supported' };
+  const page = part.width && part.height ? null : jbig2PageSize(data);
+  const width = part.width || page?.width || 0;
+  const height = part.height || page?.height || 0;
+  if (!width || !height) return { error: 'JBIG2 image without a size' };
+  return { data, width, height };
+}
+
+/**
  * Mapping options of the object area (MO:DCA Reference AFPC-0004-11, Mapping Option triplet
  * X'04': X'00' position, X'10' position and trim, X'20' scale to fit, X'30' center and trim,
  * X'60' scale to fill; X'41', X'42', X'50' are migration mappings, presented here as position).
@@ -354,10 +380,21 @@ async function renderIoca(r, file, row, env, origin, areaOverride = null) {
   const height = image.height || (idd ? u(idd, 7, 2) : 0);
   const area = (await readObjectArea(file, row, env, areaOverride)) ?? { x: 0, y: 0, width: null, height: null, contentX: 0, contentY: 0, rotation: 0, mappingOption: null };
   const unsupported = [...new Set(image.parts.map((p) => p.compression))]
-    .filter((c) => ![0x03, 0x01, 0x82, 0x80, 0x81, 0x09, 0x0d, 0x0e, 0x0c, 0x83].includes(c));
+    .filter((c) => ![0x03, 0x01, 0x06, 0x82, 0x80, 0x81, 0x09, 0x0d, 0x0e, 0x0c, 0x83, 0x84].includes(c));
   const place = placeInArea({ ...area, x: origin.x + area.x, y: origin.y + area.y }, width * 1440 / xRes, height * 1440 / yRes);
+  if (!unsupported.length && image.parts.some((p) => p.compression === 0x84)) {
+    // JBIG2 (T311): drawn by pdf.js from a one-page PDF with the image as a mask, so its 0 pels
+    // stay transparent (workspace getEmbeddedObjectBytes builds it).
+    const jbig2 = await readJbig2Image(file, row);
+    if (jbig2.error) unsupported.push(jbig2.error);
+    else {
+      return [{ type: 'pdf', rect: place.rect, clip: place.clip, rotation: area.rotation ?? 0, pageNumber: 1, transparent: true,
+        objectRef: `${file.id}:${row}`, sourceField: row, fileId: file.id }];
+    }
+  }
   if (unsupported.length) {
-    const reason = `IOCA compression ${unsupported.map((c) => COMPRESSIONS[c] ?? `X'${c.toString(16)}'`).join(', ')} not supported`;
+    const reason = typeof unsupported[0] === 'string' ? unsupported[0]
+      : `IOCA compression ${unsupported.map((c) => COMPRESSIONS[c] ?? `X'${c.toString(16)}'`).join(', ')} not supported`;
     r.report({ severity: 'warning', code: 'unsupportedObject', fileId: file.id, offset: file.index.offset[row], params: { file: file.path, reason } });
     return [{ type: 'placeholder', rect: place.rect, reason, sourceField: row, fileId: file.id }];
   }

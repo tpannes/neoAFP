@@ -51,13 +51,16 @@ export class Registry {
    * Adds or replaces the decoder of an existing entry (used by the format modules).
    * @param {number} id Identifier of the entry.
    * @param {(data: Uint8Array, context?: object) => object} decode Decoder function.
-   * @param {{rawOnly?: boolean}} [options] Whether the decoder is not yet covered by a test.
+   * @param {{rawOnly?: boolean, context?: number}} [options] Whether the decoder is not yet covered
+   *   by a test, and the identifier of an earlier field of the same group whose data the decoder
+   *   needs as its second argument (e.g. the Code Page Control for the Code Page Index).
    * @returns {void}
    */
   setDecoder(id, decode, options = {}) {
     const entry = this.entries.get(id);
     if (!entry) throw new Error(`${this.name}: no entry ${id.toString(16)}`);
-    this.entries.set(id, Object.freeze({ ...entry, decode, rawOnly: options.rawOnly ?? entry.rawOnly ?? false }));
+    this.entries.set(id, Object.freeze({ ...entry, decode, rawOnly: options.rawOnly ?? entry.rawOnly ?? false,
+      ...(options.context ? { context: options.context } : {}) }));
   }
 
   /**

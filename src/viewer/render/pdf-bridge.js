@@ -64,11 +64,12 @@ function openDocument(client, objectRef) {
  * @param {string} objectRef Object container reference.
  * @param {number} pageNumber Page (1-based).
  * @param {number} pixelWidth Target width in device pixels.
+ * @param {boolean} [transparent] Leave the page background transparent (image masks: JBIG2, T311).
  * @returns {Promise<HTMLCanvasElement>} Rendered page.
  */
-function renderPage(client, objectRef, pageNumber, pixelWidth) {
+function renderPage(client, objectRef, pageNumber, pixelWidth, transparent = false) {
   const bucket = Math.max(64, Math.ceil(pixelWidth / 128) * 128); // reuse renders of similar size
-  const key = `${objectRef}|${pageNumber}|${bucket}`;
+  const key = `${objectRef}|${pageNumber}|${bucket}|${transparent}`;
   if (!pages.has(key)) {
     pages.set(key, (async () => {
       const doc = await openDocument(client, objectRef);
@@ -78,7 +79,7 @@ function renderPage(client, objectRef, pageNumber, pixelWidth) {
       const canvas = document.createElement('canvas');
       canvas.width = Math.ceil(viewport.width);
       canvas.height = Math.ceil(viewport.height);
-      await page.render({ canvas, canvasContext: canvas.getContext('2d'), viewport }).promise;
+      await page.render({ canvas, canvasContext: canvas.getContext('2d'), viewport, ...(transparent ? { background: 'rgba(0,0,0,0)' } : {}) }).promise;
       return canvas;
     })());
   }
@@ -90,7 +91,7 @@ registerItemRenderer('pdf', async (ctx, item, renderer) => {
   const scale = ctx.getTransform().a; // device pixels per page unit
   let canvas;
   try {
-    canvas = await renderPage(renderer.client, item.objectRef, item.pageNumber ?? 1, width * scale);
+    canvas = await renderPage(renderer.client, item.objectRef, item.pageNumber ?? 1, width * scale, item.transparent);
   } catch {
     ctx.save();
     ctx.strokeStyle = '#b91c1c';

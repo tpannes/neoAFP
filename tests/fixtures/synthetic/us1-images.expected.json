@@ -35,7 +35,7 @@
     },
     {
      "type": "placeholder",
-     "reason": "IOCA compression RL4 not supported",
+     "reason": "IOCA compression ABIC not supported",
      "rect": {
       "x": 1440,
       "y": 4320,

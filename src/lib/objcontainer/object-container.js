@@ -16,6 +16,7 @@ import { registerObjectRenderer, readObjectArea, renderContent, objectRendererFo
 import { placeInArea } from '../ioca/ioca.js';
 import { readTiff } from './tiff.js';
 import { isFontOid } from './object-types.js';
+import { isJpeg2000, jpeg2000Header } from './image-pdf.js';
 
 const BOC = 0xd3a892;
 const OCD = 0xd3ee92;
@@ -28,7 +29,7 @@ const OBJECT_TYPES = { 0x92: 'objectContainer', 0xfb: 'image', 0xbb: 'graphics',
  * Recognizes the format of container data.
  * @param {Uint8Array} d Data.
  * @param {string|null} oid Object type identifier.
- * @returns {'pdf'|'jpeg'|'png'|'gif'|'tiff'|'truetype'|'other'} Format.
+ * @returns {'pdf'|'jpeg'|'png'|'gif'|'tiff'|'jpeg2000'|'truetype'|'other'} Format.
  */
 export function containerFormat(d, oid = null) {
   if (isFontOid(oid)) return 'truetype';
@@ -38,6 +39,7 @@ export function containerFormat(d, oid = null) {
   if (head.startsWith('\x89PNG')) return 'png';
   if (head.startsWith('GIF8')) return 'gif';
   if (head.startsWith('II*\x00') || head.startsWith('MM\x00*')) return 'tiff';
+  if (isJpeg2000(d)) return 'jpeg2000';
   return 'other';
 }
 
@@ -71,6 +73,7 @@ export function imageHeader(d, format) {
     return { width: u(d, 16, 4), height: u(d, 20, 4), xRes, yRes };
   }
   if (format === 'gif') return { width: d[6] | (d[7] << 8), height: d[8] | (d[9] << 8), xRes: 96, yRes: 96 };
+  if (format === 'jpeg2000') return jpeg2000Header(d);
   if (format === 'jpeg') {
     let xRes = 96;
     let yRes = 96;
@@ -153,6 +156,13 @@ async function renderContainerContent(r, file, row, area, source, pdfPage = 1) {
     if (hdr.error && !hdr.bilevel && !hdr.rgba) return unsupported(hdr.error);
     const place = placeInArea(area, hdr.width * 1440 / (hdr.xRes || 96), hdr.height * 1440 / (hdr.yRes || 96));
     return [{ type: 'image', rect: place.rect, clip: place.clip, rotation: area.rotation ?? 0, imageRef: `${file.id}:${row}`, colorSpace: c.format, ...base }];
+  }
+  if (c.format === 'jpeg2000') {
+    // JPEG 2000 (T311): drawn by pdf.js from a one-page image PDF (workspace getEmbeddedObjectBytes).
+    const hdr = jpeg2000Header(c.bytes);
+    if (!hdr || !hdr.width) return unsupported('JPEG 2000 image could not be read');
+    const place = placeInArea(area, hdr.width * 1440 / hdr.xRes, hdr.height * 1440 / hdr.yRes);
+    return [{ type: 'pdf', rect: place.rect, clip: place.clip, rotation: area.rotation ?? 0, pageNumber: 1, ...base }];
   }
   if (c.format === 'truetype') return []; // font resource, not drawn by itself
   return unsupported(`object container format not supported${c.oid ? ` (${c.oid})` : ''}`);

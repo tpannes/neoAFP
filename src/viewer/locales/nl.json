@@ -69,6 +69,7 @@
     "kind.otherResource": "Resource",
     "kind.resourceGroup": "Resourcegroep",
     "kind.truetypeFont": "TrueType-/OpenType-lettertype",
+    "kind.iccProfile": "ICC-profiel",
     "kind.unsupported:lineData": "Line data (niet ondersteund)",
     "kind.unsupported:mixedMode": "Mixed-mode-gegevens (niet ondersteund)",
     "kind.unsupported:pageDefinition": "Page definition (niet ondersteund)",

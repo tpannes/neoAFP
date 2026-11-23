@@ -5,6 +5,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createWorkspace, createBufferSource } from '../../src/lib/index.js';
+import { iccProfile } from '../helpers/fixture-meta.js';
 import {
   bytes, field, group, documentOf, page, nop, resourceGroup, resource, withSeparators, ebcdic,
   uint, ID,
@@ -76,13 +77,15 @@ test('a file damaged by a text-mode transfer (X\'DC\' instead of X\'5A\') is not
   assert.equal(file.skipReason, 'unknownEncoding');
 });
 
-test('a standalone ICC profile is not recognized', async () => {
-  const icc = new Uint8Array(132);
-  icc.set([0x00, 0x00, 0x02, 0x00], 0);
-  icc.set(new TextEncoder().encode('acsp'), 36);
-  const { file } = await classify(icc, 'profile.icc');
-  assert.equal(file.kind, 'notRecognized');
-  assert.equal(file.skipReason, 'notAfp');
+test('a stand-alone ICC profile is a resource with its color space and description (T308)', async () => {
+  const icc = iccProfile({ version: 0x04300000, deviceClass: 'prtr', colorSpace: 'CMYK', pcs: 'Lab ', intent: 0, description: 'neoAFP test CMYK' });
+  const ws = createWorkspace();
+  const [file] = await ws.addFiles([createBufferSource(icc, 'press/Coated-Test.icc')], 'file');
+  assert.equal(file.kind, 'iccProfile');
+  assert.deepEqual(ws.getDiagnostics({ fileId: file.id }), []);
+  const [r] = await ws.getResources();
+  assert.deepEqual([r.type, r.name, r.encoding, r.colorProfile, r.colorModels, r.hasPreview], ['iccProfile', 'Coated-Test', 'CMYK', 'neoAFP test CMYK', ['cmyk'], false]);
+  assert.equal((await ws.extractResource(r.id)).bytes.length, icc.length);
 });
 
 test('documents starting with Begin Print File, resource group, document index or NOPs', async () => {

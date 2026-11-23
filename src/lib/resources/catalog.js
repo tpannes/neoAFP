@@ -73,7 +73,7 @@ const IID = 0xd3a67b;
 const IOC = 0xd3a77b;
 const OBJECT_BEGINS = new Set([0xd3a8fb, 0xd3a8bb, 0xd3a8eb, 0xd3a892, 0xd3a87b, 0xd3a89b]);
 const PREVIEW_TYPES = new Set(['pageSegment', 'overlay', 'image', 'graphics', 'barcode', 'truetypeFont', 'codedFont', 'formDefinition']);
-const PREVIEW_FORMATS = new Set(['pdf', 'jpeg', 'png', 'gif', 'tiff']);
+const PREVIEW_FORMATS = new Set(['pdf', 'jpeg', 'png', 'gif', 'tiff', 'jpeg2000']);
 const PATTERN_TECHNOLOGY = { 0x05: 'Raster', 0x1e: 'CID-keyed', 0x1f: 'Type 1' };
 /** Font type of a pattern technology. */
 const PATTERN_FONT_TYPE = { 0x05: 'raster', 0x1e: 'cid', 0x1f: 'type1' };
@@ -249,6 +249,12 @@ export async function describeResource(entry, getFile) {
       r.fileSize = r.source.byteRange[1] - r.source.byteRange[0];
     }
     await describeContent(r, file, row);
+  } else if (r.type === 'iccProfile') {
+    // A stand-alone ICC profile file (T308): listed with its color space and description.
+    const icc = parseIccProfile(await file.byteSource.read(0, file.size));
+    r.encoding = icc?.colorSpace ?? null;
+    r.colorProfile = icc?.description ?? null;
+    r.colorModels = models(iccColorModel(icc?.colorSpace));
   } else {
     r.encoding = fontEncoding(await file.byteSource.read(0, 4));
   }

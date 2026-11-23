@@ -1,6 +1,6 @@
 /**
  * Image decoders and color conversion (T051): TIFF LZW and PackBits data written by libtiff from
- * a known bitmap; RL4 is not supported (research R6) and must be reported; YCbCr against Pillow,
+ * a known bitmap; ABIC is not supported (research R6, T281) and must be reported; YCbCr against Pillow,
  * CIELab (D65) against the standard sRGB values, CMYK with the simple subtractive conversion of
  * the spec assumptions (no ICC color management).
  */
@@ -17,9 +17,9 @@ test('TIFF LZW and PackBits decode to the source bitmap', () => {
   assert.deepEqual([...decodePackBits(PACKBITS, 12 * H)], [...expectedBits()]);
 });
 
-test('RL4 is reported as not supported', () => {
-  const part = { x: 0, y: 0, width: 8, height: 1, compression: 0x06, bitOrder: 0, ideSize: 1, bands: null, space: null, data: new Uint8Array(4), bandData: new Map(), mask: null };
-  assert.match(decodePart(part).error, /RL4 not supported/);
+test('ABIC is reported as not supported', () => {
+  const part = { x: 0, y: 0, width: 8, height: 1, compression: 0x08, bitOrder: 0, ideSize: 1, bands: null, space: null, data: new Uint8Array(4), bandData: new Map(), mask: null };
+  assert.match(decodePart(part).error, /ABIC not supported/);
 });
 
 const close = (actual, expected, tolerance, label) => actual.forEach((v, i) => assert.ok(Math.abs(v - expected[i]) <= tolerance, `${label}: ${actual} vs ${expected}`));
