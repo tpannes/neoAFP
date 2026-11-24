@@ -22,7 +22,7 @@ import { gcgidToUnicode, learnFromCodePage, unicodeOfGcgid, isControl } from '..
 import { readFontMetrics } from '../foca/opentype.js';
 import { fontBytesOf } from './fonts.js';
 import { contentBox } from '../resources/catalog.js';
-import { readCodedFont } from '../foca/coded-font.js';
+import { readCodedFont, specifiedSize } from '../foca/coded-font.js';
 import { formDefinitionDiagram } from './formdef-diagram.js';
 
 const SAMPLE = 'AaBbCc 0123 ÄÖÜ';
@@ -130,7 +130,7 @@ async function resolveCodedFont(ctx, file, record) {
     codePage: Boolean(part.cpName && await ctx.catalog.lookup('codePage', part.cpName, ctx.lookupContext)),
   };
   const font = found.characterSet && found.codePage
-    ? await ctx.fonts.resolve({ characterSet: part.fcsName, codePage: part.cpName, height: part.verticalSize ? part.verticalSize * 2 : null })
+    ? await ctx.fonts.resolve({ characterSet: part.fcsName, codePage: part.cpName, height: specifiedSize(part.verticalSize) })
     : null;
   return { characterSet: part.fcsName, codePage: part.cpName, found, font };
 }

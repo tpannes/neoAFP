@@ -6,7 +6,10 @@
  * Fields (MO:DCA Reference; layouts checked against sample files):
  * - BFM/EFM Begin/End Form Map; BDG/EDG document environment group with defaults (PGP, MDD).
  * - BMM/EMM Begin/End Medium Map (name).
- * - MDD Medium Descriptor: X/Y unit base (1 + 1), units per base (2 + 2), medium size (3 + 3).
+ * - MDD Medium Descriptor: X/Y unit base (1 + 1), units per base (2 + 2), medium size (3 + 3),
+ *   flags (1), triplets. A Medium Orientation triplet X'68' with landscape (X'01') or reverse
+ *   landscape (X'03') turns the medium presentation space: page positions and the sheet use the
+ *   medium's height as width (A4 given as 210 × 297 mm with landscape is shown 297 × 210 mm).
  * - PGP Page Position format 1 (X'D3ACAF'): page X/Y offset (3 + 3) on the medium; format 2
  *   (X'D3B1AF'): constant, repeating group length, then groups of X/Y offset (3 + 3),
  *   orientation (2), sheet side (1: 0 front, 1 back), flags (1) — used for N-up.
@@ -34,7 +37,7 @@
  */
 
 import { collectFields, fieldData, childRows } from '../modca/access.js';
-import { u, s, orientation, ebcdicName, toPageUnits } from '../modca/bytes.js';
+import { u, s, orientation, ebcdicName, toPageUnits, triplets } from '../modca/bytes.js';
 import { readCommonTriplets, FQN } from '../modca/structures.js';
 
 const ID = {
@@ -127,8 +130,11 @@ async function readSettings(file, rows, base) {
     const d = await fieldData(file, row);
     if (id === ID.MDD) {
       units = { kx: toPageUnits(d[0], u(d, 2, 2)), ky: toPageUnits(d[1], u(d, 4, 2)) };
-      const w = u(d, 6, 3);
-      const h = u(d, 9, 3);
+      let w = u(d, 6, 3);
+      let h = u(d, 9, 3);
+      let mediumOrientation = 0;
+      for (const t of triplets(d, 13)) if (t.id === 0x68) mediumOrientation = t.body[0];
+      if (mediumOrientation === 0x01 || mediumOrientation === 0x03) [w, h] = [h, w];
       out.mediumSize = w && h ? { width: w * units.kx, height: h * units.ky } : out.mediumSize ?? null;
     } else if (id === ID.PGP1) {
       out.pagePositions = [{ x: s(d, 0, 3) * units.kx, y: s(d, 3, 3) * units.ky, rotation: 0, side: 'front' }];

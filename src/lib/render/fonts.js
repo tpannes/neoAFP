@@ -8,7 +8,7 @@
  * (raster fonts) or font bytes (TrueType/OpenType).
  */
 
-import { readCodedFont } from '../foca/coded-font.js';
+import { readCodedFont, specifiedSize } from '../foca/coded-font.js';
 import { readCodePage } from '../foca/code-page.js';
 import { readFontCharacterSet, metricsFor, glyphBitmap } from '../foca/font-character-set.js';
 import { gcgidToUnicode, learnFromCodePage, substituteFamily } from '../foca/gcgid-unicode.js';
@@ -151,7 +151,7 @@ export class FontManager {
       if (cf?.parts[0]) {
         characterSet ||= cf.parts[0].fcsName;
         codePage ||= cf.parts[0].cpName;
-        if (!size && cf.parts[0].verticalSize) size = cf.parts[0].verticalSize * 2; // 1/10 pt → 1/1440 in
+        size ||= specifiedSize(cf.parts[0].verticalSize); // CFI size, 1/20 pt = 1/1440 in (FOCA)
       } else if (!cf) {
         this.#missing(spec.codedFont, 'codedFont', missing);
       }

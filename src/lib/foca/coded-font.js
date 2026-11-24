@@ -23,6 +23,17 @@ const CFI = 0xd38c8a;
  */
 
 /**
+ * Specified Vertical Font Size of a Coded Font Index group (FOCA Reference, CFI bytes 16–17): in
+ * 20ths of a point (1440ths of an inch); 0 means no size. Values above the MO:DCA/IPDS range
+ * (0–32,767), such as X'FFF0' written by some generators, are no size either.
+ * @param {number} value Raw value.
+ * @returns {number|null} Size in 1/1440 inch, or null.
+ */
+export function specifiedSize(value) {
+  return value > 0 && value <= 32767 ? value : null;
+}
+
+/**
  * Reads a coded font resource.
  * @param {import('../modca/access.js').FileRecord} file File containing the coded font.
  * @param {number} beginRow Row of its Begin Coded Font field.
