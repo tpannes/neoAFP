@@ -40,7 +40,7 @@ test('page details list the TLEs of the page and of its page groups, outermost f
   assert.deepEqual((await ws.getPageDetails(file.id, 1)).tles, ['Straße = Größe Ä!', 'ACCOUNT = A-100 [7]', 'PAGETAG = P1 [X]']);
 });
 
-test('TLE table queries: window, fuzzy filter, sort, row of a page, export', async () => {
+test('TLE table queries: window, filter, sort, row of a page, export', async () => {
   const { ws, file } = await open('us2-structure');
   const all = await ws.queryTleTable(file.id, { start: 1, count: 2 });
   assert.equal(all.total, 4);

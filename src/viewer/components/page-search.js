@@ -1,14 +1,15 @@
 /**
  * <page-search>: search in the page text of the shown AFP file (FR-060–FR-063): a search box,
  * the position among the hits ("2 / 7", one hit per page) and buttons for the previous and next
- * hit; Enter goes to the next hit, Shift+Enter to the previous one. Matching is fuzzy (see
- * src/lib/search). The page text index is built in the parser worker in short low-priority slices
+ * hit; Enter goes to the next hit, Shift+Enter to the previous one. A word matches when it contains
+ * the search term (see src/lib/search). The page text index is built in the parser worker in short low-priority slices
  * the first time a search is typed and again after files were added or the text code page changed;
  * meanwhile hits found so far are shown and the box says that indexing is running.
  * For very large files the library stops indexing at a memory limit (T230); the hit count then
  * gets a "*" whose tooltip names the pages searched. Hits beyond the first few come without the
  * matched word's position; it is fetched (resolveSearchHit) when the hit is shown.
- * Event: `hit` (detail: { pageNumber, itemIndex, charStart, charEnd }) for the page viewer to show.
+ * Events: `hit` (detail: { pageNumber, itemIndex, charStart, charEnd }) for the page viewer to
+ * show; `clear` when the box was emptied or the query has no hits, so the old hit is unmarked.
  */
 
 import { t, onLanguageChange, applyTranslations } from '../i18n/i18n.js';
@@ -119,6 +120,7 @@ export class PageSearch extends HTMLElement {
       this.hits = [];
       this.position = -1;
       this.#showCount();
+      this.dispatchEvent(new CustomEvent('clear'));
       return;
     }
     if (!this.started) this.#index();
@@ -137,6 +139,7 @@ export class PageSearch extends HTMLElement {
       this.position = -1;
       this.#showCount();
       if (results.length) this.step(1);
+      else this.dispatchEvent(new CustomEvent('clear'));
     }
   }
 

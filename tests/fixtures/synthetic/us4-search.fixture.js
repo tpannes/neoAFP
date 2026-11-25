@@ -10,8 +10,8 @@
  *   CCSID 1200) for CJK bigram search.
  * - NOP "Erstellt mit Testgenerator" in ASCII (shown in Windows-1252).
  * - Inline page segment resource S1LOGOXY.
- * `expected.search` lists queries (exact, one and two typos, accents, several words, and words
- * found only outside page text) with the results in rank order.
+ * `expected.search` lists queries (exact, parts of words, typos that find nothing, accents,
+ * several words, and words found only outside page text) with the results in rank order.
  *
  * Running this module directly writes us4-search.afp next to it.
  */

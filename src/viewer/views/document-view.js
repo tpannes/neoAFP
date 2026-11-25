@@ -119,6 +119,7 @@ export class DocumentView extends HTMLElement {
       const { pageNumber, itemIndex, charStart, charEnd } = e.detail;
       this.goTo(pageNumber, null, itemIndex === undefined ? null : new Map([[itemIndex, [charStart, charEnd]]]));
     });
+    this.search.addEventListener('clear', () => this.scroller.clearSearchHit());
     this.exportMenu = document.createElement('menu-button');
     this.exportMenu.setup('download', 'export.label', [
       { labelKey: 'export.png', run: () => this.#export('png') },

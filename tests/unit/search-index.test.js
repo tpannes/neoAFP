@@ -34,12 +34,11 @@ test('slices, later files, one document, and re-indexing after a code page chang
   assert.deepEqual((await ws.search({ text: 'Zürich', fileId: search.id })).results.map((r) => r.location.pageNumber), [2]);
 
   // The page text is EBCDIC 500; read as 273 the "ü" becomes another character, so "Müller"
-  // only matches with a typo.
+  // is no longer found.
   const before = (await ws.search({ text: 'Müller', fileId: search.id })).results[0];
   assert.equal(before.distance, 0);
   ws.setCodePageOverride('text', 'ebcdic-273');
   assert.equal((await ws.search({ text: 'Müller' })).indexing, true);
   await buildAll(ws);
-  const after = (await ws.search({ text: 'Müller', fileId: search.id })).results[0];
-  assert.notEqual(after.match, before.match);
+  assert.deepEqual((await ws.search({ text: 'Müller', fileId: search.id })).results, []);
 });

@@ -40,7 +40,7 @@
     "start.feature.indexes": "Indexwerte und Kommentare",
     "start.feature.indexes.text": "TLEs und NOPs als filterbare Tabellen – Export als CSV oder JSON.",
     "start.feature.search": "Intelligente Volltextsuche",
-    "start.feature.search.text": "Findet Seitentext auch mit Tippfehlern und markiert jeden Treffer.",
+    "start.feature.search.text": "Findet jedes Wort im Seitentext, das den Suchbegriff enthält, und markiert jeden Treffer.",
     "start.feature.large": "Gemacht für Massendruck",
     "start.feature.large.text": "Auch Dateien mit 2 GB und fast einer Million Seiten bleiben flüssig.",
     "start.feature.performance": "Performance ohne Installation",

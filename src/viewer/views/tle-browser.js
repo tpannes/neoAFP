@@ -2,7 +2,7 @@
  * TLE browser (FR-035): all index values (Tag Logical Elements) of the shown AFP file as a
  * table. One row per page group (or page, or document) that carries TLEs, one column per TLE
  * name, plus the owner's name, level and pages. Columns sort by a click on their title and can be
- * hidden (the hidden TLE names are remembered as the `tleHiddenColumns` preference). A fuzzy
+ * hidden (the hidden TLE names are remembered as the `tleHiddenColumns` preference). The
  * search box keeps the rows whose values match. The rows and columns shown can be exported as
  * JSON or CSV. The code page for TLEs can be chosen here (FR-037).
  *

@@ -3,7 +3,7 @@
  * page, encoding (the code page chosen for NOPs, else the one detected per record: EBCDIC 273 by
  * default, Windows-1252 when that reads better) and text. A toolbar switch hides the $ISIS_TAG
  * records ISIS Papyrus writes to carry PDF/UA tagging (there can be very many; remembered as the
- * `hideIsisTags` preference); it is shown only when the file has at least one such record. A fuzzy search box keeps the rows whose text matches; columns sort
+ * `hideIsisTags` preference); it is shown only when the file has at least one such record. A search box keeps the rows whose text matches; columns sort
  * by a click on their title; the rows shown can be exported as JSON or CSV; the code page for NOPs
  * can be chosen here (FR-037).
  *

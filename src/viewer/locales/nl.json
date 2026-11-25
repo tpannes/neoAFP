@@ -40,7 +40,7 @@
     "start.feature.indexes": "Indexwaarden en opmerkingen",
     "start.feature.indexes.text": "TLE’s en NOP’s als filterbare tabellen, te exporteren naar CSV of JSON.",
     "start.feature.search": "Slim zoeken in de volledige tekst",
-    "start.feature.search.text": "Vindt paginatekst ook met typefouten en markeert elke treffer.",
+    "start.feature.search.text": "Vindt elk woord in de paginatekst dat de zoekterm bevat en markeert elke treffer.",
     "start.feature.large": "Gemaakt voor massaprint",
     "start.feature.large.text": "Ook bestanden van 2 GB met bijna een miljoen pagina’s blijven vlot.",
     "start.feature.performance": "Hoge prestaties zonder installatie",

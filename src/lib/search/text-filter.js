@@ -1,13 +1,11 @@
 /**
- * Fuzzy filtering of table rows (TLE and NOP browsers, FR-035, FR-036), with the same rules as
- * the page text search (FR-061): case- and accent-insensitive words (see normalize.js); a row
- * matches when every query word is part of one of its words, or differs from one by at most the
- * allowed number of edits (see fuzzy.js allowedEdits). Being part of a word matters for index
- * values: "4711" finds "K4711".
+ * Filtering of table rows (TLE and NOP browsers, FR-035, FR-036), with the same rules as the page
+ * text search (FR-061): case- and accent-insensitive words (see normalize.js); a row matches when
+ * every query word is contained in one of its words ("4711" finds "K4711"). There is no typo
+ * tolerance.
  */
 
 import { tokenize } from './normalize.js';
-import { distance, allowedEdits } from './fuzzy.js';
 
 /**
  * Splits a text into normalized words (computed once per row).
@@ -27,8 +25,5 @@ export function words(text) {
 export function wordFilter(query) {
   const wanted = [...new Set(words(query))];
   if (!wanted.length) return null;
-  return (rowWords) => wanted.every((w) => {
-    const max = allowedEdits(w);
-    return rowWords.some((r) => r.includes(w) || (max > 0 && distance(w, r, max) <= max));
-  });
+  return (rowWords) => wanted.every((w) => rowWords.some((r) => r.includes(w)));
 }

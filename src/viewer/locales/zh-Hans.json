@@ -40,7 +40,7 @@
     "start.feature.indexes": "索引值与注释",
     "start.feature.indexes.text": "以可筛选表格展示 TLE 和 NOP，并可导出为 CSV 或 JSON。",
     "start.feature.search": "智能全文搜索",
-    "start.feature.search.text": "即使有拼写错误也能找到页面文本，并高亮显示每个结果。",
+    "start.feature.search.text": "查找页面中包含搜索词的每个单词，并高亮显示每个结果。",
     "start.feature.large": "专为海量打印设计",
     "start.feature.large.text": "即使是 2 GB、近百万页的文件也能流畅处理。",
     "start.feature.performance": "高性能，无需安装",

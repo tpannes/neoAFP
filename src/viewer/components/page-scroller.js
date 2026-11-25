@@ -200,6 +200,16 @@ export class PageScroller extends HTMLElement {
   }
 
   /**
+   * Removes the search hit and keeps marked fields (structure view links).
+   * @returns {void}
+   */
+  clearSearchHit() {
+    if (!this.highlight?.runs) return;
+    this.highlight = this.highlight.rows ? { ...this.highlight, runs: null } : null;
+    this.redraw();
+  }
+
+  /**
    * Removes the marked fields (structure view links) and keeps search hits.
    * @returns {void}
    */

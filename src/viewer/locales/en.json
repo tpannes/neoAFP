@@ -40,7 +40,7 @@
     "start.feature.indexes": "Index values and comments",
     "start.feature.indexes.text": "TLEs and NOPs as filterable tables, exported to CSV or JSON.",
     "start.feature.search": "Smart full-text search",
-    "start.feature.search.text": "Finds page text even with typos and highlights every hit.",
+    "start.feature.search.text": "Finds every word on the pages that contains the search term and highlights every hit.",
     "start.feature.large": "Built for mass output",
     "start.feature.large.text": "Files of 2 GB with close to a million pages stay fast.",
     "start.feature.performance": "High performance, no installation",

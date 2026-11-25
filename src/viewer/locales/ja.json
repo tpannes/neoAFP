@@ -40,7 +40,7 @@
     "start.feature.indexes": "インデックス値とコメント",
     "start.feature.indexes.text": "TLE と NOP をフィルター可能な表で表示し、CSV や JSON に書き出し。",
     "start.feature.search": "スマートな全文検索",
-    "start.feature.search.text": "入力ミスがあってもページ内のテキストを見つけ、すべてのヒットを強調表示します。",
+    "start.feature.search.text": "検索語を含むページ内のすべての単語を見つけ、すべてのヒットを強調表示します。",
     "start.feature.large": "大量印刷にも対応",
     "start.feature.large.text": "100万ページ近い 2 GB のファイルでも快適に動作します。",
     "start.feature.performance": "インストール不要の高性能",

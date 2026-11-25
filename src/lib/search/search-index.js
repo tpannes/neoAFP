@@ -8,13 +8,13 @@
  * found by reading the page again (`describeHit`), only for the results shown. The index counts
  * its word entries (`entries`) so the workspace can stop indexing before memory runs out.
  *
- * A query matches a page when every query word matches one of its words within the allowed
- * edits (see fuzzy.js allowedEdits); the page's distance is that of its worst-matching query
- * word. Results are ordered by distance, then file order and page.
+ * A query matches a page when every query word is contained in one of its words (see
+ * vocabulary.js); the page's distance is that of its worst-matching query word (0: the word
+ * itself, 1: a longer word containing it). Results are ordered by distance, then file order and page.
  */
 
 import { tokenize } from './normalize.js';
-import { Vocabulary, allowedEdits } from './fuzzy.js';
+import { Vocabulary } from './vocabulary.js';
 
 const EXCERPT = 40;
 
@@ -91,7 +91,7 @@ export class SearchIndex {
     for (const [i, word] of words.entries()) {
       const best = new Uint8Array(this.count).fill(255);
       const hit = i === 0 ? new Int32Array(this.count) : null;
-      const { matches } = this.vocabulary.lookup(word, allowedEdits(word));
+      const { matches } = this.vocabulary.lookup(word);
       matches.forEach(({ word: match, distance: d }, m) => {
         for (const id of this.postings.get(match) ?? []) {
           if (distance && distance[id] === 255) continue;

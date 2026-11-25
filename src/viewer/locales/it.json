@@ -40,7 +40,7 @@
     "start.feature.indexes": "Valori di indice e commenti",
     "start.feature.indexes.text": "TLE e NOP in tabelle filtrabili, esportabili in CSV o JSON.",
     "start.feature.search": "Ricerca intelligente nel testo",
-    "start.feature.search.text": "Trova il testo delle pagine anche con errori di battitura ed evidenzia ogni risultato.",
+    "start.feature.search.text": "Trova ogni parola delle pagine che contiene il termine cercato ed evidenzia ogni risultato.",
     "start.feature.large": "Pensato per la stampa massiva",
     "start.feature.large.text": "Anche file da 2 GB con quasi un milione di pagine restano fluidi.",
     "start.feature.performance": "Prestazioni elevate senza installazione",

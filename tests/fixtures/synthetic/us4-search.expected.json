@@ -21,52 +21,55 @@
    "query": {
     "text": "mueller"
    },
-   "results": [
-    {
-     "category": "text",
-     "distance": 1,
-     "match": "Müller",
-     "location": {
-      "pageNumber": 1
-     }
-    }
-   ]
+   "results": []
   },
   {
    "query": {
     "text": "Rechnug"
    },
-   "results": [
-    {
-     "category": "text",
-     "distance": 1,
-     "match": "Rechnung",
-     "location": {
-      "pageNumber": 1
-     }
-    }
-   ]
+   "results": []
   },
   {
    "query": {
     "text": "Rehcnug"
    },
-   "results": [
-    {
-     "category": "text",
-     "distance": 2,
-     "match": "Rechnung",
-     "location": {
-      "pageNumber": 1
-     }
-    }
-   ]
+   "results": []
   },
   {
    "query": {
     "text": "Rxhcnug"
    },
    "results": []
+  },
+  {
+   "query": {
+    "text": "chnung"
+   },
+   "results": [
+    {
+     "category": "text",
+     "distance": 1,
+     "match": "Rechnung",
+     "location": {
+      "pageNumber": 1
+     }
+    }
+   ]
+  },
+  {
+   "query": {
+    "text": "Straß"
+   },
+   "results": [
+    {
+     "category": "text",
+     "distance": 1,
+     "match": "Straße",
+     "location": {
+      "pageNumber": 1
+     }
+    }
+   ]
   },
   {
    "query": {

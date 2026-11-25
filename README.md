@@ -44,8 +44,8 @@ with vibe coding, this has the following advantages:
   groups, form definition, missing resources) and everything about the current page: size,
   sheet and side, print settings such as bins and copies, fonts, overlays, page segments,
   objects and index values.
-- **Find text.** Search the text of all pages; neoAFP ignores case and accents, tolerates up to
-  two typos per word and highlights every match on the page.
+- **Find text.** Search the text of all pages; neoAFP finds every word that contains the search
+  term, ignores case and accents, and highlights every match on the page.
 - **Trace any element to its source.** Click text, an image or a line on the page and the
   structure view opens on the structured field that drew it, even when it comes from an overlay
   or page segment in another file. The other way round, any field can show you where it lands

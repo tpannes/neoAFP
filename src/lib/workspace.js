@@ -1118,7 +1118,7 @@ export class Workspace {
    * viewer asks for the rows it shows (T230).
    * @param {string} fileId File id.
    * @param {{filter?: string, sort?: {key: string, direction: 'asc'|'desc'}|null, start?: number, count?: number}} [options]
-   *   Fuzzy filter text, sort column ('owner', 'level', 'pages', 'tle:<name>') and window.
+   *   Filter text (see search/text-filter.js), sort column ('owner', 'level', 'pages', 'tle:<name>') and window.
    * @returns {Promise<{columns: string[], total: number, shown: number, start: number, rows: object[]}>}
    *   Attribute names, all rows, rows in the view, and the window's rows (TleRow plus `row`).
    */
