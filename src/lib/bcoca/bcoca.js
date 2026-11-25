@@ -962,6 +962,9 @@ export function layoutMaxiCode(sym, bsd, bsa, place, src) {
   return [{ type: 'path', commands, fill: bsd.color, stroke: null, lineWidth: 0, ...src }];
 }
 
+/** 2D symbologies (Data Matrix, MaxiCode, PDF417, Aztec, QR Code, Han Xin): no HRI (Table 7). */
+const TWO_D = new Set([0x1c, 0x1d, 0x1e, 0x20, 0x26, 0x27]);
+
 /**
  * Renders a bar code object.
  * @param {object} r Render context.
@@ -988,6 +991,8 @@ async function renderBarcode(r, file, row, env, origin) {
     return [placeholder('decodeFailed')];
   }
   const bsd = readBsd(bdd.data);
+  // Only the text is needed (search index): 2D symbols have no human-readable text.
+  if (env.textOnly && TWO_D.has(bsd.type)) return [];
   if (bsd.type === 0x20) {
     // QR Code conversion from code page 290 or 1027 (BSA byte 6): load the table first.
     for (const f of fields) {

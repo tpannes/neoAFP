@@ -69,3 +69,18 @@ test('every occurrence of the query words on the page is listed for marking', as
   // Several query words: each one's occurrences.
   assert.equal(describeHit(text, runs, 'kundennummer', 'kunde', ['kunde', 'rechnung']).marks.length, 4);
 });
+
+test('the index counts the occurrences of the query words per page as the hit marks them', async () => {
+  const { SearchIndex } = await import('../../src/lib/search/search-index.js');
+  const index = new SearchIndex();
+  const pages = ['Kunde Kundennummer Kunde', 'Rechnung', 'Kundekunde und Rechnung für Kunden'];
+  pages.forEach((text, i) => index.putPage('f', i + 1, text));
+  for (const query of ['kunde', 'Kunde Rechnung', 'nummer']) {
+    for (const r of index.search({ text: query, fileId: 'f' })) {
+      const text = pages[r.pageNumber - 1];
+      const hit = describeHit(text, [{ start: 0, end: text.length, itemIndex: 0, sourceField: 0 }], r.word, r.term, r.terms);
+      assert.equal(r.occurrences, hit.marks.length, `${query} on page ${r.pageNumber}`);
+    }
+  }
+  assert.deepEqual(index.search({ text: 'kunde', fileId: 'f' }).map((r) => r.occurrences), [3, 3]);
+});

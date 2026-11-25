@@ -28,6 +28,11 @@ export class SearchIndex {
   clear() {
     /** @type {Map<string, number[]>} word → unit ids (ascending) */
     this.postings = new Map();
+    /**
+     * @type {Map<string, number[]>} word → how often it occurs on each unit of its postings (same
+     *   order); only for words that occur more than once on some page, else every count is 1
+     */
+    this.repeats = new Map();
     this.vocabulary = new Vocabulary();
     this.count = 0;
     this.unitFile = new Int32Array(1024);
@@ -47,7 +52,8 @@ export class SearchIndex {
    * @returns {void}
    */
   putPage(fileId, pageNumber, text) {
-    const words = new Set(tokenize(text).map((t) => t.word));
+    const words = new Map();
+    for (const t of tokenize(text)) words.set(t.word, (words.get(t.word) ?? 0) + 1);
     if (!words.size) return;
     if (!this.fileOrder.has(fileId)) {
       this.fileOrder.set(fileId, this.fileIds.length);
@@ -61,14 +67,20 @@ export class SearchIndex {
     const id = this.count++;
     this.unitFile[id] = this.fileOrder.get(fileId);
     this.unitPage[id] = pageNumber;
-    for (const word of words) {
+    for (const [word, n] of words) {
       let list = this.postings.get(word);
       if (!list) {
         list = [];
         this.postings.set(word, list);
         this.vocabulary.add(word);
       }
+      let counts = this.repeats.get(word);
+      if (!counts && n > 1) {
+        counts = new Array(list.length).fill(1);
+        this.repeats.set(word, counts);
+      }
       list.push(id);
+      counts?.push(n);
     }
     this.entries += words.size;
   }
@@ -77,9 +89,10 @@ export class SearchIndex {
    * Searches.
    * @param {{text: string, fileId?: string}} query Query; `fileId` keeps one document's pages and
    *   orders them by page.
-   * @returns {{fileId: string, pageNumber: number, distance: number, word: string, term: string}[]}
-   *   Matching pages, best first (by page with fileId), with the page word the first query word
-   *   matched, that query word and all query words (normalized).
+   * @returns {{fileId: string, pageNumber: number, distance: number, word: string, term: string,
+   *   terms: string[], occurrences: number}[]} Matching pages, best first (by page with fileId),
+   *   with the page word the first query word matched, that query word, all query words
+   *   (normalized) and how often the query words occur on the page (as describeHit marks them).
    */
   search(query) {
     const words = [...new Set(tokenize(query.text ?? '').map((t) => t.word))];
@@ -89,12 +102,18 @@ export class SearchIndex {
     // Per unit: worst distance so far (255 = not matched) and the first word's match.
     let distance = null;
     let firstHit = null;
+    const occurrences = new Uint32Array(this.count);
     for (const [i, word] of words.entries()) {
       const best = new Uint8Array(this.count).fill(255);
       const hit = i === 0 ? new Int32Array(this.count) : null;
       const { matches } = this.vocabulary.lookup(word);
       matches.forEach(({ word: match, distance: d }, m) => {
-        for (const id of this.postings.get(match) ?? []) {
+        const list = this.postings.get(match) ?? [];
+        const counts = this.repeats.get(match);
+        const inWord = countParts(match, word);
+        for (let j = 0; j < list.length; j++) {
+          const id = list[j];
+          occurrences[id] += (counts ? counts[j] : 1) * inWord;
           if (distance && distance[id] === 255) continue;
           if (d < best[id]) {
             best[id] = d;
@@ -115,8 +134,21 @@ export class SearchIndex {
     else out.sort((a, b) => distance[a] - distance[b] || this.unitFile[a] - this.unitFile[b] || this.unitPage[a] - this.unitPage[b]);
     return out.map((id) => ({
       fileId: this.fileIds[this.unitFile[id]], pageNumber: this.unitPage[id], distance: distance[id], word: firstHit.words[firstHit.hit[id]], term: words[0], terms: words,
+      occurrences: occurrences[id],
     }));
   }
+}
+
+/**
+ * How often a part occurs in a word, without overlaps (as locateParts finds them).
+ * @param {string} word Normalized word.
+ * @param {string} part Normalized part.
+ * @returns {number} Count.
+ */
+function countParts(word, part) {
+  let n = 0;
+  for (let at = word.indexOf(part); at >= 0; at = word.indexOf(part, at + part.length)) n++;
+  return n;
 }
 
 /**

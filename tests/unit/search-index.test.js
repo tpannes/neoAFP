@@ -42,3 +42,15 @@ test('slices, later files, one document, and re-indexing after a code page chang
   await buildAll(ws);
   assert.deepEqual((await ws.search({ text: 'Müller', fileId: search.id })).results, []);
 });
+
+test('indexing reads the text only; hit positions refer to the full page (2D bar codes included)', async () => {
+  const ws = createWorkspace();
+  const [f] = await ws.addFiles([createBufferSource(await fixture('us4-search'), 'us4-search.afp')], 'file');
+  await buildAll(ws);
+  for (const r of (await ws.search({ text: 'Müller', fileId: f.id })).results) {
+    const model = await ws.getRenderModel(f.id, r.location.pageNumber);
+    const run = model.items[r.location.itemIndex];
+    assert.equal(run.type, 'glyphRun');
+    assert.equal(run.text.slice(r.location.charStart, r.location.charEnd), 'Müller');
+  }
+});

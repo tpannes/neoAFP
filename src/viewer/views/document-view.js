@@ -115,16 +115,16 @@ export class DocumentView extends HTMLElement {
     switches.append(this.toggle, this.testPrint, this.inspectButton);
     this.search = document.createElement('page-search');
     this.search.attach(this.client);
-    this.search.addEventListener('hit', (e) => {
-      // Every occurrence on the page is marked; the current hit (the one the arrows go to) stronger.
-      const { pageNumber, itemIndex, charStart, charEnd, marks = [] } = e.detail;
-      const runs = new Map();
-      const add = (index, range) => { if (!runs.has(index)) runs.set(index, []); runs.get(index).push(range); };
-      for (const m of marks) if (m.itemIndex !== itemIndex || m.charStart !== charStart) add(m.itemIndex, [m.charStart, m.charEnd, false]);
-      if (itemIndex !== undefined) add(itemIndex, [charStart, charEnd, true]);
-      this.#showHit(pageNumber, itemIndex, runs.size ? runs : null);
+    // Every occurrence on the pages shown is marked (the scroller asks marksOf for each page it
+    // draws); the current hit (the one the arrows go to) stronger.
+    this.search.addEventListener('hit', (e) => this.#showHit(e.detail));
+    // Pages whose occurrences arrive together are drawn again once.
+    let redraw = null;
+    this.search.addEventListener('marks', () => {
+      clearTimeout(redraw);
+      redraw = setTimeout(() => this.scroller.redraw(), 50);
     });
-    this.search.addEventListener('clear', () => this.scroller.clearSearchHit());
+    this.search.addEventListener('clear', () => this.scroller.setSearch(null));
     this.exportMenu = document.createElement('menu-button');
     this.exportMenu.setup('download', 'export.label', [
       { labelKey: 'export.png', run: () => this.#export('png') },
@@ -334,6 +334,7 @@ export class DocumentView extends HTMLElement {
   showPage(page) {
     if (!this.documentId || this.pageCount === 0) return;
     this.page = Math.min(this.pageCount, Math.max(1, page));
+    if (this.search) this.search.viewPage = this.page;
     if (this.offsetParent !== null) this.scroller.scrollToIndex(this.#rowOf(this.page));
     else this.pendingScroll = true;
     this.#pageChanged();
@@ -362,6 +363,8 @@ export class DocumentView extends HTMLElement {
     }
     if (page === this.page) return;
     this.page = page;
+    // The user scrolled: the next search step starts from here.
+    this.search.viewPage = page;
     this.#pageChanged();
   }
 
@@ -390,21 +393,24 @@ export class DocumentView extends HTMLElement {
   /**
    * Shows a search hit: marks it and scrolls only as far as needed to bring it into view, so
    * stepping through the hits of one page does not jump back to the top of the page.
-   * @param {number} page Page number.
-   * @param {number|undefined} itemIndex Glyph run of the current hit (unknown while resolving).
-   * @param {Map<number, [number, number, boolean][]>|null} runs Ranges to mark.
+   * @param {{pageNumber: number, itemIndex?: number, charStart?: number, charEnd?: number}} hit
+   *   Hit; without `itemIndex` while its position is fetched.
    * @returns {Promise<void>} Resolves when shown.
    */
-  async #showHit(page, itemIndex, runs) {
+  async #showHit({ pageNumber, itemIndex, charStart, charEnd }) {
     await this.loading;
-    if (itemIndex === undefined || this.offsetParent === null) {
-      await this.goTo(page, null, runs);
-      return;
+    const page = Math.min(this.pageCount, Math.max(1, pageNumber));
+    const current = itemIndex === undefined || itemIndex === null ? null : { page, itemIndex, charStart, charEnd };
+    this.scroller.setHighlight(page, null, null, this.documentId);
+    this.scroller.setSearch({ marks: (p) => this.search.marksOf(p), current });
+    if (!current || this.offsetParent === null) this.showPage(page);
+    else {
+      this.page = page;
+      await this.scroller.revealItem(this.#rowOf(page), page, itemIndex);
+      this.#pageChanged();
     }
-    this.page = Math.min(this.pageCount, Math.max(1, page));
-    this.scroller.setHighlight(this.page, null, runs, this.documentId);
-    await this.scroller.revealItem(this.#rowOf(this.page), this.page, itemIndex);
-    this.#pageChanged();
+    // The view is at the hit: the next step continues from it, not from the page shown.
+    this.search.viewPage = null;
   }
 
   /** Ends a field marking and Inspect; search hits stay. */

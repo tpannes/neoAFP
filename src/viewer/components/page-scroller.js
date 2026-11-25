@@ -225,8 +225,8 @@ export class PageScroller extends HTMLElement {
    * moved by where the page's items start (`firstItem` of the sheet render model).
    * @param {number} page Page number.
    * @param {Set<number>|null} rows Source field rows to highlight.
-   * @param {Map<number, [number, number]>|null} [runs] Item index in the page's render model →
-   *   character range to highlight.
+   * @param {Map<number, [number, number, boolean][]>|null} [runs] Item index in the page's render
+   *   model → character ranges to highlight (search hits are set with setSearch).
    * @param {string|null} [fileId] File the rows belong to (the document).
    * @returns {void}
    */
@@ -240,9 +240,34 @@ export class PageScroller extends HTMLElement {
    * @returns {void}
    */
   clearSearchHit() {
-    if (!this.highlight?.runs) return;
-    this.highlight = this.highlight.rows ? { ...this.highlight, runs: null } : null;
+    this.setSearch(null);
+  }
+
+  /**
+   * Sets the search hits to mark on every page drawn.
+   * @param {{marks: (page: number) => ({itemIndex: number, charStart: number, charEnd: number}[]|null),
+   *   current: {page: number, itemIndex: number, charStart: number, charEnd: number}|null}|null} search
+   *   Occurrences per page (null = not known yet) and the current hit; null for none.
+   * @returns {void}
+   */
+  setSearch(search) {
+    this.search = search;
     this.redraw();
+  }
+
+  /**
+   * The search occurrences of one page as glyph run ranges (true in the third place: current hit).
+   * @param {number} page Page number.
+   * @returns {[number, [number, number, boolean]][]} Item index and range.
+   */
+  #searchRuns(page) {
+    const s = this.search;
+    if (!s) return [];
+    const cur = s.current?.page === page ? s.current : null;
+    const isCurrent = (m) => Boolean(cur) && m.itemIndex === cur.itemIndex && m.charStart === cur.charStart;
+    const out = (s.marks(page) ?? []).map((m) => [m.itemIndex, [m.charStart, m.charEnd, isCurrent(m)]]);
+    if (cur && !out.some(([, r]) => r[2])) out.push([cur.itemIndex, [cur.charStart, cur.charEnd, true]]);
+    return out;
   }
 
   /**
@@ -264,12 +289,22 @@ export class PageScroller extends HTMLElement {
    */
   #highlightFor(model, pageNumber) {
     const h = this.highlight;
-    if (!h) return null;
-    if (pageNumber !== null) return pageNumber === h.page ? h : null;
-    if (!model.pages?.includes(h.page)) return null;
-    const shift = model.firstItem?.[h.page] ?? 0;
-    const runs = h.runs ? new Map([...h.runs].map(([i, range]) => [i + shift, range])) : null;
-    return { rows: h.rows, runs, fileId: h.fileId };
+    const pages = pageNumber !== null ? [pageNumber] : (model.pages ?? []);
+    const runs = new Map();
+    const add = (i, range) => { if (!runs.has(i)) runs.set(i, []); runs.get(i).push(range); };
+    let rows = null;
+    let fileId = null;
+    for (const p of pages) {
+      const shift = pageNumber !== null ? 0 : (model.firstItem?.[p] ?? 0);
+      if (h?.page === p) {
+        rows = h.rows;
+        fileId = h.fileId;
+        for (const [i, ranges] of h.runs ?? []) for (const range of ranges) add(i + shift, range);
+      }
+      for (const [i, range] of this.#searchRuns(p)) add(i + shift, range);
+    }
+    if (!rows && !runs.size) return null;
+    return { rows, runs: runs.size ? runs : null, fileId };
   }
 
   /**

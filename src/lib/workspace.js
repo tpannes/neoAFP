@@ -441,15 +441,17 @@ export class Workspace {
    * @param {object} r Render context.
    * @param {object} file Document file record.
    * @param {number} pageNumber Page number.
+   * @param {{textOnly?: boolean}} [options] `textOnly`: only the page text is needed (see
+   *   renderPage); the glyph runs are the same.
    * @returns {Promise<object>} Render model (text code page override applied).
    */
-  async #renderPageAsPrinted(r, file, pageNumber) {
+  async #renderPageAsPrinted(r, file, pageNumber, { textOnly = false } = {}) {
     const sheets = await this.#sheetModel(file, false);
     const sheet = sheets.sheet(sheets.sheetOfPage[pageNumber]);
     const side = sheet?.back?.placements.some((p) => p.pageNumber === pageNumber) ? 'back' : 'front';
     const placed = sheet?.[side]?.placements.find((p) => p.pageNumber === pageNumber) ?? null;
     const ids = sheet?.suppressions?.[side] ?? [];
-    const page = await this.#applyTextOverride(await renderPage(r, file, this.#pageRow(file, pageNumber), { suppressed: ids.length ? new Set(ids) : null }));
+    const page = await this.#applyTextOverride(await renderPage(r, file, this.#pageRow(file, pageNumber), { suppressed: ids.length ? new Set(ids) : null, textOnly }));
     const map = sheets.maps[sheets.mapOfPage[pageNumber]];
     const nUp = (sheet?.nUp ?? 1) > 1;
     const flags = nUp ? (placed?.flags ?? 0) : 0;
@@ -1351,6 +1353,15 @@ export class Workspace {
   }
 
   /**
+   * Whether every page of a document is in the search index.
+   * @param {object} file Document file record.
+   * @returns {boolean} True when indexed.
+   */
+  #indexed(file) {
+    return (this.searchCursor.get(file.id) ?? 1) > file.index.pages.length;
+  }
+
+  /**
    * How far indexing is: pages indexed and pages in all documents. Costs one step per file, so
    * it can run on every call (T230: walking every page here made indexing of 880,000 pages stall).
    * @returns {{done: number, total: number}} Progress.
@@ -1370,13 +1381,19 @@ export class Workspace {
    * Reads the text of a page as the index sees it: its glyph runs joined with blanks.
    * @param {object} file Document file record.
    * @param {number} pageNumber Page number.
+   * @param {{textOnly?: boolean}} [options] `textOnly` (indexing): the same text as getRenderModel
+   *   without what only drawing needs (test print detection, 2D bar codes; together most of the
+   *   indexing time). The item indexes then differ from the viewer's, so the positions of hits
+   *   are read without it.
    * @returns {Promise<{text: string, runs: {start: number, end: number, itemIndex: number, sourceField: number}[]}|null>}
    *   Text and where each run lies in it, or null if the page cannot be read.
    */
-  async #searchText(file, pageNumber) {
+  async #searchText(file, pageNumber, { textOnly = false } = {}) {
     let model;
     try {
-      model = await this.getRenderModel(file.id, pageNumber);
+      model = textOnly
+        ? await this.#renderPageAsPrinted(await this.#renderContext(file), file, pageNumber, { textOnly: true })
+        : await this.getRenderModel(file.id, pageNumber);
     } catch {
       return null;
     }
@@ -1396,19 +1413,23 @@ export class Workspace {
    * `done`; new files and code page changes add work again. Indexing stops for good (`limited`)
    * once the index holds SEARCH_ENTRY_LIMIT word entries, so a huge file cannot exhaust the
    * memory of the worker; searches then cover the pages indexed so far.
-   * @param {{budgetMs?: number}} [options] Time to spend before returning (default 50 ms).
+   * @param {{budgetMs?: number, firstFileId?: string}} [options] Time to spend before returning
+   *   (default 50 ms); the document to index before the others (the one shown).
    * @returns {Promise<{done: boolean, progress: {done: number, total: number}, limited: object|null}>}
    *   State; `limited` = { pages, totalPages } when indexing stopped at the limit.
    */
   async buildSearchIndex(options = {}) {
     const budget = options.budgetMs ?? 50;
     const start = Date.now();
-    for (const file of this.#searchDocuments()) {
+    const documents = this.#searchDocuments();
+    const first = documents.findIndex((f) => f.id === options.firstFileId);
+    if (first > 0) documents.unshift(...documents.splice(first, 1));
+    for (const file of documents) {
       if (this.searchLimited) break;
       const pages = file.index.pages.length;
       let next = this.searchCursor.get(file.id) ?? 1;
       while (next <= pages && Date.now() - start < budget) {
-        const page = await this.#searchText(file, next);
+        const page = await this.#searchText(file, next, { textOnly: true });
         if (page) this.searchIndex.putPage(file.id, next, page.text);
         next++;
         this.searchCursor.set(file.id, next);
@@ -1420,7 +1441,7 @@ export class Workspace {
       if (next <= pages) break;
     }
     const progress = this.#searchProgress();
-    this.onProgress({ phase: 'search', ...progress });
+    this.onProgress({ phase: 'search', ...progress, completeFiles: this.#searchDocuments().filter((f) => this.#indexed(f)).map((f) => f.id) });
     return { done: progress.done >= progress.total || Boolean(this.searchLimited), progress, limited: this.searchLimited };
   }
 
@@ -1441,13 +1462,16 @@ export class Workspace {
     const results = [];
     for (const [i, hit] of hits.entries()) {
       const result = {
-        category: 'text', distance: hit.distance, word: hit.word, term: hit.term, terms: hit.terms, resolved: false, excerpt: null, highlight: null, match: null,
+        category: 'text', distance: hit.distance, word: hit.word, term: hit.term, terms: hit.terms, occurrences: hit.occurrences, resolved: false, excerpt: null, highlight: null, match: null,
         location: { fileId: hit.fileId, pageNumber: hit.pageNumber, tleIndex: null, nopIndex: null, resourceId: null },
       };
       results.push(i < SEARCH_DETAILED ? await this.resolveSearchHit(result) : result);
     }
+    // Searching one document: only its own indexing state matters.
+    const file = query.fileId === undefined ? null : this.files.get(query.fileId);
     const progress = this.#searchProgress();
-    return { results, indexing: !this.searchLimited && progress.done < progress.total, limited: this.searchLimited };
+    const pending = file?.index ? !this.#indexed(file) : progress.done < progress.total;
+    return { results, indexing: !this.searchLimited && pending, limited: this.searchLimited };
   }
 
   /**

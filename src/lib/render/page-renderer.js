@@ -415,19 +415,22 @@ export async function placeholderFor(r, file, row, env, origin, reason) {
  * @param {object} r Render context (fonts, catalog, report, getFile, lookupContext, missing).
  * @param {object} file Document file record.
  * @param {number} pageRow Row of Begin Page.
- * @param {{suppressed?: Set<number>|null}} [options] Active text suppression local IDs.
+ * @param {{suppressed?: Set<number>|null, textOnly?: boolean}} [options] Active text suppression
+ *   local IDs; `textOnly`: only the text matters (search index), so the word "TEST" drawn from
+ *   strokes is not looked for and 2D bar codes, which have no text, are left out (env.textOnly).
  * @returns {Promise<{widthUnits: number, heightUnits: number, items: object[], unitsPerInch: {x: number, y: number}}>}
  *   Render model; `unitsPerInch`: the page's own measurement units (Page Descriptor).
  */
-export async function renderPage(r, file, pageRow, { suppressed = null } = {}) {
+export async function renderPage(r, file, pageRow, { suppressed = null, textOnly = false } = {}) {
   const env = await readEnvironment(file, pageRow);
   // Active text suppressions of the sheet-side the page is printed on (MMC X'F3', T284).
   env.suppressed = suppressed;
+  env.textOnly = textOnly;
   if (env.missingDescriptor) {
     r.report({ severity: 'warning', code: 'decodeFailed', fileId: file.id, offset: file.index.offset[pageRow], params: { file: file.path, reason: 'page descriptor missing; using 8.5 × 11 in' } });
   }
   const items = await renderContent(r, file, pageRow, env, { x: 0, y: 0 });
   // The word "TEST" drawn from strokes is marked so the viewer can hide it.
-  for (const i of findTestPrint(items)) items[i].testPrint = true;
+  if (!textOnly) for (const i of findTestPrint(items)) items[i].testPrint = true;
   return { widthUnits: env.width, heightUnits: env.height, items, unitsPerInch: { x: 1440 / env.kx, y: 1440 / env.ky } };
 }
