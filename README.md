@@ -111,6 +111,24 @@ python3 -m http.server 8000     # any static file server works
 # then open http://localhost:8000/
 ```
 
+## Sample files
+
+The folder [`samples/`](samples/) holds AFP files to try the viewer with. All names, addresses,
+numbers and companies in them are made up. Open them with **Open files**, or drag them onto
+the window.
+
+| File | What it shows |
+|---|---|
+| `neoAFP-Geschaeftsbrief.afp` | A 5-page business letter with letterhead overlay, signature page segment, table, bar and donut charts, a color image, QR code, DataMatrix and Code 128, followed by a 2-page PDF form embedded in an object container |
+| `neoAFP-Kampagne-FR27.afp` | A marketing campaign: 5,000 personalized mailings (10,000 pages) in three variants, with 55,000 TLEs and 10,001 NOPs – good for testing large files and the TLE and NOP tables |
+| `neoAFP-Energy-Jahresabrechnungen-2026.afp` | 100 annual electricity bills of 5 pages each (one document per customer) with charts, tables, a picture and TLEs, using embedded TrueType fonts |
+| `neoAFP-Energy-Outline-Duplex-2026.afp` | The same bills with AFP Type 1 outline fonts (font character sets, code page, coded fonts) and a form definition for duplex printing from two input bins |
+| `neoAFP-Wandkalender-2027.afp` | A wall calendar with holidays and moon phases, A5 pages printed 2-up on A4 landscape with a medium overlay of cut marks |
+| `neoAFP-DeepBlue-Kasparow-1997-Partie6.afp` | Game 6 of Deep Blue vs. Garry Kasparov (1997), one board per move, chess pieces as Unicode symbols |
+| `neoAFP-Ode-an-die-Freude.afp` | Sheet music of Beethoven's "Ode an die Freude" with lyrics; all notation drawn as GOCA vector graphics |
+
+The fonts embedded in the samples and their licenses are listed in `THIRD-PARTY-NOTICES.md`.
+
 ## Run the tests
 
 ```sh

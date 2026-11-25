@@ -25,6 +25,21 @@ The package's QuickJS engine (`wasm/quickjs-eval.*`, JavaScript inside PDFs) is 
 neoAFP never runs JavaScript from PDFs (`enableScripting: false`, `isEvalSupported: false`)
 and pdf.js does not load it for rendering.
 
+## Fonts embedded in the sample files (`samples/`)
+
+The demo AFP files in `samples/` contain fictitious data only. All fonts embedded in them come
+from the Noto project and are licensed under the SIL Open Font License 1.1; the license text is in
+`samples/licenses/LICENSE_NOTO_OFL.txt`.
+
+| Font | Used in | Form in the files |
+|---|---|---|
+| Noto Sans Regular, Bold, Italic | all samples except the energy bills with outline fonts | TrueType, reduced to the Latin characters (other glyph outlines, glyph names and layout tables removed) |
+| Noto Sans Symbols 2 Regular | chess game | TrueType, reduced to the chess symbols U+2654–U+265F |
+| Noto Sans Regular, Bold, Italic | energy bills with outline fonts | converted from TrueType to Type 1 (outlines unchanged up to rounding to font units, no hints) for AFP font character sets |
+
+These are modified versions of the fonts as the license permits; the Noto fonts declare no
+Reserved Font Name.
+
 ## ICU character set mapping data
 
 The EBCDIC code page tables in `src/lib/codepages/tables/` are generated from the ICU
