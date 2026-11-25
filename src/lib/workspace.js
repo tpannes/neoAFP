@@ -1441,7 +1441,7 @@ export class Workspace {
     const results = [];
     for (const [i, hit] of hits.entries()) {
       const result = {
-        category: 'text', distance: hit.distance, word: hit.word, resolved: false, excerpt: null, highlight: null, match: null,
+        category: 'text', distance: hit.distance, word: hit.word, term: hit.term, terms: hit.terms, resolved: false, excerpt: null, highlight: null, match: null,
         location: { fileId: hit.fileId, pageNumber: hit.pageNumber, tleIndex: null, nopIndex: null, resourceId: null },
       };
       results.push(i < SEARCH_DETAILED ? await this.resolveSearchHit(result) : result);
@@ -1454,16 +1454,18 @@ export class Workspace {
    * Adds the excerpt and the position of the matched word to a search result (see search).
    * @param {object} result Search result.
    * @returns {Promise<object>} The result with `excerpt`, `highlight`, `match` and the glyph run
-   *   location (`itemIndex`, `sourceField`, `charStart`, `charEnd`), `resolved: true`.
+   *   location (`itemIndex`, `sourceField`, `charStart`, `charEnd`, and `marks`: every occurrence
+   *   of the query words on the page), `resolved: true`.
    */
   async resolveSearchHit(result) {
     if (result.resolved) return result;
     const file = this.files.get(result.location.fileId);
     const page = file ? await this.#searchText(file, result.location.pageNumber) : null;
-    const hit = page && describeHit(page.text, page.runs, result.word);
+    const hit = page && describeHit(page.text, page.runs, result.word, result.term, result.terms);
     if (!hit) return { ...result, resolved: true };
     const location = { ...result.location };
     if (hit.run) Object.assign(location, hit.run);
+    location.marks = hit.marks;
     return { ...result, resolved: true, excerpt: hit.excerpt, highlight: hit.highlight, match: hit.match, location };
   }
 

@@ -13,7 +13,7 @@
  * itself, 1: a longer word containing it). Results are ordered by distance, then file order and page.
  */
 
-import { tokenize } from './normalize.js';
+import { tokenize, locatePart, locateParts } from './normalize.js';
 import { Vocabulary } from './vocabulary.js';
 
 const EXCERPT = 40;
@@ -77,8 +77,9 @@ export class SearchIndex {
    * Searches.
    * @param {{text: string, fileId?: string}} query Query; `fileId` keeps one document's pages and
    *   orders them by page.
-   * @returns {{fileId: string, pageNumber: number, distance: number, word: string}[]} Matching
-   *   pages, best first (by page with fileId), with the page word the first query word matched.
+   * @returns {{fileId: string, pageNumber: number, distance: number, word: string, term: string}[]}
+   *   Matching pages, best first (by page with fileId), with the page word the first query word
+   *   matched, that query word and all query words (normalized).
    */
   search(query) {
     const words = [...new Set(tokenize(query.text ?? '').map((t) => t.word))];
@@ -113,7 +114,7 @@ export class SearchIndex {
     if (onlyFile >= 0) out.sort((a, b) => this.unitPage[a] - this.unitPage[b]);
     else out.sort((a, b) => distance[a] - distance[b] || this.unitFile[a] - this.unitFile[b] || this.unitPage[a] - this.unitPage[b]);
     return out.map((id) => ({
-      fileId: this.fileIds[this.unitFile[id]], pageNumber: this.unitPage[id], distance: distance[id], word: firstHit.words[firstHit.hit[id]],
+      fileId: this.fileIds[this.unitFile[id]], pageNumber: this.unitPage[id], distance: distance[id], word: firstHit.words[firstHit.hit[id]], term: words[0], terms: words,
     }));
   }
 }
@@ -124,14 +125,21 @@ export class SearchIndex {
  * @param {{start: number, end: number, itemIndex: number, sourceField: number}[]} runs Where each
  *   glyph run's text lies in `text`.
  * @param {string} word Normalized page word that matched.
+ * @param {string} [term] Normalized query word: only the part of the page word that it matches is
+ *   marked (the whole word without it).
+ * @param {string[]} [terms] Normalized query words whose every occurrence on the page is listed in
+ *   `marks` (default: `term`).
  * @returns {{excerpt: string, highlight: {start: number, end: number}, match: string,
- *   run: {itemIndex: number, sourceField: number, charStart: number, charEnd: number}|null}|null}
+ *   run: {itemIndex: number, sourceField: number, charStart: number, charEnd: number}|null,
+ *   marks: {itemIndex: number, charStart: number, charEnd: number}[]}|null}
  *   Hit details, or null when the word is not (any longer) on the page.
  */
-export function describeHit(text, runs, word) {
+export function describeHit(text, runs, word, term, terms = term ? [term] : []) {
   const tokens = tokenize(text);
-  const token = tokens.find((t) => t.word === word) ?? tokens[0];
-  if (!token) return null;
+  const found = tokens.find((t) => t.word === word) ?? tokens[0];
+  if (!found) return null;
+  const part = term && locatePart(text.slice(found.start, found.end), term);
+  const token = part ? { start: found.start + part.start, end: found.start + part.end } : found;
   const from = Math.max(0, token.start - EXCERPT);
   const to = Math.min(text.length, token.end + EXCERPT);
   const excerpt = `${from > 0 ? '…' : ''}${text.slice(from, to)}${to < text.length ? '…' : ''}`;
@@ -142,5 +150,29 @@ export function describeHit(text, runs, word) {
     highlight: { start: token.start - from + shift, end: token.end - from + shift },
     match: text.slice(token.start, token.end),
     run: run && { itemIndex: run.itemIndex, sourceField: run.sourceField, charStart: token.start - run.start, charEnd: Math.min(token.end, run.end) - run.start },
+    marks: pageMarks(text, runs, tokens, terms),
   };
+}
+
+/**
+ * Every occurrence of the query words on a page, as character ranges of its glyph runs.
+ * @param {string} text Page text.
+ * @param {{start: number, end: number, itemIndex: number}[]} runs Glyph runs in `text`.
+ * @param {{word: string, start: number, end: number}[]} tokens Words of `text`.
+ * @param {string[]} terms Normalized query words.
+ * @returns {{itemIndex: number, charStart: number, charEnd: number}[]} Ranges in text order.
+ */
+function pageMarks(text, runs, tokens, terms) {
+  const marks = [];
+  for (const t of tokens) {
+    for (const term of terms) {
+      if (!t.word.includes(term)) continue;
+      for (const p of locateParts(text.slice(t.start, t.end), term)) {
+        const start = t.start + p.start, end = t.start + p.end;
+        const run = runs.find((r) => start >= r.start && start < r.end);
+        if (run) marks.push({ itemIndex: run.itemIndex, charStart: start - run.start, charEnd: Math.min(end, run.end) - run.start });
+      }
+    }
+  }
+  return marks;
 }

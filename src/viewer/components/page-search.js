@@ -1,7 +1,10 @@
 /**
  * <page-search>: search in the page text of the shown AFP file (FR-060–FR-063): a search box,
- * the position among the hits ("2 / 7", one hit per page) and buttons for the previous and next
- * hit; Enter goes to the next hit, Shift+Enter to the previous one. A word matches when it contains
+ * the position among the hits ("2 / 7": every occurrence of the search words) and buttons for the
+ * previous and next hit; Enter goes to the next hit, Shift+Enter to the previous one. The library
+ * returns one result per page with the occurrences on it (`marks`); they are known for the first
+ * pages and fetched for the others when the search gets there, so until then each such page
+ * counts as one hit and the count gets a "+". A word matches when it contains
  * the search term (see src/lib/search). The page text index is built in the parser worker in short low-priority slices
  * the first time a search is typed and again after files were added or the text code page changed;
  * meanwhile hits found so far are shown and the box says that indexing is running.
@@ -46,6 +49,7 @@ export class PageSearch extends HTMLElement {
     onLanguageChange(() => this.#showCount());
     this.hits = [];
     this.position = -1;
+    this.occurrence = 0;
     this.#showCount();
   }
 
@@ -134,9 +138,11 @@ export class PageSearch extends HTMLElement {
     this.indexing = (indexing || this.building) && !limited;
     if (keep && current) {
       this.position = results.findIndex((r) => r.location.pageNumber === current.location.pageNumber);
+      if (this.position >= 0 && current.resolved !== false) this.hits[this.position] = current;
       this.#showCount();
     } else {
       this.position = -1;
+      this.occurrence = 0;
       this.#showCount();
       if (results.length) this.step(1);
       else this.dispatchEvent(new CustomEvent('clear'));
@@ -144,30 +150,74 @@ export class PageSearch extends HTMLElement {
   }
 
   /**
-   * Goes to the next or previous hit (wrapping around).
-   * @param {number} delta 1 or −1.
-   * @returns {void}
+   * The occurrences of a result: its marks once known, else one (the page).
+   * @param {object} hit Search result.
+   * @returns {number} Count, at least 1.
    */
-  step(delta) {
+  #occurrences(hit) {
+    return Math.max(1, hit?.location.marks?.length ?? 0);
+  }
+
+  /**
+   * Fetches the occurrences of a result that came without them (T230).
+   * @param {number} position Index in `hits`.
+   * @returns {Promise<object>} The resolved result.
+   */
+  async #resolve(position) {
+    const hits = this.hits;
+    const hit = hits[position];
+    if (hit.resolved !== false) return hit;
+    const full = await this.client.request({ method: 'resolveSearchHit', args: [hit], priority: 'high' });
+    if (hits[position] === hit) hits[position] = full;
+    return full;
+  }
+
+  /**
+   * Goes to the next or previous occurrence, across pages (wrapping around).
+   * @param {number} delta 1 or −1.
+   * @returns {Promise<void>} Resolves when the hit is shown.
+   */
+  async step(delta) {
     if (!this.hits.length) {
       if (this.input.value.trim()) this.run();
       return;
     }
-    this.position = (this.position + delta + this.hits.length) % this.hits.length;
-    this.#showCount();
-    const position = this.position;
     const hits = this.hits;
-    const hit = hits[position];
-    if (hit.resolved === false) {
-      // Only the first results come with the matched word's position (T230): fetch it now.
-      this.dispatchEvent(new CustomEvent('hit', { detail: hit.location }));
-      this.client.request({ method: 'resolveSearchHit', args: [hit], priority: 'high' }).then((full) => {
-        hits[position] = full;
-        if (this.hits === hits && this.position === position) this.dispatchEvent(new CustomEvent('hit', { detail: full.location }));
-      }).catch(() => {});
-      return;
+    const token = (this.stepToken = (this.stepToken ?? 0) + 1);
+    const inPage = this.position >= 0 ? this.occurrence + delta : -1;
+    if (this.position >= 0 && inPage >= 0 && inPage < this.#occurrences(hits[this.position])) {
+      this.occurrence = inPage;
+    } else {
+      this.position = this.position < 0 ? (delta > 0 ? 0 : hits.length - 1) : (this.position + delta + hits.length) % hits.length;
+      this.occurrence = 0;
+      this.#showCount();
+      if (hits[this.position].resolved === false) {
+        // Show the page at once; the occurrences follow when they are fetched.
+        this.dispatchEvent(new CustomEvent('hit', { detail: hits[this.position].location }));
+        try {
+          await this.#resolve(this.position);
+        } catch {
+          return;
+        }
+        if (token !== this.stepToken || this.hits !== hits) return;
+      }
+      if (delta < 0) this.occurrence = this.#occurrences(hits[this.position]) - 1;
     }
-    this.dispatchEvent(new CustomEvent('hit', { detail: hit.location }));
+    this.#showCount();
+    this.dispatchEvent(new CustomEvent('hit', { detail: this.#detail(hits[this.position], this.occurrence) }));
+  }
+
+  /**
+   * The event detail for one occurrence: the page, the glyph run range of the occurrence and all
+   * occurrences of the page (to mark them).
+   * @param {object} hit Search result.
+   * @param {number} occurrence Index among its marks.
+   * @returns {object} Detail.
+   */
+  #detail(hit, occurrence) {
+    const { location } = hit;
+    const mark = location.marks?.[occurrence];
+    return mark ? { ...location, itemIndex: mark.itemIndex, charStart: mark.charStart, charEnd: mark.charEnd } : location;
   }
 
   /** Shows the hit position, "no hits" or the indexing state. */
@@ -176,7 +226,20 @@ export class PageSearch extends HTMLElement {
     const text = this.input.value.trim();
     const n = this.hits.length;
     let label = '';
-    if (text && n) label = t('search.position', { index: this.position + 1, count: n });
+    if (text && n) {
+      // Occurrences before the current one, and of all pages; unknown ones count as one ("+").
+      let before = 0;
+      let count = 0;
+      let unknown = false;
+      this.hits.forEach((hit, i) => {
+        const k = this.#occurrences(hit);
+        if (hit.resolved === false) unknown = true;
+        if (i < this.position) before += k;
+        count += k;
+      });
+      const index = this.position < 0 ? 0 : before + this.occurrence + 1;
+      label = t('search.position', { index, count: unknown ? `${count}+` : count });
+    }
     else if (text && this.indexing) label = t('search.indexingShort');
     else if (text) label = t('search.none');
     // Indexing stopped at the memory limit: mark the count, the tooltip says which pages.

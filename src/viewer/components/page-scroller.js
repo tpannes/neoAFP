@@ -164,6 +164,42 @@ export class PageScroller extends HTMLElement {
   }
 
   /**
+   * Brings an item of a page into the window (a search hit): scrolls only when the item is not
+   * already visible, then puts it a third down the window. Rows whose size is still estimated are
+   * corrected as they load (the anchor keeps the position).
+   * @param {number} index Row index of the page.
+   * @param {number} page Page number.
+   * @param {number} itemIndex Item index in the page's render model.
+   * @returns {Promise<void>} Resolves when scrolled.
+   */
+  async revealItem(index, page, itemIndex) {
+    if (!this.layout) return;
+    let data;
+    try {
+      data = await this.#load(index);
+    } catch {
+      this.scrollToIndex(index);
+      return;
+    }
+    if (!this.layout) return;
+    const sides = this.#sideModels(data).map((s) => s.model);
+    const model = data.model ?? sides.find((m) => m.pages?.includes(page));
+    const item = model?.items[itemIndex + (model.firstItem?.[page] ?? 0)];
+    if (!item || typeof item.y !== 'number') {
+      this.scrollToIndex(index);
+      return;
+    }
+    this.layout.setSize(index, sizeOfData(data));
+    const y = this.layout.top(index) + item.y * this.layout.scale;
+    const top = this.#viewTop();
+    const margin = 40;
+    this.current = index;
+    this.pinned = true;
+    if (y < top + margin || y > top + this.clientHeight - margin) this.#setScrollTop(y - this.clientHeight / 3);
+    this.#update();
+  }
+
+  /**
    * Sets the zoom: a factor (0.25–4) or 'fitPage' / 'fitWidth' (both measured on the first row).
    * @param {number|'fitPage'|'fitWidth'} value Zoom.
    * @returns {Promise<void>} Resolves when laid out (rows redraw afterwards).
@@ -224,7 +260,7 @@ export class PageScroller extends HTMLElement {
    * @param {object} model Render model of a page (with `pageNumber` known from the row) or of a
    *   sheet side (with `pages` and `firstItem`).
    * @param {number|null} pageNumber Page of a page row, null for sheet sides.
-   * @returns {{rows: Set<number>|null, runs: Map<number, [number, number]>|null}|null} Highlight.
+   * @returns {{rows: Set<number>|null, runs: Map<number, [number, number, boolean][]>|null}|null} Highlight.
    */
   #highlightFor(model, pageNumber) {
     const h = this.highlight;

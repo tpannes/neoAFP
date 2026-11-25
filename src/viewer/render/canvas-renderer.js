@@ -96,7 +96,7 @@ export class CanvasRenderer {
    * @param {HTMLCanvasElement|OffscreenCanvas} canvas Target canvas.
    * @param {{widthUnits: number, heightUnits: number, items: object[]}} model Render model.
    * @param {{scale: number, pixelRatio?: number, highlight?: Set<number>, highlightFile?: string|null,
-   *   highlightRuns?: Map<number, [number, number]>}} options CSS pixels per page unit, device pixel
+   *   highlightRuns?: Map<number, [number, number, boolean][]>}} options CSS pixels per page unit, device pixel
    *   ratio, field rows of the file `highlightFile` to highlight (see #marked), and character
    *   ranges of glyph runs (by item index).
    * @returns {Promise<void>} Resolves when drawn.
@@ -137,7 +137,7 @@ export class CanvasRenderer {
       }
       if (clip) ctx.restore();
       if (highlight && marked(item, highlight, highlightFile)) this.#highlight(ctx, item);
-      if (highlightRuns?.has(index)) this.#highlight(ctx, item, highlightRuns.get(index));
+      for (const range of highlightRuns?.get(index) ?? []) this.#highlight(ctx, item, range);
     }
   }
 
@@ -417,12 +417,14 @@ export class CanvasRenderer {
    * Marks an item (linked from the structure view) or part of a glyph run (a search match).
    * @param {CanvasRenderingContext2D} ctx Context.
    * @param {object} item Item.
-   * @param {[number, number]|null} [range] Character range of a glyph run.
+   * @param {[number, number, boolean]|null} [range] Character range of a glyph run; false in the
+   *   third place for a search hit other than the current one.
    * @returns {void}
    */
   #highlight(ctx, item, range = null) {
     ctx.save();
-    ctx.fillStyle = range ? 'rgba(250, 204, 21, 0.45)' : 'rgba(37, 99, 235, 0.25)';
+    // Search hits yellow, the current one orange; marked fields blue.
+    ctx.fillStyle = range ? (range[2] === false ? 'rgba(250, 204, 21, 0.45)' : 'rgba(249, 115, 22, 0.45)') : 'rgba(37, 99, 235, 0.25)';
     if (item.type === 'glyphRun') {
       const size = item.font.size ?? 240;
       const [from, to] = range ?? [0, item.dx.length];

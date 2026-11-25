@@ -116,8 +116,13 @@ export class DocumentView extends HTMLElement {
     this.search = document.createElement('page-search');
     this.search.attach(this.client);
     this.search.addEventListener('hit', (e) => {
-      const { pageNumber, itemIndex, charStart, charEnd } = e.detail;
-      this.goTo(pageNumber, null, itemIndex === undefined ? null : new Map([[itemIndex, [charStart, charEnd]]]));
+      // Every occurrence on the page is marked; the current hit (the one the arrows go to) stronger.
+      const { pageNumber, itemIndex, charStart, charEnd, marks = [] } = e.detail;
+      const runs = new Map();
+      const add = (index, range) => { if (!runs.has(index)) runs.set(index, []); runs.get(index).push(range); };
+      for (const m of marks) if (m.itemIndex !== itemIndex || m.charStart !== charStart) add(m.itemIndex, [m.charStart, m.charEnd, false]);
+      if (itemIndex !== undefined) add(itemIndex, [charStart, charEnd, true]);
+      this.#showHit(pageNumber, itemIndex, runs.size ? runs : null);
     });
     this.search.addEventListener('clear', () => this.scroller.clearSearchHit());
     this.exportMenu = document.createElement('menu-button');
@@ -372,14 +377,34 @@ export class DocumentView extends HTMLElement {
    * Shows a page with fields or a search hit highlighted (structure view, page search).
    * @param {number} page Page number.
    * @param {Set<number>|null} [highlight] Source field rows to highlight.
-   * @param {Map<number, [number, number]>|null} [runs] Character ranges of the page's glyph runs
-   *   (by item index in the page's render model) to highlight.
+   * @param {Map<number, [number, number, boolean][]>|null} [runs] Character ranges of the page's
+   *   glyph runs (by item index in the page's render model) to highlight; true = current hit.
    * @returns {Promise<void>} Resolves when shown.
    */
   async goTo(page, highlight = null, runs = null) {
     await this.loading;
     this.showPage(page);
     this.scroller.setHighlight(page, highlight, runs, this.documentId);
+  }
+
+  /**
+   * Shows a search hit: marks it and scrolls only as far as needed to bring it into view, so
+   * stepping through the hits of one page does not jump back to the top of the page.
+   * @param {number} page Page number.
+   * @param {number|undefined} itemIndex Glyph run of the current hit (unknown while resolving).
+   * @param {Map<number, [number, number, boolean][]>|null} runs Ranges to mark.
+   * @returns {Promise<void>} Resolves when shown.
+   */
+  async #showHit(page, itemIndex, runs) {
+    await this.loading;
+    if (itemIndex === undefined || this.offsetParent === null) {
+      await this.goTo(page, null, runs);
+      return;
+    }
+    this.page = Math.min(this.pageCount, Math.max(1, page));
+    this.scroller.setHighlight(this.page, null, runs, this.documentId);
+    await this.scroller.revealItem(this.#rowOf(this.page), this.page, itemIndex);
+    this.#pageChanged();
   }
 
   /** Ends a field marking and Inspect; search hits stay. */

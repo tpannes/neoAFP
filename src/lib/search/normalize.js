@@ -52,3 +52,39 @@ export function tokenize(text) {
   }
   return out;
 }
+
+/**
+ * Finds a normalized part in a piece of original text (a word), for marking only the part of a
+ * word that matched: "strasse" in "Straße", "kunstler" in "Künstlerin".
+ * @param {string} text Original text.
+ * @param {string} part Normalized part.
+ * @returns {{start: number, end: number}|null} Offsets (UTF-16 code units) in `text`, or null.
+ */
+export function locatePart(text, part) {
+  return locateParts(text, part)[0] ?? null;
+}
+
+/**
+ * Finds every occurrence of a normalized part in a piece of original text (see locatePart).
+ * @param {string} text Original text.
+ * @param {string} part Normalized part.
+ * @returns {{start: number, end: number}[]} Offsets (UTF-16 code units) in `text`, in order.
+ */
+export function locateParts(text, part) {
+  if (!part) return [];
+  let normalized = '';
+  const starts = [];
+  const ends = [];
+  let offset = 0;
+  for (const ch of text) {
+    const n = normalizeWord(ch);
+    for (let i = 0; i < n.length; i++) { starts.push(offset); ends.push(offset + ch.length); }
+    normalized += n;
+    offset += ch.length;
+  }
+  const out = [];
+  for (let at = normalized.indexOf(part); at >= 0; at = normalized.indexOf(part, at + part.length)) {
+    out.push({ start: starts[at], end: ends[at + part.length - 1] });
+  }
+  return out;
+}
