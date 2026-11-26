@@ -1360,9 +1360,78 @@ data-table virtual-list .vl-row.data-table-row.selected {
 }
 
 .node-full {
+  /* Gives way first when a preview badge follows (the badge says more than the name). */
+  flex: 0 8 auto;
+  min-width: 4ch;
   color: var(--text-muted);
   overflow: hidden;
   text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Preview badge in the structure tree (TLE name | value, NOP text, triplet contents): one small
+   badge, the key on a muted ground. Both parts shrink with the row and end in an ellipsis; a long
+   key is cut at 24 characters. */
+.node-badge {
+  display: inline-flex;
+  flex: 0 1 auto;
+  min-width: 0;
+  max-width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+  font-size: 12px;
+  line-height: 18px;
+  white-space: nowrap;
+}
+
+.node-badge-key {
+  flex: 0 1 auto;
+  min-width: 4ch;
+  max-width: 24ch;
+  padding: 0 6px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  background: var(--surface-alt);
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.node-badge-value {
+  flex: 0 1 auto;
+  min-width: 0;
+  padding: 0 6px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--text);
+}
+
+.node-badge-value.empty {
+  color: var(--text-muted);
+}
+
+.node-badge-swatch {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  margin-right: 5px;
+  vertical-align: -1px;
+  border: 1px solid var(--border);
+  border-radius: 2px;
+}
+
+/* Key without a value (TLE with an empty attribute value): only the key, in warning colors. */
+.node-badge.no-value {
+  border-color: var(--warning);
+}
+
+.node-badge.no-value .node-badge-key {
+  background: var(--warning-soft);
+  color: var(--warning);
+}
+
+virtual-list .vl-row.selected .node-badge:not(.no-value) {
+  border-color: var(--accent-soft-strong);
 }
 
 /* A group of like items is no item of the file, only a display aid: dashed frame and muted italic

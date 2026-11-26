@@ -107,7 +107,8 @@
      "decoded": {
       "fqnType": 134,
       "fqnFormat": 0,
-      "nameHex": "C3F0D4C9E2E2D5C7"
+      "nameHex": "C3F0D4C9E2E2D5C7",
+      "name": "C0MISSNG"
      }
     },
     {
@@ -115,7 +116,8 @@
      "decoded": {
       "fqnType": 133,
       "fqnFormat": 0,
-      "nameHex": "E3F1D4C9E2E2D5C7"
+      "nameHex": "E3F1D4C9E2E2D5C7",
+      "name": "T1MISSNG"
      }
     },
     {

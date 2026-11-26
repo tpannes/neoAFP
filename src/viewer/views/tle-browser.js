@@ -64,7 +64,10 @@ export class TleBrowser extends HTMLElement {
     this.columnsWrap.append(this.columnsButton, this.columnsMenu);
     this.codePage = document.createElement('codepage-settings');
     await this.codePage.attach(client, ['tle']);
-    this.codePage.addEventListener('change', () => this.load());
+    this.codePage.addEventListener('change', () => {
+      this.load();
+      this.dispatchEvent(new CustomEvent('tlecodepagechange', { bubbles: true }));
+    });
     this.exportMenu = document.createElement('menu-button');
     this.exportMenu.setup('download', 'export.label', [
       { labelKey: 'export.json', icon: 'fileJson', run: () => this.#export('json') },

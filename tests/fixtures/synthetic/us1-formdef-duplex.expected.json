@@ -173,7 +173,8 @@
      "decoded": {
       "fqnType": 134,
       "fqnFormat": 0,
-      "nameHex": "C3F0D5C5D6C1C6F1"
+      "nameHex": "C3F0D5C5D6C1C6F1",
+      "name": "C0NEOAF1"
      }
     },
     {
@@ -181,7 +182,8 @@
      "decoded": {
       "fqnType": 133,
       "fqnFormat": 0,
-      "nameHex": "E3F1D5C5D6C1C6F1"
+      "nameHex": "E3F1D5C5D6C1C6F1",
+      "name": "T1NEOAF1"
      }
     },
     {

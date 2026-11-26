@@ -55,7 +55,10 @@ export class NopBrowser extends HTMLElement {
     });
     this.codePage = document.createElement('codepage-settings');
     await this.codePage.attach(client, ['nop']);
-    this.codePage.addEventListener('change', () => this.load());
+    this.codePage.addEventListener('change', () => {
+      this.load();
+      this.dispatchEvent(new CustomEvent('nopcodepagechange', { bubbles: true }));
+    });
     this.exportMenu = document.createElement('menu-button');
     this.exportMenu.setup('download', 'export.label', [
       { labelKey: 'export.json', icon: 'fileJson', run: () => this.#export('json') },

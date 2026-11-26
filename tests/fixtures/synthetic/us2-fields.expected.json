@@ -368,7 +368,8 @@
      "decoded": {
       "fqnType": 202,
       "fqnFormat": 0,
-      "nameHex": "C9C5D3F0F0F0F0F1"
+      "nameHex": "C9C5D3F0F0F0F0F1",
+      "name": "IEL00001"
      }
     },
     {
@@ -376,7 +377,8 @@
      "decoded": {
       "fqnType": 135,
       "fqnFormat": 0,
-      "nameHex": "D7C1C7C5F0F0F0F1"
+      "nameHex": "D7C1C7C5F0F0F0F1",
+      "name": "PAGE0001"
      }
     },
     {
@@ -604,7 +606,8 @@
      "decoded": {
       "fqnType": 18,
       "fqnFormat": 0,
-      "nameHex": "C2C9D5F2"
+      "nameHex": "C2C9D5F2",
+      "name": "BIN2"
      }
     },
     {
@@ -918,7 +921,8 @@
      "decoded": {
       "fqnType": 11,
       "fqnFormat": 0,
-      "nameHex": "E3C1C74040404040"
+      "nameHex": "E3C1C74040404040",
+      "name": "TAG     "
      }
     },
     {
@@ -965,7 +969,8 @@
      "decoded": {
       "fqnType": 132,
       "fqnFormat": 0,
-      "nameHex": "D6F1D5C5D6D6E5D3"
+      "nameHex": "D6F1D5C5D6D6E5D3",
+      "name": "O1NEOOVL"
      }
     },
     {
@@ -1005,7 +1010,8 @@
      "decoded": {
       "fqnType": 142,
       "fqnFormat": 0,
-      "nameHex": "C3F0D5C5D6C1C6F1"
+      "nameHex": "C3F0D5C5D6C1C6F1",
+      "name": "C0NEOAF1"
      }
     },
     {
@@ -1053,7 +1059,8 @@
      "decoded": {
       "fqnType": 222,
       "fqnFormat": 0,
-      "nameHex": "C1D9C9C1D3"
+      "nameHex": "C1D9C9C1D3",
+      "name": "ARIAL"
      }
     },
     {
@@ -1146,7 +1153,8 @@
      "decoded": {
       "fqnType": 135,
       "fqnFormat": 0,
-      "nameHex": "D7C1C7C5F0F0F0F1"
+      "nameHex": "D7C1C7C5F0F0F0F1",
+      "name": "PAGE0001"
      }
     }
    ]

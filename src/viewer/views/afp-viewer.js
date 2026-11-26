@@ -94,6 +94,8 @@ export class AfpViewer extends HTMLElement {
       this.setMode('pages');
       await this.pages.goTo(e.detail.page, e.detail.highlight);
     });
+    this.tle.addEventListener('tlecodepagechange', () => this.structure.rebuild());
+    this.nop.addEventListener('nopcodepagechange', () => this.structure.rebuild());
     this.structure.addEventListener('codepagechange', () => {
       this.pages.reload();
       this.thumbs.invalidate();

@@ -151,6 +151,16 @@ export class StructureView extends HTMLElement {
     this.grouping = on;
     savePrefs({ groupStructure: on });
     this.groupButton.setAttribute('aria-pressed', String(on));
+    await this.rebuild();
+  }
+
+  /**
+   * Builds the tree again (e.g. after the TLE or NOP code page changed: the previews are decoded
+   * anew); the selected item stays selected.
+   * @returns {Promise<void>} Resolves when the tree is shown again.
+   */
+  async rebuild() {
+    if (!this.loadedFor) return;
     const selected = this.tree.items[this.tree.selectedIndex]?.node;
     this.loadedFor = null;
     await this.ensureLoaded();
@@ -228,12 +238,22 @@ export class StructureView extends HTMLElement {
     const full = document.createElement('span');
     full.className = 'node-full';
     full.textContent = node.fullName ?? (triplet ? t('detail.unknownTriplet') : t('detail.unknownField'));
-    parts.push(full);
+    // Previews as small badges: a TLE shows name | value and a NOP its text in place of the field
+    // name (which stays in the tooltip), so the rows of a page group read like its index values;
+    // a triplet keeps its name and gets what it says (FQN type | name, color, size …) after it.
+    let preview = null;
+    if (!group && node.tle) preview = { key: node.tle.name || '?', value: node.tle.value, color: null };
+    else if (!group && node.nop !== undefined && node.nop !== null) preview = { key: null, value: node.nop, color: null };
+    else if (!group && node.preview) preview = node.preview;
+    const replaces = Boolean(node.tle || (node.nop !== undefined && node.nop !== null));
+    if (!(preview && replaces)) parts.push(full);
+    if (preview) parts.push(previewBadge(preview));
     label.className = `node-label kind-${node.kind}${group ? ' node-group' : ''}`;
     label.replaceChildren(...parts);
+    const said = preview ? `: ${preview.key ? `${preview.key} = ` : ''}${preview.value}` : '';
     label.title = group
       ? t('structure.groupTitle', { count: node.count.toLocaleString(), name: `${short.textContent} ${full.textContent}` })
-      : `${short.textContent} ${node.label} ${full.textContent}`.replace(/\s+/g, ' ').trim();
+      : `${short.textContent} ${node.label} ${full.textContent}${said}`.replace(/\s+/g, ' ').trim();
   }
 
   /**
@@ -357,3 +377,38 @@ export class StructureView extends HTMLElement {
 }
 
 customElements.define('structure-view', StructureView);
+
+/**
+ * Builds the preview badge of a tree item: an optional key on a muted ground (TLE name, FQN type,
+ * color space), an optional color swatch, then the value (cut with an ellipsis when the row is too
+ * narrow). An empty value after a key is left out and the badge marked; without a key it shows
+ * as a dash.
+ * @param {{key: string|null, value: string, color: string|null}} preview Preview.
+ * @returns {HTMLElement} Badge.
+ */
+function previewBadge({ key, value, color }) {
+  const badge = document.createElement('span');
+  badge.className = 'node-badge';
+  if (key) {
+    const name = document.createElement('span');
+    name.className = 'node-badge-key';
+    name.textContent = key;
+    badge.append(name);
+    // A key without a value (a TLE with an empty attribute value) shows only the key, marked.
+    if (!value) {
+      badge.classList.add('no-value');
+      return badge;
+    }
+  }
+  const text = document.createElement('span');
+  text.className = `node-badge-value${value ? '' : ' empty'}`;
+  if (color) {
+    const swatch = document.createElement('span');
+    swatch.className = 'node-badge-swatch';
+    swatch.style.background = color;
+    text.append(swatch);
+  }
+  text.append(value || '–');
+  badge.append(text);
+  return badge;
+}

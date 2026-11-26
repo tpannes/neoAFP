@@ -7,6 +7,10 @@
 import { fieldData } from './access.js';
 import { lookupField } from './registry/index.js';
 import { parseTriplets } from './registry/triplets.js';
+import { inheritedCodePage } from '../meta/owner.js';
+import { tripletTexts } from './triplet-preview.js';
+
+const TLE = 0xd3a090;
 
 /**
  * @typedef {object} FieldSummary
@@ -86,6 +90,7 @@ export function findFieldAtOffset(file, offset) {
  * expectation covers yet (`rawOnly`, Principle I); the viewer then shows the raw bytes.
  * @param {object} file File record.
  * @param {number} fieldIndex Row.
+ * @param {string|null} [tleCodePage] Code page chosen for TLEs, or null.
  * @returns {Promise<{index: number, offset: number, length: number, id: number, idHex: string,
  *   shortName: string|null, fullName: string|null, specRef: string|null,
  *   parameters: {name: string, value: (string|number)}[],
@@ -93,7 +98,7 @@ export function findFieldAtOffset(file, offset) {
  *   start: number}[], decoded: boolean, rawBytes: Uint8Array, dataOffset: number}>} The field;
  *   `start` is a triplet's position in the field data, `dataOffset` the data's byte offset in the file.
  */
-export async function getField(file, fieldIndex) {
+export async function getField(file, fieldIndex, tleCodePage = null) {
   const row = file.index.get(fieldIndex);
   const entry = lookupField(row.id);
   const data = await fieldData(file, fieldIndex);
@@ -114,6 +119,7 @@ export async function getField(file, fieldIndex) {
       parameters = out.parameters;
       triplets = out.tripletRanges.flatMap(([from, to]) => parseTriplets(data.subarray(from, to)))
         .map(({ id, name, decoded, raw, rawOnly }) => ({ id, name, decoded, rawOnly, raw, start: raw.byteOffset - data.byteOffset }));
+      await readTripletTexts(file, fieldIndex, row.id, triplets, tleCodePage);
       ok = !entry.rawOnly;
     } catch {
       parameters = [];
@@ -134,4 +140,27 @@ export async function getField(file, fieldIndex) {
     rawBytes: data,
     dataOffset: row.dataOffset,
   };
+}
+
+/**
+ * Replaces the character strings of triplets decoded without context (Attribute Value read as
+ * EBCDIC, names and comments as hex) by their text in the code page that applies: the last
+ * CGCSGID X'01' before them in the field, else that of the enclosing objects; for a TLE the code
+ * page chosen for TLEs when there is one.
+ * @param {object} file File record.
+ * @param {number} row Field row.
+ * @param {number} id Field identifier.
+ * @param {{id: number, decoded: object|null, raw: Uint8Array}[]} triplets Parsed triplets (changed in place).
+ * @param {string|null} tleCodePage Code page chosen for TLEs, or null.
+ * @returns {Promise<void>} Resolves when done.
+ */
+async function readTripletTexts(file, row, id, triplets, tleCodePage) {
+  if (!triplets.some((t) => t.id === 0x02 || t.id === 0x36 || t.id === 0x65)) return;
+  const texts = await tripletTexts(triplets, await inheritedCodePage(file, row), id === TLE ? tleCodePage : null);
+  triplets.forEach((t, i) => {
+    if (texts[i] === null || !t.decoded) return;
+    if (t.id === 0x36) t.decoded = { ...t.decoded, AttVal: texts[i] };
+    else if (t.id === 0x02) t.decoded = { ...t.decoded, name: texts[i] };
+    else if (t.id === 0x65) t.decoded = { ...t.decoded, comment: texts[i] };
+  });
 }

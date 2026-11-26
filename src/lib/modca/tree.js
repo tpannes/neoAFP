@@ -15,6 +15,12 @@ import { fieldData, sequentialReader } from './access.js';
 import { ebcdicName } from './bytes.js';
 import { lookupField } from './registry/index.js';
 import { fieldTriplets, pageNumberOfBegin, enclosingPage } from '../meta/owner.js';
+import { tlePreview } from '../meta/tle.js';
+import { inheritedCodePage } from '../meta/owner.js';
+import { detectNopCodePage } from '../meta/nop.js';
+import { decodePrintable, DEFAULT_CODE_PAGE } from '../meta/hex.js';
+import { loadCodePage } from '../codepages/index.js';
+import { tripletPreviews } from './triplet-preview.js';
 
 const TLE = 0xd3a090;
 const NOP = 0xd3eeee;
@@ -148,15 +154,18 @@ function pageOf(file, row) {
  * @param {object} file File record.
  * @param {number} row Row.
  * @param {(row: number) => Promise<Uint8Array>} [read] Field reader (a sequentialReader for long lists).
- * @returns {Promise<TreeNode>} Node.
+ * @param {{tle?: string|null, nop?: string|null}} [overrides] Code pages chosen for TLEs and NOPs.
+ * @returns {Promise<TreeNode>} Node; a TLE has `tle` (name and value), a NOP `nop` (its text),
+ *   both for the row preview.
  */
-async function fieldNode(file, row, read) {
+async function fieldNode(file, row, read, overrides = {}) {
   const { index } = file;
   const id = index.id[row];
   const entry = lookupField(id);
   const kind = fieldKind(id);
   const { triplets, data } = await tripletsOf(file, row, read);
-  const named = isBegin(index, row) || kind === 'end' || kind.startsWith('include');
+  // Invoke Medium Map carries the name of the medium map like an Include field.
+  const named = isBegin(index, row) || kind === 'end' || kind.startsWith('include') || entry?.shortName === 'IMM';
   return {
     id: String(row), type: 'field', row, kind,
     code: id.toString(16).toUpperCase().padStart(6, '0'),
@@ -168,20 +177,45 @@ async function fieldNode(file, row, read) {
     // thousands in mass output, T230).
     hasChildren: triplets.length > 0 || (isBegin(index, row) && (index.end[row] >= 0 || (row + 1 < index.count && index.parent[row + 1] === row))),
     pageNumber: pageOf(file, row),
+    tle: id === TLE ? await tlePreview(file, row, data, overrides.tle ?? null).catch(() => null) : null,
+    nop: id === NOP ? await nopPreview(data, overrides.nop ?? null) : null,
   };
+}
+
+/** Longest NOP text a tree node carries. */
+const NOP_PREVIEW = 200;
+
+/**
+ * Decodes the start of a NOP for the row preview, like the NOP browser (detected code page
+ * unless one is chosen).
+ * @param {Uint8Array} data NOP data.
+ * @param {string|null} override Code page chosen for NOPs, or null.
+ * @returns {Promise<string>} Text, blanks collapsed, cut to NOP_PREVIEW characters.
+ */
+async function nopPreview(data, override) {
+  const head = data.subarray(0, 2 * NOP_PREVIEW);
+  await loadCodePage(DEFAULT_CODE_PAGE);
+  await loadCodePage('windows-1252');
+  await loadCodePage('utf-8');
+  const text = (await decodePrintable(override ?? detectNopCodePage(head), head)).replace(/\s+/g, ' ').trim();
+  return text.length > NOP_PREVIEW ? `${text.slice(0, NOP_PREVIEW)}…` : text;
 }
 
 /**
  * Builds the nodes of a field's triplets, with their byte offsets in the file.
  * @param {object} file File record.
  * @param {number} row Field row.
- * @returns {Promise<TreeNode[]>} Triplet nodes.
+ * @param {{tle?: string|null}} [overrides] Code page chosen for TLEs (texts in a TLE's triplets).
+ * @returns {Promise<TreeNode[]>} Triplet nodes, each with its `preview` (or null).
  */
-async function tripletNodes(file, row) {
+async function tripletNodes(file, row, overrides = {}) {
   const { triplets, data } = await tripletsOf(file, row);
   const base = file.index.offset[row] + file.index.header[row];
   const page = pageOf(file, row);
+  const override = file.index.id[row] === TLE ? overrides.tle ?? null : null;
+  const previews = await tripletPreviews(triplets, await inheritedCodePage(file, row), override).catch(() => []);
   return triplets.map((t, i) => ({
+    preview: previews[i] ?? null,
     id: `${row}.${i}`, type: 'triplet', row, kind: 'triplet', tripletIndex: i,
     code: t.id.toString(16).toUpperCase().padStart(2, '0'), shortName: null, fullName: t.name ?? null, label: '',
     offset: base + (t.raw.byteOffset - data.byteOffset), length: t.raw.length, hasChildren: false, pageNumber: page,
@@ -192,22 +226,24 @@ async function tripletNodes(file, row) {
  * Returns the children of a tree node, or the top-level nodes.
  * @param {object} file File record.
  * @param {string} [parentNodeId] Node id from an earlier call; omitted for the top level.
+ * @param {{tle?: string|null, nop?: string|null}} [overrides] Code pages chosen for TLEs and NOPs
+ *   (row previews).
  * @returns {Promise<TreeNode[]>} Child nodes in file order.
  */
-export async function getTree(file, parentNodeId) {
+export async function getTree(file, parentNodeId, overrides = {}) {
   const { index } = file;
   // Child lists can be long (a document's page groups): read them in file order through one
   // sequential reader, one after the other, instead of one read per node.
   const nodes = async (rows) => {
     const read = sequentialReader(file);
     const out = [];
-    for (const r of rows) out.push(await fieldNode(file, r, read));
+    for (const r of rows) out.push(await fieldNode(file, r, read, overrides));
     return out;
   };
   if (parentNodeId === undefined || parentNodeId === null) return nodes(childFieldRows(index, -1));
   const row = Number(parentNodeId);
   if (!Number.isInteger(row) || row < 0 || row >= index.count) throw new RangeError(`unknown tree node: ${parentNodeId}`);
-  const triplets = await tripletNodes(file, row);
+  const triplets = await tripletNodes(file, row, overrides);
   const inner = isBegin(index, row) ? await nodes(childFieldRows(index, row)) : [];
   return [...triplets, ...inner];
 }

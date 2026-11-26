@@ -95,3 +95,15 @@ test('tree path: node ids from the top level down to a field; End fields lie bel
   assert.deepEqual(await ws.getTreePath(id, { row: 13 }), ['0', '3', '6', '13']); // End Page
   assert.deepEqual(await ws.getTreePath(id, { row: 25 }), ['0', '25']); // End Document
 });
+
+test('TLE nodes carry name and value for the row preview, decoded like the TLE browser', async () => {
+  const { ws, id } = await load('us2-structure');
+  const tles = async (parent) => (await ws.getTree(id, parent)).filter((n) => n.kind === 'tle').map((n) => n.tle);
+  const tles3 = await tles('3');
+  assert.ok(tles3.some((t) => t.name === 'ACCOUNT' && t.value === 'A-100 [7]'));
+  assert.deepEqual(await tles('6'), [{ name: 'PAGETAG', value: 'P1 [X]' }]);
+  // Other fields have none; the TLE code page override applies.
+  assert.ok((await ws.getTree(id, '6')).filter((n) => n.kind !== 'tle').every((n) => n.tle === null));
+  ws.setCodePageOverride('tle', 'ebcdic-037');
+  assert.deepEqual(await tles('6'), [{ name: 'PAGETAG', value: 'P1 ¢X!' }]);
+});

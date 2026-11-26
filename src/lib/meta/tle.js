@@ -228,8 +228,19 @@ export async function collectTles(file, report) {
  *   valueCp: object|null, sequence: number|null, level: number|null}>} TLE (bytes are views on the read data).
  */
 async function readTle(file, row, read, report) {
-  const triplets = parseTriplets(await read(row));
-  const inherited = await inheritedCodePage(file, row, read);
+  return tleOfTriplets(file, row, parseTriplets(await read(row)), await inheritedCodePage(file, row, read), report);
+}
+
+/**
+ * Reads name, value, code pages and qualifier from the parsed triplets of a TLE.
+ * @param {object} file File record.
+ * @param {number} row TLE row.
+ * @param {object[]} triplets Parsed triplets.
+ * @param {object|null} inherited Code page of the enclosing objects.
+ * @param {(d: object) => void} report Records a diagnostic (unknown triplets).
+ * @returns {object} TLE as readTle returns it.
+ */
+function tleOfTriplets(file, row, triplets, inherited, report) {
   let current = inherited;
   const t = { triplets, nameBytes: new Uint8Array(0), valueBytes: new Uint8Array(0), nameCp: inherited, valueCp: inherited, sequence: null, level: null };
   for (const tr of triplets) {
@@ -246,6 +257,30 @@ async function readTle(file, row, read, report) {
     }
   }
   return t;
+}
+
+/** Longest value text the structure tree gets (the row shows less; the details show all). */
+const PREVIEW_LENGTH = 200;
+
+/**
+ * Decodes name and value of one TLE for the structure tree, with the same code pages as the TLE
+ * browser.
+ * @param {object} file File record.
+ * @param {number} row TLE row.
+ * @param {Uint8Array} data Field data of the TLE.
+ * @param {string|null} override Code page chosen for TLEs, or null.
+ * @returns {Promise<{name: string, value: string}>} Texts, the value cut to PREVIEW_LENGTH.
+ */
+export async function tlePreview(file, row, data, override) {
+  // Enclosing fields are read on their own (and cached per file), not through the caller's
+  // sequential reader, which would jump back in the file.
+  const t = tleOfTriplets(file, row, parseTriplets(data), await inheritedCodePage(file, row), () => {});
+  const name = override ?? t.nameCp?.id ?? t.valueCp?.id ?? DEFAULT_CODE_PAGE;
+  const value = override ?? (t.valueCp ?? t.nameCp)?.id ?? DEFAULT_CODE_PAGE;
+  await loadCodePage(name);
+  await loadCodePage(value);
+  const text = printable(decode(value, t.valueBytes));
+  return { name: printable(decode(name, t.nameBytes)), value: text.length > PREVIEW_LENGTH ? `${text.slice(0, PREVIEW_LENGTH)}…` : text };
 }
 
 /**

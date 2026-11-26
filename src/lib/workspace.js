@@ -1005,7 +1005,7 @@ export class Workspace {
    * @returns {Promise<object>} The field with parameters, triplets, `decoded` and raw bytes.
    */
   async getField(fileId, fieldIndex) {
-    return fieldOf(this.getFileRecord(fileId), fieldIndex);
+    return fieldOf(this.getFileRecord(fileId), fieldIndex, this.codePageOverrides.tle ?? null);
   }
 
   /**
@@ -1026,7 +1026,8 @@ export class Workspace {
    * @returns {Promise<object[]>} Tree nodes.
    */
   async getTree(fileId, parentNodeId) {
-    return treeOf(this.getFileRecord(fileId), parentNodeId);
+    const { tle = null, nop = null } = this.codePageOverrides;
+    return treeOf(this.getFileRecord(fileId), parentNodeId, { tle, nop });
   }
 
   /**
