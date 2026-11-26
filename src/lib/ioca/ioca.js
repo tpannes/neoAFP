@@ -28,6 +28,7 @@ import { decodeRl4 } from './decoders/rl4.js';
 import { toRgba } from './color.js';
 import { registerObjectRenderer, readObjectArea } from '../render/page-renderer.js';
 import { jbig2Embedded, jbig2PageSize } from '../objcontainer/image-pdf.js';
+import { iocaPixelSpace } from '../resources/color-model.js';
 
 const BIM = 0xd3a8fb;
 const IDD = 0xd3a6fb;
@@ -399,7 +400,8 @@ async function renderIoca(r, file, row, env, origin, areaOverride = null) {
     return [{ type: 'placeholder', rect: place.rect, reason, sourceField: row, fileId: file.id }];
   }
   return [{ type: 'image', rect: place.rect, clip: place.clip, rotation: area.rotation, imageRef: `${file.id}:${row}`,
-    colorSpace: image.parts[0]?.space ?? (image.parts[0]?.ideSize === 1 ? 'bilevel' : 'color'), sourceField: row, fileId: file.id }];
+    colorSpace: image.parts[0]?.space ?? (image.parts[0]?.ideSize === 1 ? 'bilevel' : 'color'), pixelSpace: iocaPixelSpace(image.parts[0]),
+    sourceField: row, fileId: file.id }];
 }
 
 registerObjectRenderer(BIM, renderIoca);

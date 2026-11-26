@@ -16,6 +16,7 @@
  * Unknown orders are skipped (their length is known) and reported, never guessed (Principle I).
  */
 
+import { ocaColorSpec, extendedColorSpec, colorSpecField } from '../render/color-spec.js';
 import { collectFields, concat } from '../modca/access.js';
 import { u, s, toPageUnits } from '../modca/bytes.js';
 import { extendedColor, NAMED_COLORS } from '../ptoca/ptoca.js';
@@ -229,7 +230,7 @@ export function markerItems(symbol, cx, cy, hx, hy, color) {
 export function runGoca(orders, ctx) {
   const items = [];
   const st = {
-    x: 0, y: 0, color: '#000000', lineWidth: 1, area: null, arc: { p: 1, q: 1, r: 0, s: 0 }, cell: 0, image: null,
+    x: 0, y: 0, color: '#000000', colorSpec: null, lineWidth: 1, area: null, arc: { p: 1, q: 1, r: 0, s: 0 }, cell: 0, image: null,
     // Line attributes (T296): type (null solid, 'invisible' or dash/move lengths in line widths),
     // end, join, and the position in the dash sequence (page units), reset by Move Type orders.
     lineType: null, lineEnd: 'round', lineJoin: 'round', phase: 0,
@@ -297,6 +298,7 @@ export function runGoca(orders, ctx) {
     const e2 = P(rx, top - 1);
     const recolor = (it) => (def.fullColor ? it : {
       ...it, ...(it.stroke ? { stroke: area.color } : {}), ...(it.fill ? { fill: area.color } : {}), ...('color' in it ? { color: area.color } : {}),
+      ...colorSpecField(area.colorSpec),
       ...(it.inline ? { inline: { ...it.inline, color: area.color } } : {}),
     });
     item.tile = {
@@ -319,7 +321,7 @@ export function runGoca(orders, ctx) {
     const offset = st.phase;
     st.phase += length;
     if (st.lineType === 'invisible') return null;
-    const item = { type: 'path', commands: cmds, stroke: st.color, fill: null, lineWidth: lineWidthUnits(), lineCap: st.lineEnd, lineJoin: join, sourceField: ctx.sourceField, fileId: ctx.fileId };
+    const item = { type: 'path', commands: cmds, stroke: st.color, ...colorSpecField(st.colorSpec), fill: null, lineWidth: lineWidthUnits(), lineCap: st.lineEnd, lineJoin: join, sourceField: ctx.sourceField, fileId: ctx.fileId };
     if (st.lineType) {
       item.dash = st.lineType.map((v) => v * item.lineWidth);
       item.dashOffset = offset;
@@ -386,7 +388,7 @@ export function runGoca(orders, ctx) {
     const along = [Math.round(Math.cos(rad) * 1e12) / 1e12, Math.round(Math.sin(rad) * 1e12) / 1e12];
     const down = [-along[1], along[0]];
     const run = (px, py, list, dx) => ({
-      type: 'glyphRun', x: px, y: py, rotation, color: st.color, font: descriptor,
+      type: 'glyphRun', x: px, y: py, rotation, color: st.color, ...colorSpecField(st.colorSpec), font: descriptor,
       ids: list.map((g) => g.id), dx, chars: list.map((g) => g.unicode), text: list.map((g) => g.unicode).join(''),
       ...(font ? { codes: list.map((g) => g.code) } : {}), sourceField: ctx.sourceField, fileId: ctx.fileId,
     });
@@ -471,15 +473,15 @@ export function runGoca(orders, ctx) {
         const [hx, hy] = st.markerCell ? [st.markerCell[0] * ctx.k / 2, st.markerCell[1] * ctx.k / 2] : [MARKER_CELL / 2, MARKER_CELL / 2];
         if (hx > 0 && hy > 0) {
           for (const pt of pts) {
-            for (const item of markerItems(st.marker, ...P(...pt), hx, hy, st.color)) items.push({ ...item, sourceField: ctx.sourceField, fileId: ctx.fileId });
+            for (const item of markerItems(st.marker, ...P(...pt), hx, hy, st.color)) items.push({ ...item, ...colorSpecField(st.colorSpec), sourceField: ctx.sourceField, fileId: ctx.fileId });
           }
         }
         if (pts.length) [st.x, st.y] = pts[pts.length - 1];
         break;
       }
-      case 0x0a: st.color = GOCA_COLORS[d[0]] ?? st.color; break; // GSCOL
-      case 0x26: st.color = GOCA_COLORS[u(d, 0, 2)] ?? st.color; break; // GSECOL
-      case 0xb2: st.color = extendedColor(d) ?? st.color; break; // GSPCOL (process color)
+      case 0x0a: st.color = GOCA_COLORS[d[0]] ?? st.color; st.colorSpec = ocaColorSpec(d[0]); break; // GSCOL
+      case 0x26: st.color = GOCA_COLORS[u(d, 0, 2)] ?? st.color; st.colorSpec = ocaColorSpec(u(d, 0, 2)); break; // GSECOL
+      case 0xb2: st.color = extendedColor(d) ?? st.color; st.colorSpec = extendedColorSpec(d) ?? st.colorSpec; break; // GSPCOL (process color)
       case 0x19: st.lineWidth = d[0] || 1; break; // GSLW
       case 0x11: st.lineWidth = d[0] + (d[1] ?? 0) / 256; break; // GSFLW
       case 0x21: [st.x, st.y] = point(d, 0); break; // GSCP
@@ -492,7 +494,7 @@ export function runGoca(orders, ctx) {
       }
       case 0x68: // GBAR: flags bit 1 draw the boundary, bit 2 nonzero winding (else alternate)
         st.area = {
-          commands: [], color: st.color, boundary: (d[0] & 0x40) !== 0, nonzero: (d[0] & 0x20) !== 0,
+          commands: [], color: st.color, colorSpec: st.colorSpec, boundary: (d[0] & 0x40) !== 0, nonzero: (d[0] & 0x20) !== 0,
           patternSet: st.patternSet, pattern: st.pattern, ref: st.patternRef, boundaryItems: [],
         };
         break;
@@ -507,7 +509,7 @@ export function runGoca(orders, ctx) {
         if (area.patternSet !== 0 && area.pattern !== 0 && !def) ctx.report(`GOCA pattern X'${hex(area.patternSet)}' X'${hex(area.pattern)}' is not defined`);
         const fill = area.patternSet !== 0 ? 'solid' : patternFill(area.pattern);
         if (area.commands.length && fill !== 'none') {
-          const item = { type: 'path', commands: [...area.commands, ['Z']], stroke: null, fill: area.color, lineWidth: 0,
+          const item = { type: 'path', commands: [...area.commands, ['Z']], stroke: null, fill: area.color, ...colorSpecField(area.colorSpec), lineWidth: 0,
             fillRule: area.nonzero ? 'nonzero' : 'evenodd', sourceField: ctx.sourceField, fileId: ctx.fileId };
           if (fill === 'pattern') item.pattern = area.pattern;
           if (!def || patternedFill(item, def, area)) items.push(item);
@@ -551,7 +553,7 @@ export function runGoca(orders, ctx) {
           const line = st.area.boundary ? stroke(cmds, 'miter') : null;
           if (line) st.area.boundaryItems.push(line);
         } else if (filled) {
-          items.push({ type: 'path', commands: cmds, stroke: null, fill: st.color, lineWidth: lineWidthUnits(), sourceField: ctx.sourceField, fileId: ctx.fileId });
+          items.push({ type: 'path', commands: cmds, stroke: null, fill: st.color, ...colorSpecField(st.colorSpec), lineWidth: lineWidthUnits(), sourceField: ctx.sourceField, fileId: ctx.fileId });
         } else {
           // Line joins do not apply to the corners of a Box: they stay sharp.
           const line = stroke(cmds, 'miter');
@@ -625,7 +627,7 @@ export function runGoca(orders, ctx) {
         if (code === 0xd1) { [st.x, st.y] = point(d, 0); at = 4; }
         const width = u(d, at + 2, 2);
         const height = u(d, at + 4, 2);
-        st.image = { width, height, rowBytes: Math.ceil(width / 8), rows: [], x: st.x, y: st.y, color: st.color };
+        st.image = { width, height, rowBytes: Math.ceil(width / 8), rows: [], x: st.x, y: st.y, color: st.color, colorSpec: st.colorSpec };
         break;
       }
       case 0x92: if (st.image) st.image.rows.push(d); break; // GIMD: one row of image data
@@ -639,7 +641,7 @@ export function runGoca(orders, ctx) {
         const pel = ctx.pelK ?? { x: ctx.k, y: ctx.k };
         items.push({ type: 'image', rect: { x, y, width: img.width * pel.x, height: img.height * pel.y }, rotation: 0,
           inline: { width: img.width, height: img.height, bilevel: { rowBytes: img.rowBytes, bits }, color: img.color },
-          colorSpace: 'bilevel', sourceField: ctx.sourceField, fileId: ctx.fileId });
+          colorSpace: 'bilevel', pixelSpace: 'bilevel', ...colorSpecField(img.colorSpec), sourceField: ctx.sourceField, fileId: ctx.fileId });
         break;
       }
       case 0xa0: st.patternRef = d[0] & 0x80 ? [0, 0] : point(d, 2); break; // GSPRP

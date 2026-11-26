@@ -16,6 +16,7 @@ import {
 } from '../modca/structures.js';
 import { toPageUnits } from '../modca/bytes.js';
 import { runPtoca, extendedColor } from '../ptoca/ptoca.js';
+import { extendedColorSpec, colorSpecField } from './color-spec.js';
 import { findTestPrint } from './test-print.js';
 import { placeItems } from './transform.js';
 import { decodeIncludePage, findIncludedPage } from './include-page.js';
@@ -154,7 +155,9 @@ export async function readObjectArea(file, objectRow, env, override = null) {
     } else if (id === ID.OBD) {
       const data = await fieldData(file, row);
       const o = decodeOBD(data);
-      area.color = areaColor(data);
+      const found = areaColor(data);
+      area.color = found?.color ?? null;
+      area.colorSpec = found?.spec ?? null;
       if (o.areaSize) {
         const fx = o.units ? toPageUnits(o.units.xBase, o.units.xUnits) : env.kx;
         const fy = o.units ? toPageUnits(o.units.yBase, o.units.yUnits) : env.ky;
@@ -182,13 +185,16 @@ export async function readObjectArea(file, objectRow, env, override = null) {
  * Descriptor colors the whole object area before the object is presented (MO:DCA, Object Area
  * Descriptor). Its layout after length and identifier matches Set Extended Text Color.
  * @param {Uint8Array} d Object Area Descriptor data (triplets only).
- * @returns {string|null} Color as #rrggbb, or null without one.
+ * @returns {{color: string, spec: object|null}|null} Color as #rrggbb and as given, or null without one.
  */
 function areaColor(d) {
   for (let p = 0; p + 2 <= d.length;) {
     const len = d[p];
     if (len < 2 || p + len > d.length) break;
-    if (d[p + 1] === 0x4e && len >= 13) return extendedColor(d.subarray(p + 2, p + len));
+    if (d[p + 1] === 0x4e && len >= 13) {
+      const color = extendedColor(d.subarray(p + 2, p + len));
+      return color && { color, spec: extendedColorSpec(d.subarray(p + 2, p + len)) };
+    }
     p += len;
   }
   return null;
@@ -214,7 +220,7 @@ async function areaBackground(file, row, env, origin) {
     .map(([x, y]) => [x0 + x * cos - y * sin, y0 + x * sin + y * cos]);
   return [{
     type: 'path', commands: [['M', ...a], ['L', ...b], ['L', ...c], ['L', ...d], ['Z']],
-    fill: area.color, stroke: null, lineWidth: 0, sourceField: row, fileId: file.id,
+    fill: area.color, ...colorSpecField(area.colorSpec), stroke: null, lineWidth: 0, sourceField: row, fileId: file.id,
   }];
 }
 
@@ -290,7 +296,7 @@ async function renderText(r, file, row, env, origin) {
     const lineHeight = font.baselineIncrement || 240;
     const extent = { inline: last ? last.di + (font.glyph(last.code)?.advance ?? 0) : 0, ascent: lineHeight * 0.7, descent: lineHeight * 0.2 };
     items.push({
-      type: 'glyphRun', x, y, rotation: seg.iDeg, color: seg.color, font: font.descriptor, extent,
+      type: 'glyphRun', x, y, rotation: seg.iDeg, color: seg.color, ...colorSpecField(seg.colorSpec), font: font.descriptor, extent,
       ids: seg.glyphs.map((g) => g.id), dx: seg.glyphs.map((g) => g.di),
       chars: seg.glyphs.map((g) => g.unicode), text: seg.glyphs.map((g) => g.unicode).join(''), codes: seg.glyphs.map((g) => g.code),
       sourceField: row, textField: partRows[seg.part] ?? row, fileId: file.id,
@@ -304,7 +310,7 @@ async function renderText(r, file, row, env, origin) {
     const [x1, y1] = textToPage(ia, ib, rule.iDeg, rule.bDeg, space);
     const [x2, y2] = textToPage(ja, jb, rule.iDeg, rule.bDeg, space);
     // Like glyph runs, rules (underscores, DIR/DBR lines) know the PTX field that drew them.
-    items.push({ type: 'rule', x1, y1, x2, y2, thickness: Math.abs(rule.width), color: rule.color, sourceField: row,
+    items.push({ type: 'rule', x1, y1, x2, y2, thickness: Math.abs(rule.width), color: rule.color, ...colorSpecField(rule.colorSpec), sourceField: row,
       textField: partRows[rule.part] ?? row, fileId: file.id });
   }
   return items;

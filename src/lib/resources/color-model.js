@@ -56,13 +56,22 @@ export function imageColorModel(d, format) {
  * @returns {'rgb'|'cmyk'|null} Color model.
  */
 function jpegColorModel(d) {
+  const components = jpegComponents(d);
+  return components === 4 ? 'cmyk' : components === 3 ? 'rgb' : null;
+}
+
+/**
+ * Number of color components of a JPEG file, from its frame header (SOFn).
+ * @param {Uint8Array} d JPEG bytes.
+ * @returns {number|null} 1 (gray), 3 (RGB/YCbCr), 4 (CMYK/YCCK), or null when not found.
+ */
+function jpegComponents(d) {
   let pos = 2;
   while (pos + 9 < d.length) {
     if (d[pos] !== 0xff) { pos++; continue; }
     const marker = d[pos + 1];
     if (marker >= 0xc0 && marker <= 0xcf && ![0xc4, 0xc8, 0xcc].includes(marker)) {
-      const components = d[pos + 9];
-      return components === 4 ? 'cmyk' : components === 3 ? 'rgb' : null;
+      return d[pos + 9];
     }
     pos += 2 + ((d[pos + 2] << 8) | d[pos + 3]);
   }
@@ -75,6 +84,16 @@ function jpegColorModel(d) {
  * @returns {'rgb'|'cmyk'|null} Color model.
  */
 function tiffColorModel(d) {
+  const value = tiffPhotometric(d);
+  return value === 2 || value === 6 ? 'rgb' : value === 5 ? 'cmyk' : null;
+}
+
+/**
+ * PhotometricInterpretation (tag 262) of the first directory of a TIFF file.
+ * @param {Uint8Array} d TIFF bytes.
+ * @returns {number|null} 0/1 gray or black and white, 2 RGB, 3 palette, 5 CMYK, 6 YCbCr, 8 CIELab …
+ */
+function tiffPhotometric(d) {
   if (d.length < 8) return null;
   const view = new DataView(d.buffer, d.byteOffset, d.byteLength);
   const little = d[0] === 0x49;
@@ -85,10 +104,38 @@ function tiffColorModel(d) {
     const at = ifd + 2 + i * 12;
     if (at + 12 > d.length) break;
     if (view.getUint16(at, little) !== 262) continue;
-    const value = view.getUint16(at + 8, little);
-    return value === 2 || value === 6 ? 'rgb' : value === 5 ? 'cmyk' : null;
+    return view.getUint16(at + 8, little);
   }
   return null;
+}
+
+/**
+ * Color space of the pixel values of an image file in an object container, for the color picker:
+ * 'rgb' (also YCbCr and palettes: decoded to RGB without color management), 'cmyk', 'lab' or
+ * 'gray', or null when unknown.
+ * @param {Uint8Array} d File bytes.
+ * @param {string} format 'jpeg', 'png', 'gif' or 'tiff'.
+ * @returns {'rgb'|'cmyk'|'lab'|'gray'|null} Color space.
+ */
+export function imagePixelSpace(d, format) {
+  if (format === 'gif') return 'rgb';
+  if (format === 'png') return d.length <= 25 ? null : [2, 3, 6].includes(d[25]) ? 'rgb' : [0, 4].includes(d[25]) ? 'gray' : null;
+  if (format === 'jpeg') return { 1: 'gray', 3: 'rgb', 4: 'cmyk' }[jpegComponents(d)] ?? null;
+  if (format === 'tiff') return { 0: 'gray', 1: 'gray', 2: 'rgb', 3: 'rgb', 5: 'cmyk', 6: 'rgb', 8: 'lab' }[tiffPhotometric(d)] ?? null;
+  return null;
+}
+
+/**
+ * Color space of the pixel values of an IOCA image, from its first image part (as the decoder
+ * reads it): IDE Structure, else bands, else IDE size. YCbCr and YCrCb count as RGB.
+ * @param {{space?: string|null, bands?: number[]|null, ideSize?: number}|undefined} part Image part.
+ * @returns {'rgb'|'cmyk'|'lab'|'gray'|'bilevel'|null} Color space.
+ */
+export function iocaPixelSpace(part) {
+  if (!part) return null;
+  if (part.space) return { rgb: 'rgb', ycrcb: 'rgb', ycbcr: 'rgb', cmyk: 'cmyk', lab: 'lab', gray: 'gray' }[part.space] ?? null;
+  if (part.bands?.length) return part.bands.length === 4 ? 'cmyk' : part.bands.length === 1 ? 'gray' : 'rgb';
+  return { 1: 'bilevel', 8: 'gray', 24: 'rgb', 32: 'cmyk' }[part.ideSize] ?? null;
 }
 
 /**

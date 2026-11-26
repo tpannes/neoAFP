@@ -18,6 +18,11 @@
  * `inspecthover` reports it (detail: { item, x, y, area, clientX, clientY }; item null over empty
  * paper; x/y in page units of the side, area the page under the pointer); leaving the pages
  * fires `inspectleave`; a click on an item fires `inspectselect` (detail: { item, area }).
+ *
+ * Pick mode (`picking = true`, the color picker): the item under the pointer is outlined as in
+ * Inspect, and `pickhover` reports it with the color drawn there (detail: { item, pixel,
+ * clientX, clientY }; pixel "#rrggbb" read from the page canvas, null beside the pages); a click
+ * fires `pickselect` with the same detail; leaving the pages fires `inspectleave`.
  */
 
 import { ScrollLayout } from './scroll-layout.js';
@@ -92,6 +97,7 @@ export class PageScroller extends HTMLElement {
     this.pinned = false;
     this.highlight = null;
     this.inspecting = false;
+    this.picking = false;
   }
 
   /** Builds the scroll area when added to the page. */
@@ -504,9 +510,45 @@ export class PageScroller extends HTMLElement {
    * @returns {void}
    */
   setInspecting(on) {
+    if (on && this.picking) this.setPicking(false);
     this.inspecting = on;
     this.classList.toggle('inspecting', on);
     if (!on) this.#clearInspect();
+  }
+
+  /**
+   * Turns pick mode (the color picker) on or off; it ends Inspect, and Inspect ends it.
+   * @param {boolean} on True to pick colors.
+   * @returns {void}
+   */
+  setPicking(on) {
+    if (on && this.inspecting) this.setInspecting(false);
+    this.picking = on;
+    this.classList.toggle('picking', on);
+    if (!on) this.#clearInspect();
+  }
+
+  /**
+   * Reads the color drawn at a point of a side (the page canvas holds the side unturned, so the
+   * point in page units maps straight onto it).
+   * @param {{frame: HTMLElement, model: object, x: number, y: number}} hit Hit.
+   * @returns {string|null} "#rrggbb", or null when the canvas cannot be read.
+   */
+  #pixelAt(hit) {
+    const canvases = hit.frame.querySelectorAll('canvas.page-canvas');
+    const canvas = canvases[canvases.length - 1];
+    if (!canvas?.width) return null;
+    const px = Math.floor((hit.x / hit.model.widthUnits) * canvas.width);
+    const py = Math.floor((hit.y / hit.model.heightUnits) * canvas.height);
+    if (px < 0 || py < 0 || px >= canvas.width || py >= canvas.height) return null;
+    try {
+      const [r, g, b, a] = canvas.getContext('2d').getImageData(px, py, 1, 1).data;
+      // Transparent canvas pixels show the white paper.
+      const over = (v) => Math.round((v * a) / 255 + 255 * (1 - a / 255));
+      return `#${[r, g, b].map((v) => over(v).toString(16).padStart(2, '0')).join('')}`;
+    } catch {
+      return null;
+    }
   }
 
   /**
@@ -545,13 +587,17 @@ export class PageScroller extends HTMLElement {
    * @returns {void}
    */
   #onInspectMove(e) {
-    if (!this.inspecting) return;
+    if (!this.inspecting && !this.picking) return;
     const hit = this.#inspectAt(e);
     if (!hit) {
       this.#clearInspect();
       return;
     }
     this.#outline(hit);
+    if (this.picking) {
+      this.dispatchEvent(new CustomEvent('pickhover', { detail: { item: hit.item, pixel: this.#pixelAt(hit), clientX: e.clientX, clientY: e.clientY } }));
+      return;
+    }
     this.dispatchEvent(new CustomEvent('inspecthover', {
       detail: { item: hit.item, x: hit.x, y: hit.y, area: hit.area, clientX: e.clientX, clientY: e.clientY },
     }));
@@ -564,6 +610,12 @@ export class PageScroller extends HTMLElement {
    */
   #onInspectClick(e) {
     const hit = this.#inspectAt(e);
+    if (this.picking) {
+      if (!hit) return;
+      e.preventDefault();
+      this.dispatchEvent(new CustomEvent('pickselect', { detail: { item: hit.item, pixel: this.#pixelAt(hit), clientX: e.clientX, clientY: e.clientY } }));
+      return;
+    }
     if (!hit?.item) {
       // A click on empty paper (or beside the pages) ends a field marking and Inspect.
       if (this.inspecting || this.highlight?.rows) this.dispatchEvent(new CustomEvent('blankclick'));

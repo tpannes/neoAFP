@@ -24,6 +24,7 @@ import { collectFields } from '../modca/access.js';
 import { u, s, orientation, toPageUnits } from '../modca/bytes.js';
 import { registerObjectRenderer } from '../render/page-renderer.js';
 import { NAMED_COLORS } from '../ptoca/ptoca.js';
+import { ocaColorSpec, colorSpecField } from '../render/color-spec.js';
 
 const BII = 0xd3a87b;
 const IOC = 0xd3a77b;
@@ -125,7 +126,10 @@ export async function readImImage(file, row) {
       height = u(data, 20, 2);
       cellW = u(data, 28, 2);
       cellH = u(data, 30, 2);
-      if (data.length >= 36) out.color = NAMED_COLORS[u(data, 34, 2)] ?? '#000000';
+      if (data.length >= 36) {
+        out.color = NAMED_COLORS[u(data, 34, 2)] ?? '#000000';
+        out.colorSpec = ocaColorSpec(u(data, 34, 2));
+      }
     }
   }
   const image = { width, height, rowBytes: Math.ceil(width / 8), bits: new Uint8Array(Math.ceil(width / 8) * height) };
@@ -189,7 +193,9 @@ async function renderImImage(r, file, row, env, origin) {
     rotation: im.rotation,
     imageRef: `${file.id}:${row}`,
     colorSpace: 'bilevel',
+    pixelSpace: 'bilevel',
     color: im.color,
+    ...colorSpecField(im.colorSpec),
     sourceField: row,
     fileId: file.id,
   }];

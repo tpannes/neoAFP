@@ -26,6 +26,7 @@
  * Bar code types without a symbology module are shown as a placeholder with a diagnostic.
  */
 
+import { ocaColorSpec, extendedColorSpec, colorSpecField } from '../render/color-spec.js';
 import { collectFields } from '../modca/access.js';
 import { u, triplets, toPageUnits } from '../modca/bytes.js';
 import { registerObjectRenderer, readObjectArea, objectRendererFor } from '../render/page-renderer.js';
@@ -123,6 +124,7 @@ const CP1303 = (() => {
  * @property {number} type Bar code type.
  * @property {number} modifier Modifier.
  * @property {string} color Color of bars and HRI.
+ * @property {{space: string, value: string}|null} colorSpec Color as given (null: default).
  * @property {number|null} moduleMils Module width in mils, or null for the default.
  * @property {number|null} height Total bar height in page units, or null for the default.
  * @property {number|null} ratio WE:NE ratio, or null for the default.
@@ -150,8 +152,12 @@ export function readBsd(d) {
   const unit = toPageUnits(d[0], u(d, 2, 2));
   const colorValue = u(d, 15, 2);
   let color = [0x0000, 0xff00, 0xff07, 0xffff].includes(colorValue) ? '#000000' : (NAMED_COLORS[colorValue] ?? '#000000');
+  let colorSpec = [0x0000, 0xff00, 0xff07, 0xffff].includes(colorValue) ? null : ocaColorSpec(colorValue);
   for (const t of triplets(d, 23)) {
-    if (t.id === 0x4e) color = extendedColor(t.body) ?? color;
+    if (t.id === 0x4e) {
+      color = extendedColor(t.body) ?? color;
+      colorSpec = extendedColorSpec(t.body) ?? colorSpec;
+    }
   }
   const elementHeight = u(d, 18, 2);
   return {
@@ -159,6 +165,7 @@ export function readBsd(d) {
     type: d[12],
     modifier: d[13],
     color,
+    colorSpec,
     moduleMils: d[17] === 0xff || d[17] === 0 ? null : d[17],
     // Default element height (X'FFFF') ignores the multiplier (BSD byte 20).
     height: elementHeight === 0xffff ? null : elementHeight * unit * (d[20] || 1),
@@ -749,7 +756,7 @@ export function layoutLinear(sym, bsd, bsa, place, rotation, src) {
         rect(0, H, w, t);
       }
     }
-    if (commands.length) items.push({ type: 'path', commands, fill: bsd.color, stroke: null, lineWidth: 0, ...src });
+    if (commands.length) items.push({ type: 'path', commands, fill: bsd.color, ...colorSpecField(bsd.colorSpec), stroke: null, lineWidth: 0, ...src });
   }
   if (!bsa.noHri) {
     for (const h of sym.hri) {
@@ -773,7 +780,7 @@ export function layoutLinear(sym, bsd, bsa, place, rotation, src) {
       const chars = [...h.text];
       const [px, py] = place(ox + x, oy + y);
       items.push({
-        type: 'glyphRun', x: px, y: py, rotation, color: bsd.color,
+        type: 'glyphRun', x: px, y: py, rotation, color: bsd.color, ...colorSpecField(bsd.colorSpec),
         font: { kind: 'substitute', family: 'monospace', size, name: 'HRI' },
         ids: chars, chars, dx: chars.map((_, i) => i * (h.small ? 0.6 * size : charWidth)), text: h.text, ...src,
       });
@@ -841,7 +848,7 @@ export function layoutMatrix(sym, bsd, bsa, place, src, rotation = 0) {
       c = end;
     }
   }
-  const items = commands.length ? [{ type: 'path', commands, fill: bsd.color, stroke: null, lineWidth: 0, ...src }] : [];
+  const items = commands.length ? [{ type: 'path', commands, fill: bsd.color, ...colorSpecField(bsd.colorSpec), stroke: null, lineWidth: 0, ...src }] : [];
   if (sym.hri && !bsa.noHri) {
     const size = Math.min(240, Math.max(120, 10 * X));
     const chars = [...sym.hri];
@@ -850,7 +857,7 @@ export function layoutMatrix(sym, bsd, bsa, place, src, rotation = 0) {
     const y = bsa.suppress ? 0 : bsa.position === 2 ? -X - 0.2 * size : H + X + 0.8 * size;
     const [px, py] = place(ox + x, oy + y);
     items.push({
-      type: 'glyphRun', x: px, y: py, rotation, color: bsd.color,
+      type: 'glyphRun', x: px, y: py, rotation, color: bsd.color, ...colorSpecField(bsd.colorSpec),
       font: { kind: 'substitute', family: 'monospace', size, name: 'HRI' },
       ids: chars, chars, dx: chars.map((_, i) => i * 0.6 * size), text: sym.hri, ...src,
     });
@@ -895,7 +902,7 @@ export function layoutPostal(sym, bsd, bsa, place, rotation, src) {
     const corners = [[x, t * H], [x + barWidth, t * H], [x + barWidth, b * H], [x, b * H]].map(([px, py]) => place(ox + px, oy + py));
     commands.push(['M', ...corners[0]], ['L', ...corners[1]], ['L', ...corners[2]], ['L', ...corners[3]], ['Z']);
   });
-  const items = [{ type: 'path', commands, fill: bsd.color, stroke: null, lineWidth: 0, ...src }];
+  const items = [{ type: 'path', commands, fill: bsd.color, ...colorSpecField(bsd.colorSpec), stroke: null, lineWidth: 0, ...src }];
   if (sym.hri && !bsa.noHri) {
     const size = 160;
     const width = (sym.bars.length - 1) * pitch + barWidth;
@@ -905,7 +912,7 @@ export function layoutPostal(sym, bsd, bsa, place, rotation, src) {
     const y = above ? -0.05 * 1440 - 0.2 * size : H + 0.05 * 1440 + 0.8 * size;
     const [px, py] = place(ox + x, oy + y);
     items.push({
-      type: 'glyphRun', x: px, y: py, rotation, color: bsd.color,
+      type: 'glyphRun', x: px, y: py, rotation, color: bsd.color, ...colorSpecField(bsd.colorSpec),
       font: { kind: 'substitute', family: 'monospace', size, name: 'HRI' },
       ids: chars, chars, dx: chars.map((_, i) => i * 0.6 * size), text: sym.hri, ...src,
     });
@@ -959,7 +966,7 @@ export function layoutMaxiCode(sym, bsd, bsa, place, src) {
   // Each ring: outer and inner circle, drawn in opposite directions so that both even-odd and
   // non-zero filling leave the inside light.
   for (const [inner, outer] of MAXI_RINGS) { circle(outer, false); circle(inner, true); }
-  return [{ type: 'path', commands, fill: bsd.color, stroke: null, lineWidth: 0, ...src }];
+  return [{ type: 'path', commands, fill: bsd.color, ...colorSpecField(bsd.colorSpec), stroke: null, lineWidth: 0, ...src }];
 }
 
 /** 2D symbologies (Data Matrix, MaxiCode, PDF417, Aztec, QR Code, Han Xin): no HRI (Table 7). */

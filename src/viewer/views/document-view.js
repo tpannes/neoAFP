@@ -10,6 +10,12 @@
  * shows what it is and where (mm from the page's top-left corner and the page's own units); a
  * click on it emits `inspectfield`.
  *
+ * Color picker: a toolbar switch next to Inspect (the two end each other; Escape ends it) shows
+ * for the element under the pointer its color as given in the file (color space and values,
+ * e.g. "CMYK 100 20 0 0 %"; "default color" when none is given), the element, and the color on
+ * screen, which is only an approximation (no color management). A click copies the color as
+ * given in the file, else as drawn ("#rrggbb").
+ *
  * Marked fields (FR-034, from the structure view's "Show on page") end with the Escape key, a
  * click on empty paper (where no element lies) or switching Inspect off; Escape and the click on
  * empty paper end Inspect too. Search hits stay marked: they belong to the page search.
@@ -63,6 +69,67 @@ function sourceOf(item) {
   return named ? t(named.type === 'overlay' ? 'inspect.fromOverlay' : 'inspect.fromSegment', { name: named.name }) : null;
 }
 
+/**
+ * The color an item is drawn in, as the renderer has it ("#rrggbb"), or null (images, gradients).
+ * @param {object} item Render item.
+ * @returns {string|null} Color.
+ */
+function drawnColor(item) {
+  if (item.type === 'image' || item.type === 'pdf' || item.type === 'placeholder') return null;
+  const color = item.color ?? item.fill ?? item.stroke;
+  return typeof color === 'string' && /^#[0-9a-f]{6}$/i.test(color) ? color : null;
+}
+
+/**
+ * The colors of a pick: as given in the file (the item's color specification), and on screen:
+ * the item's own color where it has one (edges of text and lines blend with the paper, so the
+ * pixel there is no color of the file), else the pixel (images, gradients, paper).
+ * @param {{item: object|null, pixel: string|null}} d Pick.
+ * @returns {{spec: {space: string, value: string}|null, screen: string|null}} Colors.
+ */
+function colorOf(d) {
+  return { spec: d.item?.colorSpec ?? null, screen: (d.item && drawnColor(d.item)) ?? d.pixel };
+}
+
+/**
+ * The text a click copies: the color as given in the file, else as drawn.
+ * @param {{item: object|null, pixel: string|null}} d Pick.
+ * @returns {string|null} E.g. "CMYK 100 20 0 0 %" or "#005ab4".
+ */
+function copyValue(d) {
+  const { spec, screen } = colorOf(d);
+  return spec ? `${spec.space} ${spec.value}` : screen;
+}
+
+/**
+ * A tooltip line of text.
+ * @param {string} className Class names.
+ * @param {string} text Text.
+ * @returns {HTMLElement} Line.
+ */
+function textLine(className, text) {
+  return Object.assign(document.createElement('div'), { className, textContent: text });
+}
+
+/**
+ * A tooltip line with a color swatch before the text.
+ * @param {string} className Class names.
+ * @param {string} text Text.
+ * @param {string|null} color Swatch color, or null for none.
+ * @returns {HTMLElement} Line.
+ */
+function swatchLine(className, text, color) {
+  const line = textLine(`${className} pick-line`, '');
+  if (color) {
+    const swatch = document.createElement('span');
+    swatch.className = 'pick-swatch';
+    swatch.style.background = color;
+    line.append(swatch);
+  }
+  line.append(text);
+  return line;
+}
+
 export class DocumentView extends HTMLElement {
   /**
    * Connects the view to the worker and the application frame.
@@ -110,9 +177,12 @@ export class DocumentView extends HTMLElement {
       if (this.scroller.inspecting) this.#endMarking();
       else this.setInspecting(true);
     });
+    this.pickButton = iconButton('pipette', 'pick.toggle', { iconOnly: true, className: 'toggle' });
+    this.pickButton.setAttribute('aria-pressed', 'false');
+    this.pickButton.addEventListener('click', () => this.setPicking(!this.scroller.picking));
     const switches = document.createElement('span');
     switches.className = 'tool-group';
-    switches.append(this.toggle, this.testPrint, this.inspectButton);
+    switches.append(this.toggle, this.testPrint, this.inspectButton, this.pickButton);
     this.search = document.createElement('page-search');
     this.search.attach(this.client);
     // Every occurrence on the pages shown is marked (the scroller asks marksOf for each page it
@@ -147,6 +217,8 @@ export class DocumentView extends HTMLElement {
     this.tip.setAttribute('role', 'status');
     this.scroller.addEventListener('inspecthover', (e) => this.#showTip(e.detail));
     this.scroller.addEventListener('inspectleave', () => { this.tip.hidden = true; });
+    this.scroller.addEventListener('pickhover', (e) => this.#showColorTip(e.detail));
+    this.scroller.addEventListener('pickselect', (e) => this.#copyColor(e.detail));
     this.scroller.addEventListener('blankclick', () => this.#endMarking());
     this.scroller.addEventListener('inspectselect', (e) => {
       this.dispatchEvent(new CustomEvent('inspectfield', { bubbles: true, detail: { item: e.detail.item, page: e.detail.area?.pageNumber ?? this.page } }));
@@ -159,9 +231,10 @@ export class DocumentView extends HTMLElement {
     // Escape ends a field marking and Inspect, also while the focus is elsewhere (e.g. still on
     // the structure view's button), as long as the page view is shown and no dialog or input has it.
     document.addEventListener('keydown', (e) => {
-      if (e.key !== 'Escape' || !this.offsetParent || !(this.scroller.inspecting || this.scroller.highlight?.rows)) return;
+      if (e.key !== 'Escape' || !this.offsetParent || !(this.scroller.inspecting || this.scroller.picking || this.scroller.highlight?.rows)) return;
       if (e.target.closest?.('input, select, textarea, dialog') || document.querySelector('dialog[open]')) return;
-      this.#endMarking();
+      if (this.scroller.picking) this.setPicking(false);
+      else this.#endMarking();
       e.preventDefault();
     });
     this.addEventListener('keydown', (e) => {
@@ -183,7 +256,81 @@ export class DocumentView extends HTMLElement {
   setInspecting(on) {
     this.scroller.setInspecting(on);
     this.inspectButton.setAttribute('aria-pressed', String(on));
+    this.pickButton.setAttribute('aria-pressed', String(this.scroller.picking));
     if (!on) this.tip.hidden = true;
+  }
+
+  /**
+   * Turns the color picker on or off (it ends Inspect, and Inspect ends it).
+   * @param {boolean} on True to pick colors.
+   * @returns {void}
+   */
+  setPicking(on) {
+    this.scroller.setPicking(on);
+    this.pickButton.setAttribute('aria-pressed', String(on));
+    this.inspectButton.setAttribute('aria-pressed', String(this.scroller.inspecting));
+    if (!on) this.tip.hidden = true;
+  }
+
+  /**
+   * Shows the color picker tooltip: the color as given in the file (color space and values), the
+   * element it belongs to, and the color on screen (an approximation: no color management).
+   * @param {{item: object|null, pixel: string|null, clientX: number, clientY: number}} d Hover.
+   * @param {string|null} [copied] Text just copied, shown instead of the hint.
+   * @returns {void}
+   */
+  #showColorTip(d, copied = null) {
+    const { spec, screen } = colorOf(d);
+    const lines = [];
+    if (spec) lines.push(swatchLine('inspect-kind', t('pick.specified', { color: `${spec.space} ${spec.value}` }), screen));
+    else if (d.item && drawnColor(d.item)) lines.push(swatchLine('inspect-kind', t('pick.default'), screen));
+    if (d.item) {
+      lines.push(textLine('inspect-hint', describeItem(d.item)));
+      const from = sourceOf(d.item);
+      if (from) lines.push(textLine('inspect-hint', from));
+    } else {
+      lines.push(textLine('inspect-kind', t('pick.paper')));
+    }
+    if (screen) lines.push(swatchLine('inspect-pos', t('pick.screen', { color: screen }), screen));
+    // Images: whether the screen color is the value in the file (RGB, gray) or converted.
+    if (d.item?.type === 'image' && d.item.pixelSpace !== 'bilevel') lines.push(textLine('inspect-hint', t(`pick.image.${d.item.pixelSpace ?? 'unknown'}`)));
+    else if (d.item?.type === 'pdf') lines.push(textLine('inspect-hint', t('pick.image.unknown')));
+    const value = copyValue(d);
+    if (value) lines.push(textLine(copied ? 'inspect-kind pick-copied' : 'inspect-hint', copied ? t('pick.copied', { value: copied }) : t('pick.hint', { value })));
+    this.tip.replaceChildren(...lines);
+    this.tip.hidden = !lines.length;
+    this.#placeTip(d.clientX, d.clientY);
+  }
+
+  /**
+   * Copies the picked color (as given in the file, else as drawn) and says so in the tooltip.
+   * @param {{item: object|null, pixel: string|null, clientX: number, clientY: number}} d Pick.
+   * @returns {Promise<void>} Resolves when copied.
+   */
+  async #copyColor(d) {
+    const value = copyValue(d);
+    if (!value) return;
+    try {
+      await navigator.clipboard.writeText(value);
+      this.#showColorTip(d, value);
+    } catch {
+      this.app?.setStatus?.(t('hex.copyFailed'));
+    }
+  }
+
+  /**
+   * Places the tooltip beside the pointer, inside the window.
+   * @param {number} clientX Pointer x.
+   * @param {number} clientY Pointer y.
+   * @returns {void}
+   */
+  #placeTip(clientX, clientY) {
+    const { innerWidth, innerHeight } = window;
+    const box = this.tip.getBoundingClientRect();
+    const left = clientX + 16 + box.width > innerWidth ? clientX - 16 - box.width : clientX + 16;
+    const top = clientY + 16 + box.height > innerHeight ? clientY - 16 - box.height : clientY + 16;
+    this.tip.style.left = `${Math.max(4, left)}px`;
+    this.tip.style.top = `${Math.max(4, top)}px`;
   }
 
   /**
@@ -212,13 +359,7 @@ export class DocumentView extends HTMLElement {
     if (d.item) lines.push(['inspect-hint', t('inspect.hint')]);
     this.tip.replaceChildren(...lines.map(([className, text]) => Object.assign(document.createElement('div'), { className, textContent: text })));
     this.tip.hidden = !lines.length;
-    // Beside the pointer, kept inside the window.
-    const { innerWidth, innerHeight } = window;
-    const box = this.tip.getBoundingClientRect();
-    const left = d.clientX + 16 + box.width > innerWidth ? d.clientX - 16 - box.width : d.clientX + 16;
-    const top = d.clientY + 16 + box.height > innerHeight ? d.clientY - 16 - box.height : d.clientY + 16;
-    this.tip.style.left = `${Math.max(4, left)}px`;
-    this.tip.style.top = `${Math.max(4, top)}px`;
+    this.#placeTip(d.clientX, d.clientY);
   }
 
   /**
@@ -227,7 +368,10 @@ export class DocumentView extends HTMLElement {
    * @returns {void}
    */
   #setEmpty(empty) {
-    if (empty) this.setInspecting(false);
+    if (empty) {
+      this.setInspecting(false);
+      this.setPicking(false);
+    }
     this.welcome.hidden = !empty;
     this.scroller.hidden = empty;
     this.exportMenu.disabled = empty;

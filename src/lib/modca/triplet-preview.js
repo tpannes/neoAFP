@@ -15,6 +15,7 @@ import { loadCodePage, decode, listCodePages } from '../codepages/index.js';
 import { codePageOf } from '../meta/owner.js';
 import { printable, DEFAULT_CODE_PAGE } from '../meta/hex.js';
 import { extendedColor } from '../ptoca/ptoca.js';
+import { extendedColorSpec } from '../render/color-spec.js';
 
 /** Longest text a preview carries (the row shows less, the details all). */
 const PREVIEW_LENGTH = 200;
@@ -45,17 +46,6 @@ const ORIENTATIONS = ['Portrait', 'Landscape', 'Reverse Portrait', 'Reverse Land
 const WEIGHTS = [null, 'Ultralight', 'Extralight', 'Light', 'Semilight', null, 'Semibold', 'Bold', 'Extrabold', 'Ultrabold'];
 const WIDTHS = [null, 'Ultracondensed', 'Extracondensed', 'Condensed', 'Semicondensed', null, 'Semiexpanded', 'Expanded', 'Extraexpanded', 'Ultraexpanded'];
 
-/** Color spaces (ColSpce, "Color Specification Triplet X'4E'"). */
-const COLOR_SPACES = { 0x01: 'RGB', 0x04: 'CMYK', 0x06: 'Highlight', 0x08: 'CIELab', 0x40: 'OCA' };
-
-/** Standard OCA color names (as in the Set Text Color control sequence). */
-const OCA_NAMES = {
-  0x0000: 'Default', 0x0001: 'Blue', 0x0002: 'Red', 0x0003: 'Pink/Magenta', 0x0004: 'Green',
-  0x0005: 'Turquoise/Cyan', 0x0006: 'Yellow', 0x0007: 'White', 0x0008: 'Black', 0x0009: 'Dark Blue',
-  0x000a: 'Orange', 0x000b: 'Purple', 0x000c: 'Dark Green', 0x000d: 'Dark Turquoise', 0x000e: 'Mustard',
-  0x000f: 'Gray', 0x0010: 'Brown', 0xff00: 'Default', 0xff07: 'Default', 0xff08: 'Reset',
-};
-
 /**
  * Writes a byte as X'..'.
  * @param {number} v Byte.
@@ -69,12 +59,6 @@ const hex2 = (v) => `X'${v.toString(16).toUpperCase().padStart(2, '0')}'`;
  * @returns {number} Value.
  */
 const u16 = (d, at) => (d[at] << 8) | d[at + 1];
-/**
- * Reads a byte as signed number.
- * @param {number} v Byte.
- * @returns {number} −128 to 127.
- */
-const s8 = (v) => (v > 127 ? v - 256 : v);
 /**
  * Cuts a text to PREVIEW_LENGTH characters.
  * @param {string} text Text.
@@ -183,16 +167,8 @@ function preview(t, text, units) {
       return item(null, `${v.xSize} × ${v.ySize}`);
     }
     case 0x4e: {
-      const space = d[1];
-      const value = d.subarray(10);
-      const color = extendedColor(d);
-      let shown;
-      if (space === 0x40) shown = OCA_NAMES[u16(value, 0)] ?? hex2(u16(value, 0));
-      else if (space === 0x08) shown = `${fmt((value[0] * 100) / 255)} ${s8(value[1])} ${s8(value[2])}`;
-      else if (space === 0x04) shown = [0, 1, 2, 3].map((k) => Math.round((value[k] * 100) / 255)).join(' ') + ' %';
-      else if (space === 0x06) shown = `#${u16(value, 0)}`;
-      else shown = Array.from(value.subarray(0, 3)).join(' ');
-      return item(COLOR_SPACES[space] ?? hex2(space), shown, space === 0x06 ? null : color);
+      const spec = extendedColorSpec(d);
+      return spec ? item(spec.space, spec.value, d[1] === 0x06 ? null : extendedColor(d)) : null;
     }
     case 0x62: {
       const kind = { 0x00: 'Created', 0x01: 'Retired', 0x03: 'Revised' }[v.stampType] ?? null;

@@ -2082,6 +2082,29 @@ page-scroller.inspecting .page-frame {
   cursor: crosshair;
 }
 
+/* Color picker: crosshair as well; the tooltip shows swatches before the colors. */
+page-scroller.picking .page-frame {
+  cursor: crosshair;
+}
+
+.inspect-tip .pick-line {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pick-swatch {
+  flex: none;
+  width: 12px;
+  height: 12px;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+}
+
+.inspect-tip .pick-copied {
+  color: var(--safe);
+}
+
 .inspect-outline {
   position: absolute;
   pointer-events: none;

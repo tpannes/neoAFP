@@ -17,6 +17,7 @@ import { placeInArea } from '../ioca/ioca.js';
 import { readTiff } from './tiff.js';
 import { isFontOid } from './object-types.js';
 import { isJpeg2000, jpeg2000Header } from './image-pdf.js';
+import { imagePixelSpace } from '../resources/color-model.js';
 
 const BOC = 0xd3a892;
 const OCD = 0xd3ee92;
@@ -155,7 +156,7 @@ async function renderContainerContent(r, file, row, area, source, pdfPage = 1) {
     if (!hdr || !hdr.width) return unsupported(`${c.format.toUpperCase()} image could not be read`);
     if (hdr.error && !hdr.bilevel && !hdr.rgba) return unsupported(hdr.error);
     const place = placeInArea(area, hdr.width * 1440 / (hdr.xRes || 96), hdr.height * 1440 / (hdr.yRes || 96));
-    return [{ type: 'image', rect: place.rect, clip: place.clip, rotation: area.rotation ?? 0, imageRef: `${file.id}:${row}`, colorSpace: c.format, ...base }];
+    return [{ type: 'image', rect: place.rect, clip: place.clip, rotation: area.rotation ?? 0, imageRef: `${file.id}:${row}`, colorSpace: c.format, pixelSpace: imagePixelSpace(c.bytes, c.format), ...base }];
   }
   if (c.format === 'jpeg2000') {
     // JPEG 2000 (T311): drawn by pdf.js from a one-page image PDF (workspace getEmbeddedObjectBytes).

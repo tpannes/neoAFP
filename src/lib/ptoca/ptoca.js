@@ -13,6 +13,7 @@
  * units (1/1440 inch) with the factor `k` given by the caller.
  */
 
+import { ocaColorSpec, extendedColorSpec } from '../render/color-spec.js';
 import { u, s, orientation } from '../modca/bytes.js';
 import { specTable, shortNames } from '../spec-table.js';
 
@@ -121,7 +122,7 @@ export function labToRgb(l, a, b) {
 export function runPtoca(parts, ctx) {
   const { k } = ctx;
   const st = {
-    i: 0, b: 0, margin: 0, baselineInc: null, sia: 0, svi: null, lid: 0, color: '#000000',
+    i: 0, b: 0, margin: 0, baselineInc: null, sia: 0, svi: null, lid: 0, color: '#000000', colorSpec: null,
     iDeg: 0, bDeg: 90, underscore: false, tbm: 0,
     // Local ID of the open text suppression (BSU … ESU) whose ID is active, else null.
     suppressing: null,
@@ -144,7 +145,7 @@ export function runPtoca(parts, ctx) {
   const ovsOpen = () => {
     const o = st.ovs;
     if (!o || o.start !== null || st.suppressing !== null) return;
-    Object.assign(o, { start: st.i, end: st.i, b: st.b + st.tbm, iDeg: st.iDeg, bDeg: st.bDeg, color: st.color, lid: st.lid, part });
+    Object.assign(o, { start: st.i, end: st.i, b: st.b + st.tbm, iDeg: st.iDeg, bDeg: st.bDeg, color: st.color, colorSpec: st.colorSpec, lid: st.lid, part });
   };
 
   /**
@@ -163,7 +164,7 @@ export function runPtoca(parts, ctx) {
     const g = f.glyph(o.code);
     const count = g.advance > 0 ? Math.max(1, Math.floor(length / g.advance + 1e-9)) : 1;
     const glyphs = Array.from({ length: count }, (_, n) => ({ id: g.id, unicode: g.unicode, code: o.code, di: n * g.advance }));
-    segments.push({ type: 'text', i: start, b: o.b, iDeg: o.iDeg, bDeg: o.bDeg, lid: o.lid, color: o.color, part: o.part, glyphs, overstrike: true });
+    segments.push({ type: 'text', i: start, b: o.b, iDeg: o.iDeg, bDeg: o.bDeg, lid: o.lid, color: o.color, colorSpec: o.colorSpec, part: o.part, glyphs, overstrike: true });
   };
 
   /**
@@ -190,7 +191,7 @@ export function runPtoca(parts, ctx) {
   const text = (bytes) => {
     if (bytes.length === 0) return;
     const f = font();
-    const seg = { type: 'text', i: st.i, b: st.b + st.tbm, iDeg: st.iDeg, bDeg: st.bDeg, lid: st.lid, color: st.color, part, glyphs: [] };
+    const seg = { type: 'text', i: st.i, b: st.b + st.tbm, iDeg: st.iDeg, bDeg: st.bDeg, lid: st.lid, color: st.color, colorSpec: st.colorSpec, part, glyphs: [] };
     if (st.suppressing !== null) ovsClose();
     for (const { code } of f.split(bytes)) {
       const g = f.glyph(code);
@@ -208,7 +209,7 @@ export function runPtoca(parts, ctx) {
     if (st.underscore) {
       const us = f.underscore;
       rules.push({ axis: 'I', i: seg.i, b: seg.b + us.position, length: st.i - seg.i, width: us.width,
-        iDeg: st.iDeg, bDeg: st.bDeg, color: st.color, part });
+        iDeg: st.iDeg, bDeg: st.bDeg, color: st.color, colorSpec: st.colorSpec, part });
     }
   };
 
@@ -234,7 +235,7 @@ export function runPtoca(parts, ctx) {
       case 0xe4: case 0xe6: { // DIR, DBR
         const length = s(d, 0, 2) * k;
         const width = d.length >= 4 ? (s(d, 2, 2) + (d[4] ?? 0) / 256) * k : 0;
-        if (st.suppressing === null) rules.push({ axis: type === 0xe4 ? 'I' : 'B', i: st.i, b: st.b, length, width, iDeg: st.iDeg, bDeg: st.bDeg, color: st.color, part });
+        if (st.suppressing === null) rules.push({ axis: type === 0xe4 ? 'I' : 'B', i: st.i, b: st.b, length, width, iDeg: st.iDeg, bDeg: st.bDeg, color: st.color, colorSpec: st.colorSpec, part });
         break;
       }
       case 0xee: { // RPS: repeat a string until the given byte length is filled
@@ -249,8 +250,8 @@ export function runPtoca(parts, ctx) {
       }
       case 0xf0: st.lid = d[0]; break; // SCFL
       case 0xf6: ovsClose(); st.iDeg = orientation(u(d, 0, 2)); st.bDeg = orientation(u(d, 2, 2)); break; // STO
-      case 0x74: st.color = NAMED_COLORS[u(d, 0, 2)] ?? st.color; break; // STC
-      case 0x80: st.color = extendedColor(d) ?? st.color; break; // SEC
+      case 0x74: st.color = NAMED_COLORS[u(d, 0, 2)] ?? st.color; st.colorSpec = ocaColorSpec(u(d, 0, 2)); break; // STC
+      case 0x80: st.color = extendedColor(d) ?? st.color; st.colorSpec = extendedColorSpec(d) ?? st.colorSpec; break; // SEC
       case 0x76: st.underscore = d[0] !== 0; break; // USC (bypass flags; 0 = off)
       case 0x78: { // TBM
         ovsClose();

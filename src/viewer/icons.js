@@ -37,6 +37,8 @@ const ICONS = {
   columns: '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16M15 4v16"/>',
   up: '<path d="M6 15l6-6 6 6"/>',
   inspect: '<circle cx="12" cy="12" r="6.5"/><circle cx="12" cy="12" r="1"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/>',
+  // Color picker: an eyedropper, bulb at the top right, tip at the bottom left.
+  pipette: '<path d="M13 6.5l4.5 4.5"/><path d="M14.8 8.3l2.9-2.9a2 2 0 0 0-2.8-2.8l-2.9 2.9"/><path d="M15.2 9.2L7 17.4l-2.6.8.8-2.6 8.2-8.2"/><path d="M4.4 18.2L3 21"/>',
   fileJson: '<path d="M14 3H6a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8z"/><path d="M14 3v5h5"/><path d="M10 11.5c-.9 0-1.4.5-1.4 1.3v.9c0 .5-.4.8-.9.8.5 0 .9.3.9.8v.9c0 .8.5 1.3 1.4 1.3M14 11.5c.9 0 1.4.5 1.4 1.3v.9c0 .5.4.8.9.8-.5 0-.9.3-.9.8v.9c0 .8-.5 1.3-1.4 1.3"/>',
   fileImage: '<path d="M14 3H6a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8z"/><path d="M14 3v5h5"/><circle cx="9.5" cy="12" r="1.5"/><path d="M19 17l-4-4-7 7"/>',
   // Resource filters: buttons and choices.
