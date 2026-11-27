@@ -507,7 +507,7 @@
     "pick.default": "Color predeterminado (no indicado en el archivo)",
     "pick.screen": "En pantalla: {color}",
     "pick.paper": "Papel (ningún elemento)",
-    "pick.hint": "Haga clic para copiar {value}",
+    "pick.hint": "Haga clic para copiar",
     "pick.copied": "Copiado: {value}",
     "pick.image.rgb": "Imagen RGB: el color en pantalla es el valor del archivo",
     "pick.image.gray": "Imagen en escala de grises: el color en pantalla es el valor del archivo",

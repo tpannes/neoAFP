@@ -507,7 +507,7 @@
     "pick.default": "Default color (not given in the file)",
     "pick.screen": "On screen: {color}",
     "pick.paper": "Paper (no element)",
-    "pick.hint": "Click to copy {value}",
+    "pick.hint": "Click to copy",
     "pick.copied": "Copied: {value}",
     "pick.image.rgb": "RGB image: the screen color is the value in the file",
     "pick.image.gray": "Grayscale image: the screen color is the value in the file",

@@ -507,7 +507,7 @@
     "pick.default": "默认颜色（文件中未指定）",
     "pick.screen": "屏幕显示：{color}",
     "pick.paper": "纸张（无元素）",
-    "pick.hint": "单击复制 {value}",
+    "pick.hint": "单击复制",
     "pick.copied": "已复制：{value}",
     "pick.image.rgb": "RGB 图像：屏幕颜色即文件中的值",
     "pick.image.gray": "灰度图像：屏幕颜色即文件中的值",

@@ -507,7 +507,7 @@
     "pick.default": "Standaardkleur (niet opgegeven in het bestand)",
     "pick.screen": "Op het scherm: {color}",
     "pick.paper": "Papier (geen element)",
-    "pick.hint": "Klik om {value} te kopiëren",
+    "pick.hint": "Klik om te kopiëren",
     "pick.copied": "Gekopieerd: {value}",
     "pick.image.rgb": "RGB-afbeelding: de schermkleur is de waarde uit het bestand",
     "pick.image.gray": "Grijswaardenafbeelding: de schermkleur is de waarde uit het bestand",

@@ -102,6 +102,17 @@ function copyValue(d) {
 }
 
 /**
+ * Writes RGB values given as text as a hex color.
+ * @param {string} value E.g. "16 185 129".
+ * @returns {string|null} E.g. "#10b981", or null when the text holds no three values 0–255.
+ */
+function rgbHex(value) {
+  const parts = value.split(' ').map(Number);
+  if (parts.length !== 3 || parts.some((v) => !Number.isInteger(v) || v < 0 || v > 255)) return null;
+  return `#${parts.map((v) => v.toString(16).padStart(2, '0')).join('')}`;
+}
+
+/**
  * A tooltip line of text.
  * @param {string} className Class names.
  * @param {string} text Text.
@@ -282,7 +293,10 @@ export class DocumentView extends HTMLElement {
   #showColorTip(d, copied = null) {
     const { spec, screen } = colorOf(d);
     const lines = [];
-    if (spec) lines.push(swatchLine('inspect-kind', t('pick.specified', { color: `${spec.space} ${spec.value}` }), screen));
+    // An RGB color drawn as given needs no "in the file" and "on screen": one line, both notations.
+    const same = spec?.space === 'RGB' && screen !== null && rgbHex(spec.value) === screen.toLowerCase();
+    if (same) lines.push(swatchLine('inspect-kind', `RGB ${spec.value} · ${screen}`, screen));
+    else if (spec) lines.push(swatchLine('inspect-kind', t('pick.specified', { color: `${spec.space} ${spec.value}` }), screen));
     else if (d.item && drawnColor(d.item)) lines.push(swatchLine('inspect-kind', t('pick.default'), screen));
     if (d.item) {
       lines.push(textLine('inspect-hint', describeItem(d.item)));
@@ -291,12 +305,13 @@ export class DocumentView extends HTMLElement {
     } else {
       lines.push(textLine('inspect-kind', t('pick.paper')));
     }
-    if (screen) lines.push(swatchLine('inspect-pos', t('pick.screen', { color: screen }), screen));
+    if (screen && !same) lines.push(swatchLine('inspect-pos', t('pick.screen', { color: screen }), screen));
     // Images: whether the screen color is the value in the file (RGB, gray) or converted.
     if (d.item?.type === 'image' && d.item.pixelSpace !== 'bilevel') lines.push(textLine('inspect-hint', t(`pick.image.${d.item.pixelSpace ?? 'unknown'}`)));
     else if (d.item?.type === 'pdf') lines.push(textLine('inspect-hint', t('pick.image.unknown')));
     const value = copyValue(d);
-    if (value) lines.push(textLine(copied ? 'inspect-kind pick-copied' : 'inspect-hint', copied ? t('pick.copied', { value: copied }) : t('pick.hint', { value })));
+    if (value) lines.push(textLine('inspect-hint', t('pick.hint')));
+    if (copied) lines.push(textLine('inspect-kind pick-copied', t('pick.copied', { value: copied })));
     this.tip.replaceChildren(...lines);
     this.tip.hidden = !lines.length;
     this.#placeTip(d.clientX, d.clientY);

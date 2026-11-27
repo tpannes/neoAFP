@@ -507,7 +507,7 @@
     "pick.default": "既定の色（ファイルで指定なし）",
     "pick.screen": "画面上: {color}",
     "pick.paper": "用紙（要素なし）",
-    "pick.hint": "クリックで {value} をコピー",
+    "pick.hint": "クリックでコピー",
     "pick.copied": "コピーしました: {value}",
     "pick.image.rgb": "RGB 画像: 画面の色はファイルの値と同じです",
     "pick.image.gray": "グレースケール画像: 画面の色はファイルの値と同じです",

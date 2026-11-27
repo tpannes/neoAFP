@@ -507,7 +507,7 @@
     "pick.default": "Couleur par défaut (non indiquée dans le fichier)",
     "pick.screen": "À l’écran : {color}",
     "pick.paper": "Papier (aucun élément)",
-    "pick.hint": "Cliquer pour copier {value}",
+    "pick.hint": "Cliquer pour copier",
     "pick.copied": "Copié : {value}",
     "pick.image.rgb": "Image RVB : la couleur à l’écran est la valeur du fichier",
     "pick.image.gray": "Image en niveaux de gris : la couleur à l’écran est la valeur du fichier",

@@ -507,7 +507,7 @@
     "pick.default": "Standardfarbe (in der Datei nicht angegeben)",
     "pick.screen": "Am Bildschirm: {color}",
     "pick.paper": "Papier (kein Element)",
-    "pick.hint": "Klicken, um {value} zu kopieren",
+    "pick.hint": "Klicken zum Kopieren",
     "pick.copied": "Kopiert: {value}",
     "pick.image.rgb": "RGB-Bild: Die Bildschirmfarbe ist der Wert aus der Datei",
     "pick.image.gray": "Graustufenbild: Die Bildschirmfarbe ist der Wert aus der Datei",
