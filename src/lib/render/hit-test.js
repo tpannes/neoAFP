@@ -184,19 +184,30 @@ function hitArea(item, x, y, tolerance) {
  * @returns {number} Index of the item in `model.items`, or −1.
  */
 export function hitTest(model, x, y, { tolerance = 0, hideTestPrint = false } = {}) {
-  let best = -1;
-  let bestArea = Infinity;
+  return hitAll(model, x, y, { tolerance, hideTestPrint })[0] ?? -1;
+}
+
+/**
+ * Finds every item under a point, the one a click most likely aims at first: smallest first, on
+ * equal size the one drawn last (the color picker steps through them for stacked elements).
+ * @param {{items: object[]}} model Render model.
+ * @param {number} x Point x in page units.
+ * @param {number} y Point y in page units.
+ * @param {{tolerance?: number, hideTestPrint?: boolean, withoutSource?: boolean}} [options]
+ *   tolerance: extra distance in page units for thin items; hideTestPrint: skip test print marks;
+ *   withoutSource: also items without a source field (resource previews).
+ * @returns {number[]} Item indexes.
+ */
+export function hitAll(model, x, y, { tolerance = 0, hideTestPrint = false, withoutSource = false } = {}) {
+  const hits = [];
   model.items.forEach((item, i) => {
-    if (item.sourceField === undefined || item.sourceField === null) return;
+    if (!withoutSource && (item.sourceField === undefined || item.sourceField === null)) return;
     if (item.testPrint && hideTestPrint) return;
     if (item.type === 'glyphRun' && !(item.text ?? (item.chars ?? []).join('')).trim()) return;
     const area = hitArea(item, x, y, tolerance);
-    if (area !== null && area <= bestArea) {
-      best = i;
-      bestArea = area;
-    }
+    if (area !== null) hits.push([i, area]);
   });
-  return best;
+  return hits.sort((a, b) => a[1] - b[1] || b[0] - a[0]).map(([i]) => i);
 }
 
 /**

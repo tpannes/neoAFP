@@ -2504,8 +2504,18 @@ resources-view > .empty-state {
 }
 
 .fullscreen-canvas {
+  display: block;
   box-shadow: var(--page-shadow);
+}
+
+/* Canvas of the preview and the color picker's outline over it. */
+.fullscreen-frame {
+  position: relative;
   flex: none;
+}
+
+.fullscreen-frame.picking {
+  cursor: crosshair;
 }
 
 .fullscreen-meta {

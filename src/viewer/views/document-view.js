@@ -37,109 +37,10 @@ import { saveBlob, downloadPng } from '../download.js';
 import { encodeTiff } from '../../lib/export/tiff.js';
 import { t, currentLanguage } from '../i18n/i18n.js';
 import { iconButton } from '../icons.js';
-
-/** Characters of a text element shown in the inspect tooltip. */
-const TIP_TEXT = 40;
+import { ColorPicker, describeItem, sourceOf } from '../components/color-picker.js';
 
 /** Resolution of exported page images (dots per inch). */
 const EXPORT_DPI = 300;
-
-/**
- * Names a drawn element for the inspect tooltip.
- * @param {object} item Render item.
- * @returns {string} Description, e.g. 'Text: "Dear Sir"'.
- */
-function describeItem(item) {
-  if (item.type === 'glyphRun') {
-    const text = (item.text ?? (item.chars ?? []).join('')).trim();
-    return t('inspect.kind.text', { text: text.length > TIP_TEXT ? `${text.slice(0, TIP_TEXT)}…` : text });
-  }
-  if (item.type === 'placeholder') return t('inspect.kind.placeholder', { name: item.resourceName ?? '' });
-  return t(`inspect.kind.${['image', 'pdf', 'rule', 'path'].includes(item.type) ? item.type : 'other'}`);
-}
-
-/**
- * Says where an element comes from when it is not drawn by the page itself.
- * @param {object} item Render item.
- * @returns {string|null} E.g. "From overlay O1FORM", or null for the page's own elements.
- */
-function sourceOf(item) {
-  if (item.mediumOverlay) return t('inspect.fromMedium', { name: item.mediumOverlay });
-  const named = item.via?.findLast((v) => v.name);
-  return named ? t(named.type === 'overlay' ? 'inspect.fromOverlay' : 'inspect.fromSegment', { name: named.name }) : null;
-}
-
-/**
- * The color an item is drawn in, as the renderer has it ("#rrggbb"), or null (images, gradients).
- * @param {object} item Render item.
- * @returns {string|null} Color.
- */
-function drawnColor(item) {
-  if (item.type === 'image' || item.type === 'pdf' || item.type === 'placeholder') return null;
-  const color = item.color ?? item.fill ?? item.stroke;
-  return typeof color === 'string' && /^#[0-9a-f]{6}$/i.test(color) ? color : null;
-}
-
-/**
- * The colors of a pick: as given in the file (the item's color specification), and on screen:
- * the item's own color where it has one (edges of text and lines blend with the paper, so the
- * pixel there is no color of the file), else the pixel (images, gradients, paper).
- * @param {{item: object|null, pixel: string|null}} d Pick.
- * @returns {{spec: {space: string, value: string}|null, screen: string|null}} Colors.
- */
-function colorOf(d) {
-  return { spec: d.item?.colorSpec ?? null, screen: (d.item && drawnColor(d.item)) ?? d.pixel };
-}
-
-/**
- * The text a click copies: the color as given in the file, else as drawn.
- * @param {{item: object|null, pixel: string|null}} d Pick.
- * @returns {string|null} E.g. "CMYK 100 20 0 0 %" or "#005ab4".
- */
-function copyValue(d) {
-  const { spec, screen } = colorOf(d);
-  return spec ? `${spec.space} ${spec.value}` : screen;
-}
-
-/**
- * Writes RGB values given as text as a hex color.
- * @param {string} value E.g. "16 185 129".
- * @returns {string|null} E.g. "#10b981", or null when the text holds no three values 0–255.
- */
-function rgbHex(value) {
-  const parts = value.split(' ').map(Number);
-  if (parts.length !== 3 || parts.some((v) => !Number.isInteger(v) || v < 0 || v > 255)) return null;
-  return `#${parts.map((v) => v.toString(16).padStart(2, '0')).join('')}`;
-}
-
-/**
- * A tooltip line of text.
- * @param {string} className Class names.
- * @param {string} text Text.
- * @returns {HTMLElement} Line.
- */
-function textLine(className, text) {
-  return Object.assign(document.createElement('div'), { className, textContent: text });
-}
-
-/**
- * A tooltip line with a color swatch before the text.
- * @param {string} className Class names.
- * @param {string} text Text.
- * @param {string|null} color Swatch color, or null for none.
- * @returns {HTMLElement} Line.
- */
-function swatchLine(className, text, color) {
-  const line = textLine(`${className} pick-line`, '');
-  if (color) {
-    const swatch = document.createElement('span');
-    swatch.className = 'pick-swatch';
-    swatch.style.background = color;
-    line.append(swatch);
-  }
-  line.append(text);
-  return line;
-}
 
 export class DocumentView extends HTMLElement {
   /**
@@ -227,9 +128,19 @@ export class DocumentView extends HTMLElement {
     this.tip.hidden = true;
     this.tip.setAttribute('role', 'status');
     this.scroller.addEventListener('inspecthover', (e) => this.#showTip(e.detail));
-    this.scroller.addEventListener('inspectleave', () => { this.tip.hidden = true; });
-    this.scroller.addEventListener('pickhover', (e) => this.#showColorTip(e.detail));
-    this.scroller.addEventListener('pickselect', (e) => this.#copyColor(e.detail));
+    this.scroller.addEventListener('inspectleave', () => {
+      if (this.scroller.picking) this.picker.leave();
+      else this.tip.hidden = true;
+    });
+    this.picker = new ColorPicker({
+      client: this.client, tip: this.tip,
+      locate: (x, y) => this.scroller.pickSpot(x, y),
+      outline: (spot, item) => this.scroller.outlineItem(spot, item),
+      status: (text) => this.app?.setStatus?.(text),
+    });
+    // A finger moving over the pages scrolls them; a tap picks (see ColorPicker).
+    this.scroller.addEventListener('pickmove', (e) => { if (e.detail.pointerType !== 'touch') this.picker.move(e.detail.clientX, e.detail.clientY, e.detail.pointerType); });
+    this.scroller.addEventListener('pickclick', (e) => this.picker.click(e.detail.clientX, e.detail.clientY, e.detail));
     this.scroller.addEventListener('blankclick', () => this.#endMarking());
     this.scroller.addEventListener('inspectselect', (e) => {
       this.dispatchEvent(new CustomEvent('inspectfield', { bubbles: true, detail: { item: e.detail.item, page: e.detail.area?.pageNumber ?? this.page } }));
@@ -248,6 +159,15 @@ export class DocumentView extends HTMLElement {
       else this.#endMarking();
       e.preventDefault();
     });
+    // While picking colors: arrows move the point, Tab steps through stacked elements, Enter
+    // copies (before the scroll area uses the arrows to scroll, hence the capture phase).
+    document.addEventListener('keydown', (e) => {
+      if (!this.scroller.picking || !this.offsetParent || e.ctrlKey || e.metaKey || e.altKey) return;
+      if (e.target.closest?.('input, select, textarea, dialog') || document.querySelector('dialog[open]')) return;
+      if (!this.picker.key(e)) return;
+      e.preventDefault();
+      e.stopPropagation();
+    }, true);
     this.addEventListener('keydown', (e) => {
       if (e.target.closest('input, select')) return;
       if (e.key === 'PageDown' || (e.key === 'ArrowRight' && e.altKey)) this.showPage(this.page + 1);
@@ -265,6 +185,7 @@ export class DocumentView extends HTMLElement {
    * @returns {void}
    */
   setInspecting(on) {
+    if (on && this.scroller.picking) this.picker.stop();
     this.scroller.setInspecting(on);
     this.inspectButton.setAttribute('aria-pressed', String(on));
     this.pickButton.setAttribute('aria-pressed', String(this.scroller.picking));
@@ -277,60 +198,11 @@ export class DocumentView extends HTMLElement {
    * @returns {void}
    */
   setPicking(on) {
+    if (!on && this.scroller.picking) this.picker.stop();
     this.scroller.setPicking(on);
     this.pickButton.setAttribute('aria-pressed', String(on));
     this.inspectButton.setAttribute('aria-pressed', String(this.scroller.inspecting));
     if (!on) this.tip.hidden = true;
-  }
-
-  /**
-   * Shows the color picker tooltip: the color as given in the file (color space and values), the
-   * element it belongs to, and the color on screen (an approximation: no color management).
-   * @param {{item: object|null, pixel: string|null, clientX: number, clientY: number}} d Hover.
-   * @param {string|null} [copied] Text just copied, shown instead of the hint.
-   * @returns {void}
-   */
-  #showColorTip(d, copied = null) {
-    const { spec, screen } = colorOf(d);
-    const lines = [];
-    // An RGB color drawn as given needs no "in the file" and "on screen": one line, both notations.
-    const same = spec?.space === 'RGB' && screen !== null && rgbHex(spec.value) === screen.toLowerCase();
-    if (same) lines.push(swatchLine('inspect-kind', `RGB ${spec.value} · ${screen}`, screen));
-    else if (spec) lines.push(swatchLine('inspect-kind', t('pick.specified', { color: `${spec.space} ${spec.value}` }), screen));
-    else if (d.item && drawnColor(d.item)) lines.push(swatchLine('inspect-kind', t('pick.default'), screen));
-    if (d.item) {
-      lines.push(textLine('inspect-hint', describeItem(d.item)));
-      const from = sourceOf(d.item);
-      if (from) lines.push(textLine('inspect-hint', from));
-    } else {
-      lines.push(textLine('inspect-kind', t('pick.paper')));
-    }
-    if (screen && !same) lines.push(swatchLine('inspect-pos', t('pick.screen', { color: screen }), screen));
-    // Images: whether the screen color is the value in the file (RGB, gray) or converted.
-    if (d.item?.type === 'image' && d.item.pixelSpace !== 'bilevel') lines.push(textLine('inspect-hint', t(`pick.image.${d.item.pixelSpace ?? 'unknown'}`)));
-    else if (d.item?.type === 'pdf') lines.push(textLine('inspect-hint', t('pick.image.unknown')));
-    const value = copyValue(d);
-    if (value) lines.push(textLine('inspect-hint', t('pick.hint')));
-    if (copied) lines.push(textLine('inspect-kind pick-copied', t('pick.copied', { value: copied })));
-    this.tip.replaceChildren(...lines);
-    this.tip.hidden = !lines.length;
-    this.#placeTip(d.clientX, d.clientY);
-  }
-
-  /**
-   * Copies the picked color (as given in the file, else as drawn) and says so in the tooltip.
-   * @param {{item: object|null, pixel: string|null, clientX: number, clientY: number}} d Pick.
-   * @returns {Promise<void>} Resolves when copied.
-   */
-  async #copyColor(d) {
-    const value = copyValue(d);
-    if (!value) return;
-    try {
-      await navigator.clipboard.writeText(value);
-      this.#showColorTip(d, value);
-    } catch {
-      this.app?.setStatus?.(t('hex.copyFailed'));
-    }
   }
 
   /**

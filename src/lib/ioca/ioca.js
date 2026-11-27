@@ -222,11 +222,13 @@ function bilevel(data, width, height, compression) {
 /**
  * Decodes one image part into displayable pixels.
  * @param {IocaPart} p Part.
+ * @param {{samples?: boolean}} [options] samples: also keep the decoded pixel values in their own
+ *   color space (`samples`: {space, planes, interleaved}; for the color picker, not for drawing).
  * @returns {{x: number, y: number, width: number, height: number, bilevel?: object, rgba?: Uint8ClampedArray,
  *   encodedBytes?: Uint8Array, encodedPlanes?: Uint8Array[], space?: string, mimeType?: string,
  *   mask?: object, error: string|null}} Pixels (encodedPlanes: one encoded image per color band).
  */
-export function decodePart(p) {
+export function decodePart(p, { samples = false } = {}) {
   const out = { x: p.x, y: p.y, width: p.width, height: p.height, error: null };
   if (p.mask) {
     const m = bilevel(p.mask.data, p.mask.width || p.width, p.mask.height || p.height, p.mask.compression);
@@ -274,7 +276,9 @@ export function decodePart(p) {
     out.error = `compression ${COMPRESSIONS[p.compression] ?? `X'${p.compression.toString(16)}'`} not supported for color images`;
     return out;
   }
-  out.rgba = toRgba({ width: p.width, height: p.height, space: p.bands && p.bands.length === 1 ? 'gray' : space, planes, interleaved });
+  const own = p.bands && p.bands.length === 1 ? 'gray' : space;
+  out.rgba = toRgba({ width: p.width, height: p.height, space: own, planes, interleaved });
+  if (samples) out.samples = { space: own, planes, interleaved };
   return out;
 }
 
@@ -282,10 +286,11 @@ export function decodePart(p) {
  * Reads and decodes an IOCA image object.
  * @param {object} file File record.
  * @param {number} row Row of Begin Image Object.
+ * @param {{samples?: boolean}} [options] samples: keep the pixel values of color parts (decodePart).
  * @returns {Promise<{width: number, height: number, xRes: number, yRes: number, parts: object[],
  *   errors: string[]}>} Decoded image.
  */
-export async function readIocaImage(file, row) {
+export async function readIocaImage(file, row, options = {}) {
   const fields = await collectFields(file, row, new Set([IDD, IPD]));
   const idd = fields.find((f) => f.id === IDD)?.data;
   const image = parseIoca(concat(fields.filter((f) => f.id === IPD).map((f) => f.data)));
@@ -298,7 +303,7 @@ export async function readIocaImage(file, row) {
   }
   image.xRes ||= 240;
   image.yRes ||= 240;
-  const parts = image.parts.map(decodePart);
+  const parts = image.parts.map((p) => decodePart(p, options));
   return { width: image.width, height: image.height, xRes: image.xRes, yRes: image.yRes, parts, errors: [...new Set(parts.map((p) => p.error).filter(Boolean))] };
 }
 

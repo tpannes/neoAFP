@@ -29,6 +29,7 @@ import { ebcdicName } from './modca/bytes.js';
 import { readFontNames } from './foca/opentype.js';
 import { outlineReader } from './foca/type1.js';
 import { imImagePixels, BEGIN_IM_IMAGE } from './im/im-image.js';
+import { pixelOf } from './render/image-pixel.js';
 import { readIocaImage, readJbig2Image, BEGIN_IMAGE_OBJECT } from './ioca/ioca.js';
 import { imagePdf, jpeg2000Header } from './objcontainer/image-pdf.js';
 import './goca/goca.js';
@@ -609,6 +610,34 @@ export class Workspace {
       return { width: image.width, height: image.height, tiles: image.parts };
     }
     throw new RangeError(`not an image: ${imageRef}`);
+  }
+
+  /**
+   * Reads one pixel of an image for the color picker, from the pixel data neoAFP decodes itself
+   * (IOCA and IM images): exact, and for color images with the value in the image's own color
+   * space. The last image asked for stays decoded (with its pixel values) for the next pixels.
+   * @param {string} imageRef Reference from an image item ("<fileId>:<row>").
+   * @param {number} fx Horizontal position, 0–1 of the image width.
+   * @param {number} fy Vertical position, 0–1 of the image height.
+   * @returns {Promise<{ink: boolean}|{rgb: string, spec: object|null}|null>} Pixel (see
+   *   render/image-pixel.js), or null for images the browser decodes (JPEG, object containers).
+   */
+  async getImagePixel(imageRef, fx, fy) {
+    if (this.pickedImage?.ref !== imageRef) {
+      const [fileId, rowText] = String(imageRef).split(':');
+      const file = this.getFileRecord(fileId);
+      const row = Number(rowText);
+      const id = file.index?.id[row];
+      const image = id === BEGIN_IMAGE_OBJECT ? await readIocaImage(file, row, { samples: true })
+        : id === BEGIN_IM_IMAGE ? await imImagePixels(file, row) : null;
+      this.pickedImage = { ref: imageRef, image };
+    }
+    return this.pickedImage.image ? pixelOf(this.pickedImage.image, fx, fy) : null;
+  }
+
+  /** Forgets the image kept for the color picker (picker switched off). */
+  releasePickedImage() {
+    this.pickedImage = null;
   }
 
   /**

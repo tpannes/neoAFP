@@ -6,7 +6,8 @@
  * bytes (FR-056, FR-057). Above the metadata, a warning box lists the resources the preview
  * misses (placeholders, substitute fonts; FR-054), with a button to add files. Fonts show their character grid, coded fonts a sample and their
  * character map by code point, code pages their code point table (FR-058), form definitions
- * every medium map with diagram and settings. Esc or Close ends the view; the event `close` lets the resource view restore its
+ * every medium map with diagram and settings. A color picker (as in the page view) reads the
+ * colors of the preview; Esc ends it first. Esc or Close ends the view; the event `close` lets the resource view restore its
  * scroll position.
  */
 
@@ -20,6 +21,8 @@ import { encodeTiff } from '../../lib/export/tiff.js';
 import { icon, iconButton } from '../icons.js';
 import { pickFiles } from '../file-open.js';
 import { loadPrefs, savePrefs } from '../prefs.js';
+import { ColorPicker } from './color-picker.js';
+import { hitAll, itemBox } from '../../lib/render/hit-test.js';
 
 const ACTUAL = 96 / 1440; // CSS pixels per page unit at 100 %
 
@@ -30,8 +33,26 @@ export class ResourceFullscreen extends HTMLElement {
     this.dialog = document.createElement('dialog');
     this.dialog.className = 'resource-fullscreen';
     this.dialog.addEventListener('close', () => this.dispatchEvent(new CustomEvent('close')));
+    // Escape ends the color picker first; the next one closes the dialog.
+    this.dialog.addEventListener('cancel', (e) => {
+      if (!this.picking) return;
+      e.preventDefault();
+      this.#setPicking(false);
+    });
     this.dialog.addEventListener('keydown', (e) => {
       if (e.target.closest('input, select')) return;
+      // While picking colors the arrows move the point, Tab steps through stacked elements and
+      // Enter copies (see ColorPicker).
+      if (this.picking && e.key === 'Escape') {
+        // Not the dialog's cancel alone: browsers honor its preventDefault only after a click.
+        e.preventDefault();
+        this.#setPicking(false);
+        return;
+      }
+      if (this.picking && !e.ctrlKey && !e.metaKey && !e.altKey && this.picker.key(e)) {
+        e.preventDefault();
+        return;
+      }
       if (e.key === 'ArrowRight') this.#step(1);
       else if (e.key === 'ArrowLeft') this.#step(-1);
       else if (e.key === '+') this.#zoomBy(1.25);
@@ -61,6 +82,20 @@ export class ResourceFullscreen extends HTMLElement {
       button('fullscreen.fit', () => this.#chooseZoom('fit'), 'fit'), button('fullscreen.actual', () => this.#chooseZoom('actual'), 'actual'),
     ];
     [, , this.fitButton, this.actualButton] = this.zoomButtons;
+    // Color picker over the preview (as in the page view).
+    this.pickButton = iconButton('pipette', 'pick.toggle', { iconOnly: true, className: 'toggle' });
+    this.pickButton.setAttribute('aria-pressed', 'false');
+    this.pickButton.addEventListener('click', () => this.#setPicking(!this.picking));
+    this.tip = document.createElement('div');
+    this.tip.className = 'inspect-tip';
+    this.tip.hidden = true;
+    this.tip.setAttribute('role', 'status');
+    this.picker = new ColorPicker({
+      client: null, tip: this.tip,
+      locate: (x, y) => this.#pickSpot(x, y),
+      outline: (spot, item) => this.#outline(item),
+      status: (text) => this.app?.setStatus?.(text),
+    });
     // Save buttons show icon and text.
     const saveButton = (iconName, key, action) => {
       const b = iconButton(iconName, key);
@@ -73,7 +108,7 @@ export class ResourceFullscreen extends HTMLElement {
     spacer.className = 'spacer';
     bar.append(
       button('fullscreen.previous', () => this.#step(-1), 'previous'), button('fullscreen.next', () => this.#step(1), 'next'),
-      this.heading, this.position, spacer, ...this.zoomButtons, this.pngButton, this.tiffButton,
+      this.heading, this.position, spacer, ...this.zoomButtons, this.pickButton, this.pngButton, this.tiffButton,
       saveButton('extract', 'fullscreen.extract', async () => downloadResource(await this.client.call('extractResource', this.resource.id))),
       close,
     );
@@ -84,7 +119,8 @@ export class ResourceFullscreen extends HTMLElement {
     const body = document.createElement('div');
     body.className = 'fullscreen-body';
     body.append(this.stage, this.meta);
-    this.dialog.append(bar, body);
+    this.dialog.append(bar, body, this.tip);
+    this.dialog.addEventListener('close', () => this.#setPicking(false));
     this.append(this.dialog);
     applyTranslations(this.dialog);
     onLanguageChange(() => {
@@ -108,6 +144,7 @@ export class ResourceFullscreen extends HTMLElement {
    */
   async open({ client, app, renderer, thumbs, resources, index }) {
     Object.assign(this, { client, app, renderer, thumbs, resources });
+    this.picker.client = client;
     if (!this.dialog.open) {
       // Each opening starts with the last of "Fit to screen" and "Actual size" the user chose.
       this.zoom = loadPrefs().previewZoom === 'actual' ? 1 : 'fit';
@@ -138,7 +175,9 @@ export class ResourceFullscreen extends HTMLElement {
     this.heading.textContent = `${r.name} – ${typeLabel(r.type)}`;
     this.position.textContent = t('fullscreen.position', { index: index + 1, count: this.resources.length });
     this.#renderMeta(r);
+    this.picker.leave();
     this.canvas = null;
+    this.frame = null;
     // Form definitions show every medium map in their own view instead of one picture.
     this.model = r.hasPreview && r.type !== 'formDefinition' ? await this.thumbs.model(r.id, 'high') : null;
     if (this.resource !== r) return;
@@ -147,7 +186,23 @@ export class ResourceFullscreen extends HTMLElement {
     if (this.model) {
       this.canvas = document.createElement('canvas');
       this.canvas.className = 'fullscreen-canvas';
-      parts.push(this.canvas);
+      // The frame holds the canvas and the color picker's outline over it.
+      this.frame = document.createElement('div');
+      this.frame.className = 'fullscreen-frame';
+      this.frame.append(this.canvas);
+      this.frame.addEventListener('pointerdown', (e) => { this.pointerType = e.pointerType; });
+      this.frame.addEventListener('pointermove', (e) => {
+        if (this.picking && e.pointerType !== 'touch') this.picker.move(e.clientX, e.clientY, e.pointerType);
+      });
+      this.frame.addEventListener('pointerleave', (e) => {
+        if (this.picking && e.pointerType !== 'touch') this.picker.leave();
+      });
+      this.frame.addEventListener('click', (e) => {
+        if (!this.picking) return;
+        e.preventDefault();
+        this.picker.click(e.clientX, e.clientY, { pointerType: e.pointerType || this.pointerType || 'mouse', altKey: e.altKey });
+      });
+      parts.push(this.frame);
     }
     if (r.type === 'formDefinition') {
       const view = document.createElement('formdef-view');
@@ -168,7 +223,9 @@ export class ResourceFullscreen extends HTMLElement {
       parts.push(none);
     }
     this.stage.replaceChildren(...parts);
-    for (const b of [...this.zoomButtons, this.pngButton, this.tiffButton]) b.disabled = !this.model;
+    for (const b of [...this.zoomButtons, this.pickButton, this.pngButton, this.tiffButton]) b.disabled = !this.model;
+    if (!this.model) this.#setPicking(false);
+    this.frame?.classList.toggle('picking', Boolean(this.picking));
     if (this.model) await this.#setZoom(this.zoom ?? 'fit');
   }
 
@@ -207,6 +264,61 @@ export class ResourceFullscreen extends HTMLElement {
   async #downloadPng() {
     const canvas = await this.#exportCanvas();
     if (canvas) await downloadPng(canvas, this.resource.name, this.#exportDpi());
+  }
+
+  /**
+   * Turns the color picker on or off.
+   * @param {boolean} on True to pick colors.
+   * @returns {void}
+   */
+  #setPicking(on) {
+    if (this.picking && !on) this.picker.stop();
+    this.picking = on;
+    this.pickButton.setAttribute('aria-pressed', String(on));
+    this.frame?.classList.toggle('picking', on);
+  }
+
+  /**
+   * What lies at a window point of the preview, for the color picker (every item, also those
+   * without a source field: a preview draws one resource on its own).
+   * @param {number} clientX Window x.
+   * @param {number} clientY Window y.
+   * @returns {object|null} Spot (see ColorPicker), or null beside the preview.
+   */
+  #pickSpot(clientX, clientY) {
+    if (!this.model || !this.canvas) return null;
+    const box = this.canvas.getBoundingClientRect();
+    if (clientX < box.left || clientY < box.top || clientX >= box.right || clientY >= box.bottom) return null;
+    const fx = (clientX - box.left) / box.width;
+    const fy = (clientY - box.top) / box.height;
+    const x = fx * this.model.widthUnits;
+    const y = fy * this.model.heightUnits;
+    const scale = box.width / this.model.widthUnits;
+    const items = hitAll(this.model, x, y, { tolerance: 4 / scale, withoutSource: true }).map((i) => this.model.items[i]);
+    return { model: this.model, x, y, items, canvas: this.canvas, cx: Math.floor(fx * this.canvas.width), cy: Math.floor(fy * this.canvas.height) };
+  }
+
+  /**
+   * Outlines the color picker's element over the preview, or removes the outline.
+   * @param {object|null} item Render item.
+   * @returns {void}
+   */
+  #outline(item) {
+    const box = item ? itemBox(item) : null;
+    if (!box || !this.frame || !this.model) {
+      this.outlineEl?.remove();
+      return;
+    }
+    if (!this.outlineEl) {
+      this.outlineEl = document.createElement('div');
+      this.outlineEl.className = 'inspect-outline';
+      this.outlineEl.setAttribute('aria-hidden', 'true');
+    }
+    if (this.outlineEl.parentElement !== this.frame) this.frame.append(this.outlineEl);
+    const scale = this.canvas.getBoundingClientRect().width / this.model.widthUnits;
+    Object.assign(this.outlineEl.style, {
+      left: `${box.x * scale}px`, top: `${box.y * scale}px`, width: `${Math.max(box.width * scale, 2)}px`, height: `${Math.max(box.height * scale, 2)}px`,
+    });
   }
 
   /**
