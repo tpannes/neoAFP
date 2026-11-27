@@ -50,6 +50,11 @@ with vibe coding, this has the following advantages:
   structure view opens on the structured field that drew it, even when it comes from an overlay
   or page segment in another file. The other way round, any field can show you where it lands
   on the page.
+- **Pick colors.** Point the color picker at text, a line, graphics, an image or the paper,
+  on the page or in a resource preview, to see the color as the file gives it (OCA name, RGB,
+  CMYK or CIELab values) next to the color on screen. Images that neoAFP decodes itself (IOCA,
+  IM) give their exact pixel values. Step through stacked elements with Tab, and click to copy
+  the color.
 - **Look inside the data stream.** The structure view shows every structured field and triplet
   as a tree, with decoded parameters and the raw bytes in hex. Find fields by name or
   identifier, jump to a byte offset, group long runs of like items, and choose the code page
